@@ -4,7 +4,7 @@
 
 MCP Apps let a tool return an interactive UI that the host renders right in the conversation. ChatGPT calls them ChatGPT Apps, Claude renders them as part of connectors, and VS Code and Goose support them too. The protocol is shared, but the tooling around it has been thin: you end up wiring a server, a bundler and a fake host together, then testing by hand in real accounts.
 
-moonpeak is our answer: one package, MIT licensed, with no token and no telemetry.
+moonpeak is our answer: one package, MIT licensed, with no telemetry.
 
 ## What's in the box
 

@@ -129,4 +129,4 @@ npm run validate        # typecheck, tests, builds and e2e for every example
 
 ## About
 
-moonpeak is open source under the [MIT license](./LICENSE). It has no token and no telemetry. Contributions are welcome: open an issue or a pull request, and run `npm run validate` before you push.
+moonpeak is open source under the [MIT license](./LICENSE). It has no telemetry. Contributions are welcome: open an issue or a pull request, and run `npm run validate` before you push.

@@ -57,7 +57,7 @@ export const FOOTER = (base) => `<footer class="site-foot">
     <div><b>Community</b><a href="${X}">X · @moonpeak_ai</a><a href="${GH}">GitHub</a><a href="${GH}/issues">Issues</a></div>
     <div><b>Open source</b><a href="${GH}">Source</a><a href="https://www.npmjs.com/package/moonpeak">npm</a><a href="${GH}/blob/main/LICENSE">MIT License</a></div>
   </div>
-  <p class="foot-copy">© 2026 moonpeak contributors · MIT · No token, no telemetry</p>
+  <p class="foot-copy">© 2026 moonpeak contributors · MIT · No telemetry</p>
 </footer>`;
 
 const page = ({ slug, title, description, body }) => `<!doctype html>
@@ -387,7 +387,7 @@ const FAQ = [
   ["What do evals need?", "Provider keys (<code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>) and the matching SDK in your project. Everything else runs offline."],
   ["How do I deploy?", "<code>moonpeak build</code> then <code>moonpeak start</code>, or import <code>createHandler</code> from <code>moonpeak/server</code> and mount it on any runtime that speaks Fetch."],
   ["Is there a live demo?", "Yes. The starter app runs at <code>https://moonpeak-ai.com/mcp</code>. Add it as a connector in Claude or an app in ChatGPT developer mode, or inspect it with <code>npx moonpeak inspect --server https://moonpeak-ai.com/mcp</code>."],
-  ["Is it free? Is there a token?", "Free and MIT licensed. No account, no telemetry and no token."],
+  ["Is it free?", "Free and MIT licensed. No account and no telemetry."],
 ];
 const faqs = page({
   slug: "faqs",

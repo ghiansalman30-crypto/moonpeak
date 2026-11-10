@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>moonpeak owner panel</title>
+<link rel="icon" href="../assets/og.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../style.css" />
+<style>
+  html { background: #05071c; }
+  body { background: radial-gradient(ellipse 80% 50% at 50% 0%, #18205a 0%, #0b0f33 45%, #05071c 100%) fixed; min-height: 100vh; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+  header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 26px; }
+  header.top a { color: var(--text); text-decoration: none; font-weight: 700; font-size: 22px; }
+  header.top a span { color: var(--moon); }
+  .who { font: 13px var(--mono); color: var(--mute); word-break: break-all; text-align: right; }
+  h1 { font-size: 34px; margin: 0 0 6px; }
+  .lede { color: var(--mute); margin: 0 0 26px; }
+  .card { border: 1px solid #2a3560; border-radius: 18px; background: rgba(13, 17, 32, .82); padding: 22px; margin: 0 0 18px; }
+  .card h2 { font-size: 20px; margin: 0 0 6px; }
+  .note { color: var(--mute); font-size: 14px; line-height: 1.55; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-top: 14px; }
+  label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--mute); flex: 1 1 220px; }
+  input { font: 15px var(--mono); color: var(--text); background: #0a0d1a; border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; min-width: 0; }
+  input:focus { outline: none; border-color: #4a5a99; }
+  button { font: 600 14px var(--sans); color: var(--text); background: transparent; border: 1px solid #33406b; border-radius: 10px; padding: 11px 16px; cursor: pointer; white-space: nowrap; }
+  button:hover:not(:disabled) { border-color: var(--moon); }
+  button.solid { background: var(--moon); color: #11131c; border-color: var(--moon); }
+  button.danger { border-color: #8a3a3a; color: #ffb4b4; }
+  button:disabled { opacity: .45; cursor: default; }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; font-size: 14px; margin-top: 14px; }
+  .kv span { color: var(--mute); }
+  .kv div { font-family: var(--mono); word-break: break-all; }
+  #log { position: sticky; bottom: 14px; margin-top: 18px; padding: 12px 16px; border-radius: 12px; background: #0a0d1a; border: 1px solid var(--line); font: 13px/1.5 var(--mono); color: var(--mute); white-space: pre-wrap; word-break: break-all; }
+  #log.ok { color: var(--ok); border-color: #2c6b4b; }
+  #log.bad { color: #ff9b9b; border-color: #7a3434; }
+  .list { display: grid; gap: 6px; margin-top: 12px; font: 13px var(--mono); }
+  .list a { color: #bfe9ff; word-break: break-all; }
+  .steps { counter-reset: s; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a href="../">moonpeak<span>.</span> owner</a>
+    <div class="who" id="who">not connected</div>
+  </header>
+  <h1>$MOONPEAK owner panel</h1>
+  <p class="lede">Every action is a transaction you sign in your own wallet. This page and the server never see a private key.</p>
+
+  <div class="card">
+    <h2>1 · Sign in</h2>
+    <div class="note">Connect the owner wallet and sign a message (free, no transaction). Only the owner wallet set on the server can use the panel.</div>
+    <div class="row"><button id="connect">Connect wallet</button><button class="solid" id="signin">Sign in</button></div>
+    <div class="kv"><span>Owner wallet on server</span><div id="ownerSet">-</div><span>Chain</span><div id="chainInfo">-</div></div>
+  </div>
+
+  <div class="card">
+    <h2>2 · Post the CA</h2>
+    <div class="note">Shows the contract address, buy link and Telegram on moonpeak-ai.com. Check the CA twice: buyers will trust it.</div>
+    <div class="row">
+      <label>$MOONPEAK contract address (CA)<input id="ca" placeholder="0x…" autocomplete="off" /></label>
+    </div>
+    <div class="row">
+      <label>Buy link (optional)<input id="buyUrl" placeholder="https://…" autocomplete="off" /></label>
+      <label>Telegram (optional)<input id="telegram" placeholder="https://t.me/…" autocomplete="off" /></label>
+    </div>
+    <div class="row"><button class="solid" id="postCa" disabled>Post to website</button><span class="note" id="caNow"></span></div>
+  </div>
+
+  <div class="card">
+    <h2>3 · Buyback &amp; burn (in dollars)</h2>
+    <div class="note">Type a dollar amount. Your wallet pays that much ETH, buys $MOONPEAK and sends it straight to the dead address (0x…dEaD) in one transaction. <b>Max</b> uses your whole ETH balance minus a small amount left for gas.</div>
+    <div class="row">
+      <label>Amount (USD)<input id="usd" inputmode="decimal" placeholder="10" autocomplete="off" /></label>
+      <button data-usd="10">$10</button><button data-usd="15">$15</button><button data-usd="20">$20</button><button id="usdMax">Max</button>
+    </div>
+    <div class="row"><button class="solid" id="buyback" disabled>Buy back &amp; burn</button><span class="note" id="usdInfo"></span></div>
+    <div class="kv"><span>Bought back &amp; burned</span><div id="usdTotal">-</div></div>
+  </div>
+
+  <div class="card">
+    <h2>4 · Dev burn</h2>
+    <div class="note">Sends $MOONPEAK from this wallet to the dead address. It cannot be undone. <b>Max</b> fills in your whole balance; <b>Burn all supply</b> burns all of it in one go.</div>
+    <div class="kv"><span>Wallet $MOONPEAK</span><div id="bal">connect and post the CA first</div><span>Burned so far</span><div id="burnTotal">-</div></div>
+    <div class="row">
+      <label>Amount ($MOONPEAK)<input id="amt" inputmode="decimal" placeholder="0" autocomplete="off" /></label>
+      <button id="max">Max</button><button class="solid" id="burn" disabled>Burn</button><button class="danger" id="burnAll" disabled>Burn all supply</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Burn history</h2>
+    <div class="note">Every burn here was checked on-chain by the server (sent by the owner wallet, $MOONPEAK reached the dead address) before it was listed. The same list shows on moonpeak-ai.com.</div>
+    <div class="list" id="history">-</div>
+  </div>
+
+  <div id="log">Ready.</div>
+</div>
+<script type="module">
+const $ = (id) => document.getElementById(id);
+const log = (t, k = "") => { $("log").textContent = t; $("log").className = k; };
+const params = new URLSearchParams(location.search);
+const DEAD = "0x000000000000000000000000000000000000dEaD";
+const WEI = 10n ** 18n;
+const pad = (h) => String(h).replace(/^0x/, "").toLowerCase().padStart(64, "0");
+const u256 = (v) => pad(BigInt(v).toString(16));
+const toWei = (s) => { const [i, f = ""] = String(s).replace(/,/g, "").trim().split("."); if (!/^\d*$/.test(i) || !/^\d*$/.test(f) || (!i && !f)) throw new Error("Bad amount: " + s); return BigInt(i || "0") * WEI + BigInt((f + "0".repeat(18)).slice(0, 18) || "0"); };
+const fromWei = (w) => { w = BigInt(w); const f = (w % WEI).toString().padStart(18, "0").replace(/0+$/, ""); return (w / WEI).toString() + (f ? "." + f : ""); };
+const pretty = (s) => Number(s).toLocaleString("en-US", { maximumFractionDigits: 2 });
+let acct = null, token = null, info = null;
+
+const eth = () => { if (!window.ethereum) throw new Error("No wallet found. Install MetaMask or Rabby."); return window.ethereum; };
+async function api(p, body) {
+  const r = await fetch("/api/" + p, body === undefined ? {} : { method: "POST", headers: { "content-type": "application/json", "x-token": token || "" }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({ error: "Bad response from the server." }));
+  if (!r.ok) throw new Error(j.error || "Request failed."); return j;
+}
+async function load() {
+  info = await api("token");
+  $("ownerSet").textContent = info.owner || "not set yet";
+  $("chainInfo").textContent = "id " + info.chainId + " · " + info.explorer;
+  $("ca").value = $("ca").value || info.ca || ""; $("buyUrl").value = $("buyUrl").value || info.buyUrl || ""; $("telegram").value = $("telegram").value || info.telegram || "";
+  $("caNow").textContent = info.ca ? "Live CA: " + info.ca : "No CA posted yet";
+  $("usdTotal").textContent = "$" + pretty(info.burned.usd) + " in " + info.burned.buybacks + " buyback" + (info.burned.buybacks === 1 ? "" : "s");
+  $("burnTotal").textContent = pretty(info.burned.tokens) + " $MOONPEAK in " + info.burned.count + " burn" + (info.burned.count === 1 ? "" : "s");
+  $("history").replaceChildren(...(info.burned.recent.length ? info.burned.recent.map((b) => { const a = document.createElement("a"); a.href = info.explorer + "/tx/" + b.tx; a.target = "_blank"; a.rel = "noopener"; a.textContent = (b.usd ? "$" + b.usd + " buyback → " : "dev burn → ") + pretty(b.tokens) + " $MOONPEAK · " + b.tx; return a; }) : [document.createTextNode("No burns yet.")]));
+  if (acct && info.ca) { try { $("bal").textContent = pretty(fromWei(await balance())) + " $MOONPEAK"; } catch {} }
+}
+async function connect() {
+  const [a] = await eth().request({ method: "eth_requestAccounts" }); acct = a;
+  const want = "0x" + Number(params.get("chain") || info?.chainId || 4663).toString(16);
+  const have = await eth().request({ method: "eth_chainId" });
+  if (have !== want) {
+    try { await eth().request({ method: "wallet_switchEthereumChain", params: [{ chainId: want }] }); }
+    catch (e) { if (e && e.code === 4902) await eth().request({ method: "wallet_addEthereumChain", params: [{ chainId: want, chainName: "Robinhood Chain", rpcUrls: ["https://rpc.mainnet.chain.robinhood.com"], nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 }, blockExplorerUrls: [info?.explorer || "https://robinhoodchain.blockscout.com"] }] }); else throw e; }
+  }
+  $("who").textContent = "connected " + a; return a;
+}
+async function signin() {
+  if (!acct) await connect();
+  const n = await api("nonce?address=" + acct);
+  const hex = "0x" + [...new TextEncoder().encode(n.message)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  const signature = await eth().request({ method: "personal_sign", params: [hex, acct] });
+  const l = await api("login", { address: acct, nonce: n.nonce, signature });
+  token = l.token;
+  for (const id of ["postCa", "buyback", "burn", "burnAll"]) $(id).disabled = false;
+  $("who").textContent = "owner signed in " + acct; log("Signed in as the owner.", "ok"); await load();
+}
+async function receipt(hash) { for (let i = 0; i < 150; i++) { const r = await eth().request({ method: "eth_getTransactionReceipt", params: [hash] }); if (r) return r; await new Promise((s) => setTimeout(s, 2000)); } throw new Error("No receipt yet. Check the explorer: " + hash); }
+async function record(hash, usd) {
+  for (let i = 0; i < 10; i++) { try { return await api("owner/burn", { tx: hash, usd }); } catch (e) { if (i === 9) throw e; await new Promise((z) => setTimeout(z, 3000)); } }
+}
+async function balance() {
+  if (!info?.ca) throw new Error("Post the CA first.");
+  if (!acct) await connect();
+  return BigInt(await eth().request({ method: "eth_call", params: [{ to: info.ca, data: "0x70a08231" + pad(acct) }, "latest"] }) || "0x0");
+}
+const run = (fn) => async () => { try { await fn(); } catch (e) { log(e && e.code === 4001 ? "Cancelled in the wallet." : (e && e.message) || String(e), "bad"); } };
+const needToken = () => { if (!token) throw new Error("Sign in first."); };
+
+$("connect").onclick = run(connect);
+$("signin").onclick = run(signin);
+
+$("postCa").onclick = run(async () => {
+  needToken();
+  const body = { ca: $("ca").value.trim(), buyUrl: $("buyUrl").value.trim(), telegram: $("telegram").value.trim() };
+  if (body.ca && !/^0x[0-9a-fA-F]{40}$/.test(body.ca)) throw new Error("That CA is not a valid address.");
+  if (body.ca && body.ca.toLowerCase() !== (info.ca || "").toLowerCase() && !confirm("Post this CA to moonpeak-ai.com?\n\n" + body.ca + "\n\nCheck it twice: buyers will trust it.")) return;
+  await api("owner/launch", body); await load(); log("Posted. It shows on moonpeak-ai.com now.", "ok");
+});
+
+document.querySelectorAll("[data-usd]").forEach((b) => (b.onclick = () => { $("usd").value = b.dataset.usd; $("usdInfo").textContent = ""; }));
+$("usdMax").onclick = run(async () => {
+  needToken(); if (!acct) await connect();
+  const w = await api("owner/wallet", { from: acct });
+  if (!(w.maxUsd >= 1)) throw new Error("Not enough ETH. Balance " + Number(w.eth).toFixed(6) + " ETH.");
+  $("usd").value = String(w.maxUsd); $("usdInfo").textContent = "Max: " + Number(w.eth).toFixed(6) + " ETH ≈ $" + pretty(w.maxUsd) + " (ETH $" + Math.round(w.ethUsd) + "), gas kept aside";
+});
+$("buyback").onclick = run(async () => {
+  needToken(); if (!info.ca) throw new Error("Post the CA first.");
+  const usd = Number(($("usd").value || "").replace(/[$,\s]/g, ""));
+  if (!(usd >= 1)) throw new Error("Type a dollar amount, at least $1.");
+  if (!acct) await connect();
+  log("Getting a quote for $" + usd + "…");
+  const q = await api("owner/quote", { usd, from: acct });
+  if (!confirm("Buy back & burn $" + usd + "?\n\nPays " + Number(q.eth).toFixed(6) + " ETH (ETH $" + Math.round(q.ethUsd) + ")\nBuys about " + pretty(q.tokens) + " $MOONPEAK via " + q.route + "\nand sends it to the dead address. This cannot be undone.")) return;
+  log("Confirm the transaction in your wallet…");
+  const hash = await eth().request({ method: "eth_sendTransaction", params: [{ from: acct, to: q.tx.to, data: q.tx.data, value: q.tx.value }] });
+  log("Sent " + hash + ". Waiting for it to confirm…");
+  const r = await receipt(hash); if (r.status !== "0x1") throw new Error("The burn failed on-chain: " + hash);
+  await record(hash, usd); await load(); log("Bought back and burned $" + usd + " of $MOONPEAK.\ntx " + hash, "ok");
+});
+
+$("max").onclick = run(async () => { const w = await balance(); $("amt").value = fromWei(w); $("bal").textContent = pretty(fromWei(w)) + " $MOONPEAK"; });
+async function devBurn(wei) {
+  if (wei <= 0n) throw new Error("Nothing to burn.");
+  if (!confirm("Burn " + pretty(fromWei(wei)) + " $MOONPEAK from " + acct + "?\n\nIt goes to the dead address and cannot be undone.")) return;
+  log("Confirm the burn in your wallet…");
+  const hash = await eth().request({ method: "eth_sendTransaction", params: [{ from: acct, to: info.ca, data: "0xa9059cbb" + pad(DEAD) + u256(wei) }] });
+  log("Sent " + hash + ". Waiting for it to confirm…");
+  const r = await receipt(hash); if (r.status !== "0x1") throw new Error("The burn failed on-chain: " + hash);
+  await record(hash, 0); await load(); log("Burned " + pretty(fromWei(wei)) + " $MOONPEAK.\ntx " + hash, "ok");
+}
+$("burn").onclick = run(async () => { needToken(); if (!info.ca) throw new Error("Post the CA first."); if (!acct) await connect(); await devBurn(toWei($("amt").value || "0")); });
+$("burnAll").onclick = run(async () => { needToken(); const w = await balance(); $("amt").value = fromWei(w); await devBurn(w); });
+
+load().catch((e) => log("Couldn't reach the server: " + e.message, "bad"));
+</script>
+</body>
+</html>

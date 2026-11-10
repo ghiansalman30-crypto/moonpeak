@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "moonpeak": "./bin/moonpeak.mjs"
+    "moonpeak": "bin/moonpeak.mjs"
   },
   "exports": {
     ".": {

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>moonpeak · MCP App framework and MCP testing framework</title>
+<meta name="description" content="Open-source MCP App framework, MCP testing framework and local inspector with ChatGPT and Claude style hosts. Build, inspect and test apps for every MCP Apps host." />
+<meta property="og:title" content="moonpeak" />
+<meta property="og:description" content="Build, inspect and test MCP Apps for ChatGPT, Claude and every MCP Apps host. MIT licensed." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M20 3a13 13 0 1 0 9 21A11 11 0 0 1 20 3z' fill='%23d8def5'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="sky" aria-hidden="true"></div>
+
+<header class="nav">
+  <a class="logo" href="./"><span class="mark"></span>moonpeak</a>
+  <nav>
+    <a href="#framework">App framework</a>
+    <a href="#testing">Testing</a>
+    <a href="#inspector">Inspector</a>
+    <a href="docs/">Docs</a>
+    <a class="gh" href="https://github.com/ghiansalman30-crypto/moonpeak" aria-label="Source on GitHub"><svg viewBox="0 0 16 16" width="18" height="18"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="moon-big" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <p class="kicker">Open source · MIT · npm</p>
+    <h1>Build MCP Apps<br />by <em>moonlight</em>.</h1>
+    <p class="lede">The MCP App framework, MCP testing framework and local inspector in one package. Ship interactive apps to ChatGPT, Claude and every MCP Apps host, and test them in CI without host accounts, tunnels or AI credits.</p>
+    <div class="cta">
+      <button class="cmd" data-copy="npx moonpeak new"><span class="prompt">$</span> npx moonpeak new <span class="copy">copy</span></button>
+      <a class="btn" href="docs/">Documentation</a>
+      <a class="btn ghost" href="https://github.com/ghiansalman30-crypto/moonpeak">Source</a>
+    </div>
+    <p class="hosts">Runs in <b>ChatGPT</b> · <b>Claude</b> · <b>VS Code</b> · <b>Goose</b> · any MCP Apps host</p>
+  </section>
+
+  <section class="what">
+    <h2>What is moonpeak?</h2>
+    <p class="sub">Four tools that usually live in four repos.</p>
+    <div class="grid4">
+      <article><span class="ic">◐</span><h3>App framework</h3><p>One file per tool, one folder per View. React hooks for tool data, theme, display modes, state and host actions.</p></article>
+      <article><span class="ic">◑</span><h3>Inspector</h3><p>ChatGPT-style and Claude-style hosts on localhost. Switch theme, device and display mode. Edit tool data live.</p></article>
+      <article><span class="ic">◒</span><h3>Testing framework</h3><p>Schema, View and simulation checks in about a second. Playwright fixtures for e2e. Multi-model tool-choice evals.</p></article>
+      <article><span class="ic">◓</span><h3>CLI</h3><p><code>new</code>, <code>dev</code>, <code>build</code>, <code>start</code>, <code>inspect</code>, <code>test</code>. Hot reload for both your Views and your server code.</p></article>
+    </div>
+  </section>
+
+  <section id="framework" class="split">
+    <div>
+      <p class="kicker">MCP App framework · ChatGPT Apps · Claude connectors</p>
+      <h2>Write it once. It renders in every host.</h2>
+      <p>moonpeak is built on the official MCP Apps SDK, so your Views speak the same protocol ChatGPT and Claude speak. No host-specific forks, no rewrites when a new client adds MCP Apps support.</p>
+      <ul class="ticks">
+        <li>Folders are the config: tools, Views and fixtures are discovered.</li>
+        <li>Return a plain object from a tool and it becomes structured content.</li>
+        <li>Each View builds to a single inlined HTML file, ready for strict CSPs.</li>
+        <li>ChatGPT and Claude extras live behind <code>moonpeak/chatgpt</code> and <code>moonpeak/claude</code>, with safe fallbacks.</li>
+      </ul>
+    </div>
+    <pre class="code"><span class="c">my-app/</span>
+├─ src/
+│  ├─ tools/
+│  │  └─ <b>show-moon.ts</b>        <span class="c"># one MCP tool</span>
+│  └─ resources/
+│     └─ moon/
+│        ├─ <b>moon.tsx</b>         <span class="c"># its View</span>
+│        └─ moon.css
+└─ tests/
+   ├─ simulations/
+   │  └─ <b>show-moon.json</b>     <span class="c"># fixtures</span>
+   ├─ e2e/moon.spec.ts
+   └─ evals/moon.eval.json</pre>
+  </section>
+
+  <section class="split rev">
+    <pre class="code"><span class="k">import</span> { useToolData, useTheme, useCallTool } <span class="k">from</span> <span class="s">"moonpeak"</span>;
+
+<span class="k">export const</span> resource = { title: <span class="s">"Moon phase"</span> };
+
+<span class="k">export default function</span> <b>Moon</b>() {
+  <span class="k">const</span> { output, isPending } = useToolData();
+  <span class="k">const</span> theme = useTheme();
+  <span class="k">const</span> callTool = useCallTool();
+
+  <span class="k">if</span> (isPending) <span class="k">return</span> &lt;Skeleton /&gt;;
+  <span class="k">return</span> (
+    &lt;Card theme={theme}&gt;
+      &lt;h1&gt;{output.phase}&lt;/h1&gt;
+      &lt;button onClick={() =&gt; callTool(<span class="s">"show-moon"</span>, next)}&gt;
+        Next week
+      &lt;/button&gt;
+    &lt;/Card&gt;
+  );
+}</pre>
+    <div>
+      <h2>Twenty-seven hooks, zero host glue.</h2>
+      <p>Everything a View needs, typed: the tool's input and output, theme, locale, safe areas, container size, display mode requests, per-View state that survives reloads, calling other tools, posting into the chat and updating model context.</p>
+      <a class="more" href="docs/#hooks">See every hook →</a>
+    </div>
+  </section>
+
+  <section id="testing" class="split">
+    <div>
+      <p class="kicker">MCP testing framework</p>
+      <h2>Test MCP Apps in CI. No accounts, no keys.</h2>
+      <p>Simulations are JSON fixtures: tool input, optional mocked output, expectations and host settings. <code>moonpeak test</code> runs them in-process against your real handlers, checks every tool schema and builds every View to make sure it renders.</p>
+      <p>Need more? <code>--e2e</code> drives the inspector with Playwright, <code>--eval</code> asks real models whether they pick the right tool, and <code>--server</code> points all of it at any MCP server, in any language.</p>
+      <a class="more" href="docs/#testing">Testing docs →</a>
+    </div>
+    <div class="term">
+      <div class="bar"><i></i><i></i><i></i></div>
+<pre><span class="d">$</span> moonpeak test
+
+  <b>moonpeak test</b> <span class="d">starter</span>
+
+  <span class="ok">✓</span> <span class="d">schema</span>     moon-facts
+  <span class="ok">✓</span> <span class="d">schema</span>     show-moon
+  <span class="ok">✓</span> <span class="d">view</span>       ui://starter/moon.html
+  <span class="ok">✓</span> <span class="d">sim</span>        show-moon#full-moon
+  <span class="ok">✓</span> <span class="d">sim</span>        show-moon#new-moon-dark-mode
+  <span class="ok">✓</span> <span class="d">sim</span>        show-moon#bad-date-is-a-tool-error
+
+  <span class="ok">all passed</span> <span class="d">· 8 checks · 0.3s</span>
+
+<span class="d">$</span> moonpeak test --e2e
+  <span class="ok">5 passed</span> <span class="d">(8.3s)</span></pre>
+    </div>
+  </section>
+
+  <section id="inspector" class="inspector">
+    <p class="kicker">Inspector</p>
+    <h2>ChatGPT and Claude, on localhost.</h2>
+    <p class="sub">Flip host, theme, device and display mode while your View hot-reloads. Every setting lives in the URL, so a bug report is a link.</p>
+    <div class="shots">
+      <figure class="tilt-l"><img src="assets/chatgpt-light.png" alt="moonpeak inspector showing a moon phase View in a ChatGPT-style host, light theme" loading="lazy" /><figcaption>ChatGPT-style · light</figcaption></figure>
+      <figure class="tilt-r"><img src="assets/claude-dark.png" alt="The same View in a Claude-style host, dark theme" loading="lazy" /><figcaption>Claude-style · dark</figcaption></figure>
+    </div>
+    <div class="cmdrow">
+      <code>moonpeak dev</code><span>for your project</span>
+      <code>moonpeak inspect --server http://localhost:8000/mcp</code><span>for any MCP server</span>
+    </div>
+  </section>
+
+  <section class="docs">
+    <h2>Popular docs</h2>
+    <div class="grid4">
+      <a href="docs/#quickstart"><h3>Quickstart</h3><p>From <code>npx moonpeak new</code> to a View in Claude.</p></a>
+      <a href="docs/#hooks"><h3>Hooks</h3><p>Every hook, what it returns, and where it works.</p></a>
+      <a href="docs/#simulations"><h3>Simulations</h3><p>Fixtures, mocked output and expectations.</p></a>
+      <a href="docs/#deploy"><h3>Deploying</h3><p>Node, Workers, Express, Deno and Bun.</p></a>
+    </div>
+  </section>
+
+  <section class="faq">
+    <h2>Frequently asked questions</h2>
+    <table class="facts">
+      <tr><th>Product</th><td>moonpeak</td></tr>
+      <tr><th>Category</th><td>MCP App framework, MCP testing framework, MCP inspector</td></tr>
+      <tr><th>License</th><td>MIT</td></tr>
+      <tr><th>Package</th><td><code>moonpeak</code> on npm</td></tr>
+      <tr><th>Built on</th><td>MCP Apps SDK, MCP TypeScript SDK v2, React, Vite</td></tr>
+    </table>
+    <details><summary>What is an MCP App?</summary><p>An MCP tool that comes with a UI. The tool declares a <code>ui://</code> resource, the host fetches that HTML and renders it in a sandboxed frame next to the conversation, and the two talk over a small postMessage protocol. ChatGPT, Claude, VS Code and Goose all support it.</p></details>
+    <details><summary>Do I need a ChatGPT or Claude account to develop?</summary><p>No. The inspector replicates both hosts locally, including theme, display modes and the bridge calls a View can make. You only need a host account when you want to try the deployed app there.</p></details>
+    <details><summary>Can I test a server that isn't built with moonpeak?</summary><p>Yes. <code>moonpeak inspect --server</code> and <code>moonpeak test --server</code> work with any MCP server over Streamable HTTP, written in any language.</p></details>
+    <details><summary>Does it work with ChatGPT's Apps SDK?</summary><p>Yes. Resources carry both the MCP Apps metadata and the older <code>openai/*</code> keys, and <code>moonpeak/chatgpt</code> exposes widget state, file upload and modals when your View runs inside ChatGPT.</p></details>
+    <details><summary>What do evals need?</summary><p>Provider keys (<code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>) and the matching SDK in your project. Everything else runs offline.</p></details>
+    <details><summary>How do I deploy?</summary><p><code>moonpeak build</code> then <code>moonpeak start</code>, or import <code>createHandler</code> from <code>moonpeak/server</code> and mount it on any runtime that speaks Fetch.</p></details>
+    <details><summary>Is it free?</summary><p>Yes. MIT licensed, no account, no telemetry.</p></details>
+  </section>
+
+  <section class="final">
+    <div class="moon-small" aria-hidden="true"></div>
+    <h2>Open source, MIT licensed.</h2>
+    <div class="cta center">
+      <button class="cmd" data-copy="npx moonpeak new"><span class="prompt">$</span> npx moonpeak new <span class="copy">copy</span></button>
+      <a class="btn" href="docs/">Documentation →</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span class="logo small"><span class="mark"></span>moonpeak</span>
+  <span>© 2026 moonpeak contributors · MIT</span>
+  <a href="https://github.com/ghiansalman30-crypto/moonpeak">GitHub</a>
+</footer>
+
+<script>
+  for (const b of document.querySelectorAll("[data-copy]")) {
+    b.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(b.dataset.copy); } catch {}
+      const s = b.querySelector(".copy");
+      if (s) { s.textContent = "copied"; setTimeout(() => (s.textContent = "copy"), 1400); }
+    });
+  }
+</script>
+</body>
+</html>

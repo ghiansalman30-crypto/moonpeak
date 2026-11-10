@@ -1,0 +1,38 @@
+[
+  {
+    "name": "full moon",
+    "prompt": "What does the moon look like on Nov 24, 2026?",
+    "input": { "date": "2026-11-24" },
+    "expect": { "output": { "date": "2026-11-24", "phase": "Full Moon", "week": { "$length": 7 } } }
+  },
+  {
+    "name": "new moon, dark mode",
+    "prompt": "Moon on Dec 9 2026?",
+    "input": { "date": "2026-12-09" },
+    "host": { "theme": "dark" },
+    "expect": { "output": { "phase": "New Moon" } }
+  },
+  {
+    "name": "mocked waxing crescent",
+    "prompt": "Show me tonight's moon",
+    "input": {},
+    "output": {
+      "date": "2026-11-14", "age": 3.4, "illumination": 0.11, "phase": "Waxing Crescent", "waxing": true,
+      "week": [
+        { "date": "2026-11-14", "age": 3.4, "illumination": 0.11, "phase": "Waxing Crescent", "waxing": true },
+        { "date": "2026-11-15", "age": 4.4, "illumination": 0.18, "phase": "Waxing Crescent", "waxing": true },
+        { "date": "2026-11-16", "age": 5.4, "illumination": 0.26, "phase": "Waxing Crescent", "waxing": true },
+        { "date": "2026-11-17", "age": 6.4, "illumination": 0.35, "phase": "First Quarter", "waxing": true },
+        { "date": "2026-11-18", "age": 7.4, "illumination": 0.45, "phase": "First Quarter", "waxing": true },
+        { "date": "2026-11-19", "age": 8.4, "illumination": 0.55, "phase": "First Quarter", "waxing": true },
+        { "date": "2026-11-20", "age": 9.4, "illumination": 0.65, "phase": "Waxing Gibbous", "waxing": true }
+      ],
+      "nextFull": "2026-11-24", "nextNew": "2026-12-09"
+    }
+  },
+  {
+    "name": "bad date is a tool error",
+    "input": { "date": "next tuesday" },
+    "expect": { "isError": true, "text": "not a date" }
+  }
+]

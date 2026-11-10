@@ -1,0 +1,23 @@
+{
+  "name": "moonpeak-starter",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "moonpeak dev",
+    "build": "moonpeak build",
+    "start": "moonpeak start",
+    "test": "moonpeak test"
+  },
+  "dependencies": {
+    "moonpeak": "*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^4.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^5.9.3"
+  }
+}

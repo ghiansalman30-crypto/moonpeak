@@ -1,0 +1,31 @@
+.moon-app {
+  --bg: #ffffff; --text: #16181d; --mute: #646a78; --line: #e6e8ee; --chip: #f4f5f8; --accent: #4b5bdc;
+  --lit: #f4f1e6; --dark: #2a2f3d; --rim: rgba(0,0,0,.08);
+  font: 14px/1.45 var(--font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
+  color: var(--text); background: var(--bg); padding: 20px; display: flex; flex-direction: column; gap: 18px;
+}
+.moon-app.dark { --bg: #14161d; --text: #eceef4; --mute: #9aa1b4; --line: #272b37; --chip: #1c1f29; --accent: #9fb0ff; --lit: #f2efe2; --dark: #050609; --rim: rgba(255,255,255,.12); }
+.moon-app.mode-fullscreen { min-height: 100vh; box-sizing: border-box; padding: 40px max(24px, 8vw); }
+.moon-lit { fill: var(--lit); }
+.moon-dark { fill: var(--dark); }
+.moon-rim { stroke: var(--rim); stroke-width: 1.5; }
+header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.eyebrow { margin: 0; color: var(--mute); font-size: 12.5px; }
+h1 { margin: 2px 0 4px; font-size: 26px; letter-spacing: -0.01em; }
+.sub { margin: 0; color: var(--mute); }
+.week { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.week button { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 0; border-radius: 12px; border: 1px solid var(--line); background: var(--chip); color: inherit; cursor: pointer; font: inherit; }
+.week button span { font-size: 12px; color: var(--mute); }
+.week button b { font-size: 12px; font-weight: 600; }
+.week button.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0; }
+.facts div { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.facts dt { color: var(--mute); font-size: 12px; }
+.facts dd { margin: 2px 0 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+footer { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+footer .grow { flex: 1; }
+footer button { border: 1px solid var(--line); background: var(--bg); color: inherit; border-radius: 999px; padding: 7px 14px; cursor: pointer; font: inherit; font-size: 13px; }
+footer button:hover { border-color: var(--accent); }
+.skeleton { color: var(--mute); padding: 40px 0; text-align: center; }
+.error { color: #d24545; margin: 0; }
+@media (max-width: 420px) { header svg { width: 96px; height: 96px; } .week b { display: none; } }

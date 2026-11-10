@@ -1,0 +1,9 @@
+{
+  "models": ["claude-opus-5-5"],
+  "runs": 3,
+  "cases": [
+    { "prompt": "what does the moon look like on 2026-11-24?", "expect": { "tool": "show-moon", "args": { "date": "2026-11-24" } } },
+    { "prompt": "quick: what phase is the moon on 2026-12-09, just text please", "expect": { "tool": "moon-facts" } },
+    { "prompt": "write me a haiku about autumn", "expect": { "tool": null } }
+  ]
+}

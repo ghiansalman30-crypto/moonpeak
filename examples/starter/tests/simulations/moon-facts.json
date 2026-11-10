@@ -1,0 +1,6 @@
+{
+  "name": "plain text answer",
+  "tool": "moon-facts",
+  "input": { "date": "2026-11-24" },
+  "expect": { "text": "Full Moon" }
+}

@@ -240,8 +240,6 @@ function shadowPath(p) {
     const max = document.documentElement.scrollHeight - innerHeight;
     const f = max > 0 ? Math.min(1, scrollY / max) : 0;
     if (bar) bar.style.transform = `scaleX(${f})`;
-    // logo moon: crescent at the top of the page, full by the footer
-    document.documentElement.style.setProperty("--mk", 42 + f * 64 + "%");
     nav?.classList.toggle("scrolled", scrollY > 20);
     let cur = null;
     for (const s of secs) if (s.getBoundingClientRect().top < innerHeight * 0.4) cur = s.id;

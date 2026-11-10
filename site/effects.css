@@ -174,7 +174,6 @@ p code, li code { white-space: nowrap; }
 .mist-drift { animation: mist 26s ease-in-out infinite alternate; }
 @keyframes mist { to { transform: translateX(-120px); } }
 /* the logo's moon waxes with your reading progress */
-.mark::after { transform: translateX(var(--mk, 42%)); transition: transform .25s linear; }
 /* slow libration so the moon never feels like a sticker */
 .moon .disc { transform-origin: 50% 50%; }
 .moon .disc { animation: moonrise 1.8s cubic-bezier(.2,.7,.2,1) both, librate 22s ease-in-out 2s infinite alternate; }

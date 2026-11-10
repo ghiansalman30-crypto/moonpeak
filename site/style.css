@@ -40,8 +40,7 @@ code { font: 0.88em var(--mono); background: rgba(169, 184, 255, 0.08); border: 
 .nav nav a { text-decoration: none; color: var(--mute); }
 .nav nav a:hover { color: var(--text); }
 .logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 18px; text-decoration: none; letter-spacing: -0.01em; }
-.mark { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, var(--moon) 45%, var(--moon-shade)); box-shadow: 0 0 18px rgba(233, 230, 218, 0.45); position: relative; overflow: hidden; }
-.mark::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--night); transform: translateX(42%); }
+.mark { width: 20px; height: 20px; border-radius: 50%; flex: none; background: radial-gradient(ellipse 30% 24% at 36% 34%, rgba(140,137,127,.55), transparent), radial-gradient(ellipse 20% 18% at 63% 40%, rgba(140,137,127,.45), transparent), radial-gradient(ellipse 22% 16% at 52% 66%, rgba(140,137,127,.32), transparent), radial-gradient(circle at 38% 34%, #fffdf5, var(--moon) 48%, #aaa79a 100%); box-shadow: 0 0 18px rgba(233, 230, 218, 0.45), inset -2px -2px 4px rgba(0,0,0,.25); }
 
 main { overflow-x: clip; }
 main section { padding: clamp(64px, 10vw, 120px) clamp(16px, 5vw, 64px); max-width: 1180px; margin: 0 auto; }

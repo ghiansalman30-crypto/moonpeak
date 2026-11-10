@@ -4,6 +4,8 @@
 
 # moonpeak
 
+[![npm version](https://img.shields.io/npm/v/moonpeak.svg?color=a9b8ff)](https://www.npmjs.com/package/moonpeak)
+[![npm downloads](https://img.shields.io/npm/dm/moonpeak.svg?color=a9b8ff)](https://www.npmjs.com/package/moonpeak)
 [![CI](https://github.com/ghiansalman30-crypto/moonpeak/actions/workflows/ci.yml/badge.svg)](https://github.com/ghiansalman30-crypto/moonpeak/actions/workflows/ci.yml)
 [![GitHub stars](https://img.shields.io/github/stars/ghiansalman30-crypto/moonpeak?style=flat&color=a9b8ff)](https://github.com/ghiansalman30-crypto/moonpeak/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-a9b8ff.svg)](./LICENSE)
@@ -18,7 +20,7 @@
 npx moonpeak new
 ```
 
-[Website](https://moonpeak-ai.com) · [Live demo server](https://moonpeak-ai.com/mcp) · [Documentation](https://moonpeak-ai.com/docs/) · [Blog](https://moonpeak-ai.com/blog/) · [GitHub](https://github.com/ghiansalman30-crypto/moonpeak)
+[Website](https://moonpeak-ai.com) · [Live demo server](https://moonpeak-ai.com/mcp) · [Documentation](https://moonpeak-ai.com/docs/) · [Blog](https://moonpeak-ai.com/blog/) · [npm](https://www.npmjs.com/package/moonpeak) · [GitHub](https://github.com/ghiansalman30-crypto/moonpeak)
 
 </div>
 

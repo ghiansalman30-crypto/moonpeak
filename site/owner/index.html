@@ -24,6 +24,7 @@
   .card h2 { font-size: 20px; margin: 0 0 6px; }
   .note { color: var(--mute); font-size: 14px; line-height: 1.55; }
   .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-top: 14px; }
+  [hidden] { display: none !important; }
   label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--mute); flex: 1 1 220px; }
   input { font: 15px var(--mono); color: var(--text); background: #0a0d1a; border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; min-width: 0; }
   input:focus { outline: none; border-color: #4a5a99; }
@@ -54,7 +55,11 @@
 
   <div class="card">
     <h2>1 · Sign in</h2>
-    <div class="note">Connect the owner wallet and sign a message (free, no transaction). Only the owner wallet set on the server can use the panel.</div>
+    <div class="note">Type the panel password, connect your wallet and sign a message (free, no transaction). The first time, you pick the password and that wallet becomes the owner; after that you need both the password and that wallet. Keep this page's address private.</div>
+    <div class="row">
+      <label>Panel password<input id="pw" type="password" autocomplete="current-password" placeholder="password" /></label>
+      <label id="pw2Box" hidden>Type it again<input id="pw2" type="password" autocomplete="new-password" placeholder="same password" /></label>
+    </div>
     <div class="row"><button id="connect">Connect wallet</button><button class="solid" id="signin">Sign in</button></div>
     <div class="kv"><span>Owner wallet on server</span><div id="ownerSet">-</div><span>Chain</span><div id="chainInfo">-</div></div>
   </div>
@@ -105,6 +110,8 @@
 const $ = (id) => document.getElementById(id);
 const log = (t, k = "") => { $("log").textContent = t; $("log").className = k; };
 const params = new URLSearchParams(location.search);
+// the panel lives at a secret path (/owner-<code>/); that code lets the first wallet claim ownership
+const CLAIM = (location.pathname.match(/\/owner-([0-9a-f]{16,64})\//) || [])[1] || params.get("claim") || "";
 const DEAD = "0x000000000000000000000000000000000000dEaD";
 const WEI = 10n ** 18n;
 const pad = (h) => String(h).replace(/^0x/, "").toLowerCase().padStart(64, "0");
@@ -122,7 +129,9 @@ async function api(p, body) {
 }
 async function load() {
   info = await api("token");
-  $("ownerSet").textContent = info.owner || "not set yet";
+  $("ownerSet").textContent = info.owner || (info.claimable ? "not claimed yet: the first wallet that signs in here becomes the owner" : "not set yet");
+  const first = !info.owner && info.claimable;
+  $("pw2Box").hidden = !first; $("pw").placeholder = first ? "pick a password (8+ characters)" : "password"; $("pw").autocomplete = first ? "new-password" : "current-password";
   $("chainInfo").textContent = "id " + info.chainId + " · " + info.explorer;
   $("ca").value = $("ca").value || info.ca || ""; $("buyUrl").value = $("buyUrl").value || info.buyUrl || ""; $("telegram").value = $("telegram").value || info.telegram || "";
   $("caNow").textContent = info.ca ? "Live CA: " + info.ca : "No CA posted yet";
@@ -142,12 +151,19 @@ async function connect() {
   $("who").textContent = "connected " + a; return a;
 }
 async function signin() {
+  const password = $("pw").value;
+  if (!password) throw new Error("Type the panel password first.");
+  if (!info?.owner && info?.claimable) {
+    if (password.length < 8) throw new Error("Pick a password of at least 8 characters.");
+    if (password !== $("pw2").value) throw new Error("The two passwords don't match.");
+  }
   if (!acct) await connect();
   const n = await api("nonce?address=" + acct);
   const hex = "0x" + [...new TextEncoder().encode(n.message)].map((b) => b.toString(16).padStart(2, "0")).join("");
   const signature = await eth().request({ method: "personal_sign", params: [hex, acct] });
-  const l = await api("login", { address: acct, nonce: n.nonce, signature });
-  token = l.token;
+  if (!info?.owner && info?.claimable && !confirm("Make this wallet the owner of the $MOONPEAK panel?\n\n" + acct + "\n\nThis is permanent: only this wallet can sign in afterwards.")) return;
+  const l = await api("login", { address: acct, nonce: n.nonce, signature, claim: CLAIM, password });
+  token = l.token; $("pw").value = ""; $("pw2").value = "";
   for (const id of ["postCa", "buyback", "burn", "burnAll"]) $(id).disabled = false;
   $("who").textContent = "owner signed in " + acct; log("Signed in as the owner.", "ok"); await load();
 }

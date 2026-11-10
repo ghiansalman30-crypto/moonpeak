@@ -9,6 +9,20 @@ const index = fs.readFileSync(path.join(here, "index.html"), "utf8");
 const LOGO = index.match(/<svg class="mark"[\s\S]*?<\/svg>/)[0];
 const ICON = index.match(/<link rel="icon"[^>]*>/)[0];
 const GH = "https://github.com/ghiansalman30-crypto/moonpeak";
+export const X = "https://x.com/moonpeak_ai";
+const X_ICON = `<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8zm-1.1 18h1.7L6.3 3.9H4.5z"/></svg>`;
+/** Open Graph + X card tags, so a shared link shows the moonpeak preview image. */
+export const SOCIAL = (url, title, description) => `<meta property="og:type" content="website" />
+<meta property="og:url" content="${url}" />
+<meta property="og:site_name" content="moonpeak" />
+<meta property="og:image" content="https://moonpeak-ai.com/assets/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@moonpeak_ai" />
+<meta name="twitter:title" content="${title}" />
+<meta name="twitter:description" content="${String(description).replace(/"/g, "&quot;")}" />
+<meta name="twitter:image" content="https://moonpeak-ai.com/assets/og.png" />`;
 const GH_ICON = `<svg viewBox="0 0 16 16" width="18" height="18"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>`;
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -28,6 +42,7 @@ export const NAV = (base) => `<header class="nav">
     <a href="${base}blog/">Blog</a>
     <a href="${base}docs/">Docs</a>
     <a class="gh" href="${GH}" aria-label="Source on GitHub">${GH_ICON}</a>
+    <a class="gh x" href="${X}" aria-label="moonpeak on X">${X_ICON}</a>
   </nav>
   <button class="menu-btn" type="button" aria-label="Menu" aria-expanded="false" onclick="var n=this.closest('.nav');n.classList.toggle('open');this.setAttribute('aria-expanded',n.classList.contains('open'))"><span></span><span></span></button>
   <span class="progress" aria-hidden="true"></span>
@@ -39,7 +54,8 @@ export const FOOTER = (base) => `<footer class="site-foot">
   <div class="foot-cols">
     <div><b>Product</b><a href="${base}mcp-app-framework/">MCP App framework</a><a href="${base}chatgpt-app-framework/">ChatGPT App framework</a><a href="${base}claude-connector-framework/">Claude Connector framework</a><a href="${base}testing-framework/">Testing Framework</a><a href="${base}mcp-app-inspector/">Inspector</a></div>
     <div><b>Learn</b><a href="${base}docs/">Docs</a><a href="${base}blog/">Blog</a><a href="${base}faqs/">FAQs</a><a href="${base}llms.txt">llms.txt</a></div>
-    <div><b>Open source</b><a href="${GH}">GitHub</a><a href="https://www.npmjs.com/package/moonpeak">npm</a><a href="${GH}/blob/main/LICENSE">MIT License</a></div>
+    <div><b>Community</b><a href="${X}">X · @moonpeak_ai</a><a href="${GH}">GitHub</a><a href="${GH}/issues">Issues</a></div>
+    <div><b>Open source</b><a href="${GH}">Source</a><a href="https://www.npmjs.com/package/moonpeak">npm</a><a href="${GH}/blob/main/LICENSE">MIT License</a></div>
   </div>
   <p class="foot-copy">© 2026 moonpeak contributors · MIT · No token, no telemetry</p>
 </footer>`;
@@ -53,6 +69,7 @@ const page = ({ slug, title, description, body }) => `<!doctype html>
 <meta name="description" content="${description}" />
 <meta property="og:title" content="${title}" />
 <meta property="og:description" content="${description}" />
+${SOCIAL(`https://moonpeak-ai.com/${slug}/`, title, description)}
 <link rel="canonical" href="https://moonpeak-ai.com/${slug}/" />
 ${ICON}
 <link rel="preconnect" href="https://fonts.googleapis.com" />

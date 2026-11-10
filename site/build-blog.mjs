@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { marked } from "marked";
-import { NAV, FOOTER } from "./build-pages.mjs";
+import { NAV, FOOTER, SOCIAL } from "./build-pages.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.join(here, "blog");
@@ -30,6 +30,7 @@ const shell = ({ title, description, canonical, root, body }) => `<!doctype html
 <meta name="description" content="${description.replace(/"/g, "&quot;")}" />
 <meta property="og:title" content="${title}" />
 <meta property="og:description" content="${description.replace(/"/g, "&quot;")}" />
+${SOCIAL(canonical, title, description)}
 <link rel="canonical" href="${canonical}" />
 <link rel="alternate" type="application/rss+xml" title="moonpeak blog" href="${root}blog/rss.xml" />
 ${ICON}

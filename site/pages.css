@@ -25,7 +25,7 @@
 /* footer */
 footer.site-foot { display: grid; grid-template-columns: 1.2fr 2fr; gap: 32px 48px; align-items: start; padding-top: 44px; padding-bottom: 36px; }
 .foot-brand p { margin: 10px 0 0; color: var(--mute); font-size: 14px; max-width: 300px; }
-.foot-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.foot-cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .foot-cols div { display: flex; flex-direction: column; gap: 8px; }
 .foot-cols b { font: 500 12px var(--mono); color: var(--accent); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
 .foot-cols a { color: var(--mute); text-decoration: none; font-size: 14.5px; }
@@ -80,3 +80,5 @@ footer.site-foot { display: grid; grid-template-columns: 1.2fr 2fr; gap: 32px 48
   .nav.open .dd-menu a { padding: 12px 0; border-radius: 0; }
   .nav.open .dd-menu a span { display: none; }
 }
+
+.nav nav a.gh.x svg { width: 17px; height: 17px; }

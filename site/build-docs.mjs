@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { marked } from "marked";
-import { NAV, FOOTER } from "./build-pages.mjs";
+import { NAV, FOOTER, SOCIAL } from "./build-pages.mjs";
 import { hookPages } from "./docs-src/hooks.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -100,6 +100,8 @@ for (const [i, slug] of order.entries()) {
 <title>${title}</title>
 <meta name="description" content="${(p.description || p.title).replace(/"/g, "&quot;")}" />
 <meta property="og:title" content="${title}" />
+<meta property="og:description" content="${(p.description || p.title).replace(/"/g, "&quot;")}" />
+${SOCIAL(`${SITE}/docs/${slug ? slug + "/" : ""}`, title, p.description || p.title)}
 <link rel="canonical" href="${SITE}/docs/${slug ? slug + "/" : ""}" />
 <link rel="alternate" type="text/markdown" href="index.md" />
 ${ICON}

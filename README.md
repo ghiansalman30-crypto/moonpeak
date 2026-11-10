@@ -13,6 +13,7 @@
 [![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev)
 [![MCP Apps](https://img.shields.io/badge/MCP%20Apps-ext--apps%202.0-e9e6da.svg)](https://github.com/modelcontextprotocol/ext-apps)
 [![Docs](https://img.shields.io/badge/docs-moonpeak--ai.com-a9b8ff.svg)](https://moonpeak-ai.com/docs/)
+[![X](https://img.shields.io/badge/X-@moonpeak__ai-000000.svg?logo=x)](https://x.com/moonpeak_ai)
 
 **Server-agnostic MCP testing framework and full-stack MCP App framework.**
 
@@ -20,7 +21,7 @@
 npx moonpeak new
 ```
 
-[Website](https://moonpeak-ai.com) · [Live demo server](https://moonpeak-ai.com/mcp) · [Documentation](https://moonpeak-ai.com/docs/) · [Blog](https://moonpeak-ai.com/blog/) · [npm](https://www.npmjs.com/package/moonpeak) · [GitHub](https://github.com/ghiansalman30-crypto/moonpeak)
+[Website](https://moonpeak-ai.com) · [Live demo server](https://moonpeak-ai.com/mcp) · [Documentation](https://moonpeak-ai.com/docs/) · [Blog](https://moonpeak-ai.com/blog/) · [npm](https://www.npmjs.com/package/moonpeak) · [X](https://x.com/moonpeak_ai) · [GitHub](https://github.com/ghiansalman30-crypto/moonpeak)
 
 </div>
 

@@ -125,7 +125,7 @@ Host extras, safe to call anywhere: `moonpeak/chatgpt` (`useWidgetState`, `useUp
 ## Testing
 
 ```bash
-moonpeak test                     # schema + View + simulation checks, in-process, ~1s
+moonpeak test                     # schema + View + simulation checks, in-process, in seconds
 moonpeak test --e2e               # Playwright against the inspector (starts it for you)
 moonpeak test --visual            # screenshot tests tagged @visual (first run records baselines)
 moonpeak test --visual --update   # re-record baselines after an intended change

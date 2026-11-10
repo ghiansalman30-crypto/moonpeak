@@ -10,7 +10,7 @@ moonpeak is our answer: one package, MIT licensed, with no token and no telemetr
 
 - **An app framework.** One file per tool in `src/tools`, one folder per View in `src/resources`. Twenty-seven React hooks cover tool data, theme, display modes, state and host actions. The same project runs in every MCP Apps host.
 - **An inspector.** ChatGPT-style and Claude-style hosts on localhost, with theme, device width and display mode switches, live input and output editing, and every setting in the URL.
-- **A testing framework.** JSON simulations, schema and View checks that run in about a second, Playwright e2e against both host styles, visual regression and real-model evals. It works on MCP servers written in any language.
+- **A testing framework.** JSON simulations, schema and View checks that run in seconds, Playwright e2e against both host styles, visual regression and real-model evals. It works on MCP servers written in any language.
 
 ## Try it
 

@@ -1,6 +1,6 @@
 # In-process checks
 
-> What moonpeak test checks, in about a second, with no browser.
+> What moonpeak test checks, in seconds, with no browser.
 
 ```bash
 moonpeak test [--filter plan-night]

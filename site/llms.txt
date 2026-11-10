@@ -79,7 +79,7 @@ Start a project with `npx moonpeak new`. A live demo MCP server runs at https://
 
 - [Testing Framework](https://moonpeak-ai.com/docs/testing/index.md): Test MCP Apps and any MCP server in CI, without host accounts, tunnels or AI credits.
 - [Simulations](https://moonpeak-ai.com/docs/testing/simulations/index.md): JSON fixtures for a tool: input, optional mocked output, expectations and host settings.
-- [In-process checks](https://moonpeak-ai.com/docs/testing/unit/index.md): What moonpeak test checks, in about a second, with no browser.
+- [In-process checks](https://moonpeak-ai.com/docs/testing/unit/index.md): What moonpeak test checks, in seconds, with no browser.
 - [E2E testing](https://moonpeak-ai.com/docs/testing/e2e/index.md): Playwright tests against the inspector, in ChatGPT and Claude style hosts.
 - [Visual regression](https://moonpeak-ai.com/docs/testing/visual/index.md): Screenshot tests tagged @visual.
 - [Evals](https://moonpeak-ai.com/docs/testing/evals/index.md): Check that real models pick the right tool with the right arguments.

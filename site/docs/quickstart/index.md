@@ -36,7 +36,7 @@ Edit `src/resources/moon/moon.tsx` and save: the View updates in place and keeps
 ## 4. Test it
 
 ```bash
-npm test                      # schemas, Views and simulations, ~1 s
+npm test                      # schemas, Views and simulations, in seconds
 npx playwright install chromium
 npx moonpeak test --e2e       # Playwright against the inspector
 ```

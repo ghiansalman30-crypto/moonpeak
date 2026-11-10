@@ -48,7 +48,7 @@ and act through the host with others: `useCallTool` to call your server again, `
 npm test
 ```
 
-runs schema checks, builds every View and checks the fixtures in `tests/simulations/show-moon.json` against your real handler, in about a second. Add a case:
+runs schema checks, builds every View and checks the fixtures in `tests/simulations/show-moon.json` against your real handler, in a few seconds. Add a case:
 
 ```json
 { "name": "new moon", "input": { "date": "2026-12-09" }, "expect": { "output": { "phase": "New Moon" } } }

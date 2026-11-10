@@ -33,7 +33,7 @@ MCP Apps are MCP tools that come with a UI. The host (ChatGPT, Claude, VS Code, 
 
 - **One file per tool, one folder per View.** No config file, no host-specific forks.
 - **A local inspector** with ChatGPT-style and Claude-style hosts, so you can see your View without an account, a tunnel or a model.
-- **Tests that run in CI** in about a second, plus Playwright e2e and real-model evals when you want them.
+- **Tests that run in CI** in seconds, plus Playwright e2e and real-model evals when you want them.
 - **Built on the official SDKs** (`@modelcontextprotocol/ext-apps` and the MCP TypeScript SDK v2), so what works in the inspector works in real hosts.
 
 ## moonpeak has three use cases
@@ -80,7 +80,7 @@ export default function Moon() {
 ### 2. Testing Framework
 
 ```bash
-moonpeak test                     # schemas, Views and simulations, in-process, ~1s
+moonpeak test                     # schemas, Views and simulations, in-process, in seconds
 moonpeak test --e2e               # Playwright against the inspector
 moonpeak test --visual            # screenshot tests
 moonpeak test --eval              # do real models pick the right tool?

@@ -87,7 +87,7 @@ export default async function ({ date }) {
 <h2>4. Test it</h2>
 <pre><code class="language-bash">npm test
 </code></pre>
-<p>runs schema checks, builds every View and checks the fixtures in <code>tests/simulations/show-moon.json</code> against your real handler, in about a second. Add a case:</p>
+<p>runs schema checks, builds every View and checks the fixtures in <code>tests/simulations/show-moon.json</code> against your real handler, in a few seconds. Add a case:</p>
 <pre><code class="language-json">{ &quot;name&quot;: &quot;new moon&quot;, &quot;input&quot;: { &quot;date&quot;: &quot;2026-12-09&quot; }, &quot;expect&quot;: { &quot;output&quot;: { &quot;phase&quot;: &quot;New Moon&quot; } } }
 </code></pre>
 <p>For browser tests, run <code>npx playwright install chromium</code> once and then <code>npx moonpeak test --e2e</code>.</p>

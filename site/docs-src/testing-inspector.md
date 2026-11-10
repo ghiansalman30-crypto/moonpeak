@@ -4,7 +4,7 @@ moonpeak tests at five levels. Start with the first and add the others when you 
 
 | Level | Command | Needs | Speed |
 |---|---|---|---|
-| [In-process checks](/docs/testing/unit) | `moonpeak test` | nothing | ~1 s |
+| [In-process checks](/docs/testing/unit) | `moonpeak test` | nothing | seconds |
 | [E2E](/docs/testing/e2e) | `moonpeak test --e2e` | Chromium (Playwright) | seconds |
 | [Visual regression](/docs/testing/visual) | `moonpeak test --visual` | Chromium | seconds |
 | [Evals](/docs/testing/evals) | `moonpeak test --eval` | provider API keys | depends on the model |
@@ -21,7 +21,7 @@ All of them read the same [simulations](/docs/testing/simulations): JSON fixture
   ✗ sim        plan-night#bad-date
       expected isError true, got false
 
-  1 failed · 21 checks · 1.1s
+  1 failed · 21 checks · 7.1s
 ```
 
 Ready-made CI setup: [CI](/docs/testing/ci).
@@ -92,7 +92,7 @@ moonpeak test init --server http://localhost:8000/mcp
 
 writes a starter simulation per tool (with example input built from its schema) plus `moonpeak.test.json`. Running it again only adds files for new tools.
 
-@@page slug="testing/unit" title="In-process checks" description="What moonpeak test checks, in about a second, with no browser."
+@@page slug="testing/unit" title="In-process checks" description="What moonpeak test checks, in seconds, with no browser."
 
 ```bash
 moonpeak test [--filter plan-night]

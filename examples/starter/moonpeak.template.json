@@ -1,0 +1,17 @@
+{
+  "$comment": "Used by `moonpeak new` to offer resources, like `npx moonpeak new my-app calendar,review`. Removed from new projects.",
+  "resources": {
+    "moon": {
+      "description": "moon phase card for a date, with a 7-day strip",
+      "files": ["src/resources/moon", "src/tools/show-moon.ts", "src/tools/moon-facts.ts", "tests/simulations/show-moon.json", "tests/simulations/moon-facts.json", "tests/e2e/moon.spec.ts", "tests/evals/moon.eval.json"]
+    },
+    "calendar": {
+      "description": "carousel of the upcoming moon phases",
+      "files": ["src/resources/calendar", "src/tools/moon-calendar.ts", "tests/simulations/moon-calendar.json", "tests/e2e/calendar.spec.ts", "tests/evals/calendar.eval.json"]
+    },
+    "review": {
+      "description": "review a proposed stargazing night, confirm or decline",
+      "files": ["src/resources/review", "src/tools/plan-night.ts", "src/tools/confirm-plan.ts", "tests/simulations/plan-night.json", "tests/simulations/confirm-plan.json", "tests/e2e/review.spec.ts", "tests/evals/review.eval.json"]
+    }
+  }
+}

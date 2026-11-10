@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "moonpeak dev",
     "test": "moonpeak test",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p .",
+    "build": "moonpeak build"
   },
   "dependencies": {
     "moonpeak": "*",

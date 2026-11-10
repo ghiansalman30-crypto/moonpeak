@@ -91,10 +91,18 @@ export function createMcpServer({ name, version = "0.0.0", tools = [], resources
       }
     };
 
+    // Visibility applies with or without a View: an app-only helper tool (no resource
+    // of its own) must still be hidden from the model, or the model could call it.
+    if (def.visibility) {
+      config._meta.ui = { ...(config._meta.ui || {}), visibility: def.visibility };
+      if (!def.visibility.includes("model")) config._meta["openai/visibility"] = "private";
+      if (def.visibility.includes("app")) config._meta["openai/widgetAccessible"] = true;
+    }
+
     if (def.resource) {
       if (!known.has(def.resource)) throw new Error(`moonpeak: tool "${t.name}" points at resource "${def.resource}", which does not exist in src/resources`);
       const uri = resourceUri(name, def.resource);
-      config._meta.ui = { resourceUri: uri, ...(def.visibility ? { visibility: def.visibility } : {}) };
+      config._meta.ui = { ...(config._meta.ui || {}), resourceUri: uri };
       config._meta["openai/outputTemplate"] = uri;
       if (def.invoking) config._meta["openai/toolInvocation/invoking"] = def.invoking;
       if (def.invoked) config._meta["openai/toolInvocation/invoked"] = def.invoked;

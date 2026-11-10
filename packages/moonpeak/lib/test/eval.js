@@ -84,8 +84,13 @@ export async function runEvals({ root, server, headers, filter, quiet = false })
   }
 
   const { client, close } = await connect({ root, server, headers });
-  const { tools } = await client.listTools();
+  const { tools: listed } = await client.listTools();
   await close();
+  // Hosts never offer app-only tools to the model, so evals must not either.
+  const tools = listed.filter((t) => {
+    const vis = t._meta?.ui?.visibility;
+    return !Array.isArray(vis) || vis.includes("model");
+  });
 
   const results = [];
   for (const ev of evals) {

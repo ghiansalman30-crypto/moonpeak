@@ -12,5 +12,16 @@
   },
   "devDependencies": {
     "marked": "^15.0.12"
+  },
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "test:e2e": "npm run test:e2e -w examples/starter",
+    "build": "npm run build -w examples/starter && npm run build -w examples/kitchen-sink",
+    "docs": "node site/build-docs.mjs",
+    "validate": "npm run typecheck && npm test && npm run build && npm run test:e2e"
+  },
+  "engines": {
+    "node": ">=20.19"
   }
 }

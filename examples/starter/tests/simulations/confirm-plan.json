@@ -1,0 +1,7 @@
+[
+  {
+    "name": "confirms with a stable ref",
+    "input": { "date": "2026-12-09", "place": "Bromo" },
+    "expect": { "output": { "status": "confirmed", "date": "2026-12-09", "ref": "re:^MP-[0-9A-Z]{6}$" } }
+  }
+]

@@ -4,3 +4,8 @@ test-results
 playwright-report
 packages/moonpeak/templates
 .vite
+__screenshots__
+.env
+.env.*
+*.log
+.DS_Store

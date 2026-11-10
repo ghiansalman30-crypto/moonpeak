@@ -56,3 +56,37 @@ export function parseDate(input?: string): Date {
   if (Number.isNaN(d.getTime())) throw new Error(`"${input}" is not a real date.`);
   return d;
 }
+
+export const PRINCIPAL = ["New Moon", "First Quarter", "Full Moon", "Last Quarter"] as const;
+export type PhaseEvent = { date: string; phase: (typeof PRINCIPAL)[number]; illumination: number; waxing: boolean; daysAway: number };
+
+/** The next `count` principal phases (new, first quarter, full, last quarter) after `from`. */
+export function upcomingPhases(from: Date, count: number): PhaseEvent[] {
+  const days = (from.getTime() - KNOWN_NEW_MOON) / 86_400_000;
+  const age = ((days % SYNODIC) + SYNODIC) % SYNODIC;
+  const out: PhaseEvent[] = [];
+  // index of the next quarter step strictly ahead of today (half a day of slack)
+  let step = Math.floor(age / (SYNODIC / 4) + 0.5 / (SYNODIC / 4)) + 1;
+  while (out.length < count) {
+    const ahead = step * (SYNODIC / 4) - age;
+    const exact = new Date(from.getTime() + ahead * 86_400_000);
+    const day = moonOn(exact);
+    out.push({
+      date: day.date,
+      phase: PRINCIPAL[step % 4],
+      illumination: day.illumination,
+      waxing: day.waxing,
+      daysAway: Math.round(ahead),
+    });
+    step++;
+  }
+  return out;
+}
+
+/** How dark the sky is on a date: moonlight washes out faint stars. */
+export function darkness(illumination: number): "excellent" | "good" | "fair" | "poor" {
+  if (illumination < 0.15) return "excellent";
+  if (illumination < 0.4) return "good";
+  if (illumination < 0.75) return "fair";
+  return "poor";
+}

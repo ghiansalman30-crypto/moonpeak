@@ -6,7 +6,9 @@
     "dev": "moonpeak dev",
     "build": "moonpeak build",
     "start": "moonpeak start",
-    "test": "moonpeak test"
+    "test": "moonpeak test",
+    "test:e2e": "moonpeak test --e2e",
+    "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
     "moonpeak": "*",

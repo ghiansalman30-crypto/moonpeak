@@ -1,0 +1,25 @@
+[
+  {
+    "name": "next eight phases",
+    "prompt": "When are the next moon phases after Nov 10 2026?",
+    "input": { "from": "2026-11-10" },
+    "expect": { "output": { "from": "2026-11-10", "events": { "$length": 8 } } }
+  },
+  {
+    "name": "full moon comes up",
+    "prompt": "Next full moon after Nov 18 2026?",
+    "input": { "from": "2026-11-18", "count": 1 },
+    "expect": { "output": { "events": [{ "phase": "Full Moon", "date": "2026-11-24" }] } }
+  },
+  {
+    "name": "dark mode",
+    "input": { "from": "2026-11-10", "count": 4 },
+    "host": { "theme": "dark" },
+    "expect": { "output": { "events": { "$length": 4 } } }
+  },
+  {
+    "name": "too many is a schema error",
+    "input": { "from": "2026-11-10", "count": 40 },
+    "expect": { "isError": true }
+  }
+]

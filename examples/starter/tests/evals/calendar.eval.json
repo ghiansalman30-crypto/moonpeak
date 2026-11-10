@@ -1,0 +1,8 @@
+{
+  "models": ["claude-opus-5-5"],
+  "runs": 3,
+  "cases": [
+    { "prompt": "when are the next few moon phases? I want to plan the next month", "expect": { "tool": "moon-calendar" } },
+    { "prompt": "list the next 4 moon phases starting 2026-11-10", "expect": { "tool": "moon-calendar", "args": { "from": "2026-11-10", "count": 4 } } }
+  ]
+}

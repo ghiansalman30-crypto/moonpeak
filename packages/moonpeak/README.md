@@ -5,8 +5,8 @@
 Build interactive apps that render inside ChatGPT, Claude and every other MCP Apps host, then test them in CI without host accounts, tunnels or AI credits.
 
 ```bash
-npx moonpeak new my-app
-cd my-app && npm install
+npx moonpeak new my-app       # asks which resources to include and whether to install
+cd my-app
 npm run dev            # inspector at http://localhost:3000, MCP server at /mcp
 ```
 
@@ -22,6 +22,18 @@ Open source, MIT licensed. Built on the official [MCP Apps SDK](https://github.c
 | **Inspector** | ChatGPT-style and Claude-style hosts on localhost. Switch host, theme, device width and display mode (inline, PiP, fullscreen). Edit tool input and output live. Every setting lives in the URL. |
 | **Testing** | `moonpeak test` checks schemas, Views and simulations in-process. `--e2e` runs Playwright against the inspector. `--eval` checks real models pick the right tool. `--server` tests any MCP server in any language. |
 | **Production** | `moonpeak build` inlines each View into one HTML file and bundles your tools. Serve with `moonpeak start`, or mount `createHandler` on Workers, Hono, Express, Deno or Bun. |
+
+## Starter resources
+
+`npx moonpeak new` asks which of these to include. Pass them directly with `npx moonpeak new my-app calendar,review`.
+
+| Resource | Pattern | What it shows |
+|---|---|---|
+| `moon` | detail card | moon phase for a date, a 7-day strip, calling tools from the View |
+| `calendar` | carousel | swipeable cards of the upcoming phases, loading more through the host |
+| `review` | review / confirm | the model proposes a plan, the user confirms in the UI through an app-only tool |
+
+Flags: `--install` / `--no-install` skip the install question, `-y` accepts every default.
 
 ## Project layout
 
@@ -172,7 +184,7 @@ Then add the URL as a connector in Claude, or as an app in ChatGPT developer mod
 
 | Command | |
 |---|---|
-| `moonpeak new [dir]` | scaffold a project |
+| `moonpeak new [name] [resources]` | scaffold a project; resources: `moon`, `calendar`, `review` (default: ask, or all) |
 | `moonpeak dev` | MCP server + inspector with hot reload |
 | `moonpeak build` | `dist/resources/*.html` + `dist/server.mjs` |
 | `moonpeak start` | serve the build at `/mcp` |

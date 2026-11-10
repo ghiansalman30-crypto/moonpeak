@@ -408,8 +408,39 @@ function shadowPath(p) {
   const glyphs = ["◐", "◓", "◑", "◒"];
   for (const ic of $$(".grid4 .ic")) {
     let i = glyphs.indexOf(ic.textContent), timer;
-    const card = ic.closest("article");
+    const card = ic.closest(".glow-card");
     card?.addEventListener("pointerenter", () => { timer = setInterval(() => (ic.textContent = glyphs[(i = (i + 1) % 4)]), 160); });
     card?.addEventListener("pointerleave", () => clearInterval(timer));
   }
+})();
+
+/* ---------- screenshot tabs (inspector page) ---------- */
+(() => {
+  const tabs = $$(".tabs [role=tab]");
+  if (!tabs.length) return;
+  const panels = $$(".tab-stage figure");
+  const show = (i) => {
+    tabs.forEach((t, j) => t.setAttribute("aria-selected", String(i === j)));
+    panels.forEach((p, j) => p.classList.toggle("on", i === j));
+  };
+  tabs.forEach((t, i) => t.addEventListener("click", () => show(i)));
+  // arrow keys move between tabs
+  tabs.forEach((t, i) => t.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const n = (i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length;
+    show(n); tabs[n].focus();
+  }));
+})();
+
+/* ---------- rotating "what it is" line in the hero ---------- */
+(() => {
+  const el = $(".rotator b");
+  if (!el) return;
+  const words = el.dataset.words.split("|");
+  let i = 0;
+  if (reduce) return;
+  setInterval(() => {
+    el.classList.add("out");
+    setTimeout(() => { i = (i + 1) % words.length; el.textContent = words[i]; el.classList.remove("out"); }, 320);
+  }, 2400);
 })();

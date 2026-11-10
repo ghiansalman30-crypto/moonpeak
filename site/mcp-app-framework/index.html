@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MCP App Framework · ChatGPT App & Claude Connector framework | moonpeak</title>
+<meta name="description" content="moonpeak is a full-stack MCP App framework: one file per tool, one folder per View, 27 React hooks, a local inspector and a production server. The same app runs as a ChatGPT App and a Claude connector." />
+<meta property="og:title" content="MCP App Framework · ChatGPT App & Claude Connector framework | moonpeak" />
+<meta property="og:description" content="moonpeak is a full-stack MCP App framework: one file per tool, one folder per View, 27 React hooks, a local inspector and a production server. The same app runs as a ChatGPT App and a Claude connector." />
+<link rel="canonical" href="https://moonpeak-ai.com/mcp-app-framework/" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='38%25' cy='34%25'%3E%3Cstop offset='0' stop-color='%23fffdf5'/%3E%3Cstop offset='1' stop-color='%23aaa79a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='12' cy='12' r='3.5' fill='%238c897f' fill-opacity='.45'/%3E%3Ccircle cx='20' cy='13' r='2.5' fill='%238c897f' fill-opacity='.4'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../style.css" />
+<link rel="stylesheet" href="../effects.css" />
+<link rel="stylesheet" href="../pages.css" />
+</head>
+<body class="landing sub-page">
+<div class="sky" aria-hidden="true"></div>
+<canvas class="stars" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<header class="nav">
+  <a class="logo" href="../"><svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="mk-lit" cx="42%" cy="38%" r="64%"><stop offset="0" stop-color="#fffdf5"/><stop offset=".6" stop-color="#e7e3d6"/><stop offset="1" stop-color="#a3a094"/></radialGradient><radialGradient id="mk-limb" r="50%"><stop offset=".72" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#11131c" stop-opacity=".45"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#mk-lit)"/><filter id="mk-soft"><feGaussianBlur stdDeviation="1.6"/></filter><g filter="url(#mk-soft)" opacity=".8"><path fill="#97948a" d="M30.49 51.43 C29.66 54.60 29.97 56.99 29.16 60.14 C28.36 63.28 27.32 68.28 25.66 70.31 C24.00 72.33 21.36 72.04 19.20 72.29 C17.04 72.54 14.28 73.40 12.70 71.81 C11.13 70.23 10.43 65.86 9.73 62.77 C9.04 59.68 8.21 56.40 8.51 53.29 C8.81 50.18 10.73 47.47 11.55 44.11 C12.37 40.75 12.03 35.14 13.41 33.14 C14.80 31.14 17.91 32.39 19.86 32.11 C21.82 31.84 23.27 31.38 25.12 31.49 C26.98 31.60 29.50 31.16 31.00 32.77 C32.50 34.37 34.23 38.03 34.15 41.14 C34.06 44.25 31.32 48.27 30.49 51.43Z"/><path fill="#858279" d="M45.29 28.91 C45.46 30.72 47.49 32.39 46.96 33.83 C46.43 35.28 43.81 36.55 42.12 37.57 C40.43 38.60 38.81 39.32 36.82 39.99 C34.84 40.66 32.02 41.98 30.21 41.59 C28.39 41.20 27.23 39.00 25.91 37.66 C24.60 36.33 22.93 35.18 22.34 33.57 C21.74 31.96 21.67 29.77 22.34 28.00 C23.00 26.23 24.49 23.94 26.30 22.96 C28.11 21.99 30.99 22.47 33.20 22.13 C35.42 21.78 37.46 20.73 39.58 20.88 C41.70 21.02 44.97 21.66 45.92 23.00 C46.87 24.33 45.12 27.11 45.29 28.91Z"/><path fill="#a3a095" d="M59.74 14.86 C60.64 15.54 65.02 16.57 63.85 17.24 C62.69 17.90 56.51 18.42 52.73 18.84 C48.94 19.26 44.54 19.80 41.14 19.75 C37.75 19.69 33.63 19.10 32.36 18.51 C31.10 17.91 33.59 16.93 33.53 16.17 C33.47 15.42 30.62 14.56 32.02 13.96 C33.41 13.35 38.40 13.01 41.91 12.54 C45.42 12.06 50.32 10.99 53.07 11.10 C55.82 11.20 57.33 12.52 58.44 13.15 C59.55 13.78 58.83 14.18 59.74 14.86Z"/><path fill="#827f76" d="M62.34 31.00 C62.21 32.30 61.93 33.46 61.27 34.62 C60.62 35.78 59.65 37.46 58.39 37.96 C57.14 38.46 55.12 38.09 53.73 37.61 C52.34 37.13 50.87 36.18 50.06 35.08 C49.25 33.98 48.88 32.38 48.86 31.00 C48.83 29.62 49.05 27.81 49.90 26.82 C50.75 25.82 52.57 25.40 53.95 25.04 C55.33 24.68 56.83 24.36 58.18 24.66 C59.53 24.96 61.36 25.79 62.06 26.84 C62.75 27.90 62.47 29.70 62.34 31.00Z"/><path fill="#9a978d" d="M50.36 41.00 C50.36 41.72 50.60 42.64 50.15 43.14 C49.70 43.63 48.48 43.91 47.65 43.98 C46.82 44.04 45.94 43.85 45.19 43.54 C44.43 43.24 43.41 42.74 43.12 42.14 C42.84 41.55 43.23 40.70 43.49 39.97 C43.75 39.23 43.97 38.20 44.69 37.76 C45.41 37.31 46.89 37.11 47.81 37.30 C48.72 37.48 49.75 38.22 50.18 38.84 C50.60 39.46 50.37 40.28 50.36 41.00Z"/><path fill="#88857c" d="M71.76 46.25 C71.34 47.55 72.32 49.55 71.52 50.44 C70.72 51.34 68.59 51.24 66.97 51.62 C65.34 52.01 63.24 53.23 61.79 52.76 C60.34 52.30 59.36 50.07 58.25 48.83 C57.14 47.59 55.76 46.67 55.11 45.35 C54.47 44.02 53.97 42.15 54.39 40.87 C54.81 39.60 56.45 38.74 57.63 37.69 C58.80 36.64 59.98 34.59 61.45 34.59 C62.93 34.58 64.78 37.00 66.46 37.66 C68.15 38.32 70.30 37.72 71.56 38.54 C72.82 39.37 74.01 41.35 74.04 42.63 C74.08 43.91 72.18 44.94 71.76 46.25Z"/><path fill="#7f7c73" d="M84.98 35.45 C85.01 36.28 85.17 37.46 84.62 38.12 C84.08 38.78 82.72 39.28 81.71 39.40 C80.70 39.52 79.44 39.23 78.56 38.83 C77.68 38.42 76.91 37.67 76.43 36.96 C75.95 36.24 75.66 35.35 75.66 34.51 C75.67 33.68 75.83 32.50 76.46 31.94 C77.09 31.38 78.47 31.23 79.44 31.16 C80.41 31.09 81.43 31.20 82.26 31.53 C83.09 31.85 83.98 32.46 84.43 33.11 C84.88 33.77 84.95 34.61 84.98 35.45Z"/><path fill="#97948a" d="M78.68 57.00 C78.63 58.24 79.35 59.62 78.97 60.62 C78.60 61.62 77.42 62.33 76.43 63.02 C75.43 63.71 73.95 65.10 73.01 64.79 C72.08 64.48 71.61 62.15 70.81 61.17 C70.02 60.19 68.85 59.99 68.24 58.92 C67.63 57.84 66.85 55.91 67.14 54.72 C67.44 53.53 69.01 52.57 70.00 51.77 C70.99 50.96 72.01 50.09 73.10 49.90 C74.19 49.71 75.53 50.10 76.56 50.65 C77.59 51.19 78.91 52.11 79.26 53.17 C79.62 54.23 78.73 55.76 78.68 57.00Z"/><path fill="#9d9a8f" d="M66.74 61.00 C66.85 61.75 67.09 62.79 66.70 63.45 C66.32 64.11 65.27 64.71 64.42 64.97 C63.56 65.22 62.32 65.29 61.58 64.96 C60.84 64.64 60.55 63.66 59.97 63.00 C59.39 62.34 58.27 61.78 58.10 61.00 C57.93 60.22 58.34 58.92 58.94 58.32 C59.55 57.72 60.83 57.50 61.71 57.38 C62.59 57.26 63.49 57.33 64.22 57.60 C64.95 57.86 65.66 58.40 66.08 58.97 C66.50 59.53 66.64 60.25 66.74 61.00Z"/><path fill="#9d9a8f" d="M45.80 63.00 C45.72 64.00 45.74 65.03 45.14 65.88 C44.53 66.72 43.44 67.33 42.18 68.08 C40.91 68.82 39.13 70.31 37.55 70.34 C35.98 70.37 33.59 69.26 32.73 68.27 C31.88 67.29 32.49 65.53 32.42 64.41 C32.34 63.29 32.21 62.65 32.30 61.56 C32.38 60.48 32.03 58.77 32.93 57.89 C33.83 57.01 36.08 56.40 37.68 56.30 C39.28 56.21 41.22 56.74 42.55 57.34 C43.87 57.94 45.07 58.95 45.62 59.90 C46.16 60.84 45.88 62.00 45.80 63.00Z"/><path fill="#918e84" d="M31.55 66.00 C31.55 66.82 31.64 67.77 31.21 68.46 C30.78 69.15 29.83 69.88 28.97 70.14 C28.12 70.41 26.95 70.31 26.06 70.05 C25.17 69.79 24.19 69.25 23.61 68.58 C23.03 67.90 22.51 66.80 22.59 66.00 C22.68 65.20 23.53 64.40 24.12 63.76 C24.71 63.12 25.32 62.52 26.14 62.18 C26.96 61.84 28.17 61.51 29.02 61.74 C29.86 61.96 30.79 62.83 31.21 63.54 C31.63 64.25 31.55 65.18 31.55 66.00Z"/><path fill="#aca89e" d="M36.00 54.00 C36.09 54.68 36.67 55.60 36.30 56.22 C35.94 56.84 34.68 57.66 33.82 57.72 C32.96 57.77 31.96 56.97 31.16 56.55 C30.36 56.12 29.22 55.74 29.01 55.16 C28.80 54.59 29.50 53.67 29.89 53.09 C30.28 52.52 30.74 51.99 31.36 51.72 C31.97 51.45 32.83 51.39 33.56 51.46 C34.30 51.53 35.36 51.72 35.77 52.14 C36.17 52.57 35.91 53.32 36.00 54.00Z"/></g><circle cx="44" cy="82" r="4" fill="#fffdf5" fill-opacity=".8"/><circle cx="50" cy="50" r="50" fill="url(#mk-limb)"/></svg>moonpeak</a>
+  <nav>
+    <a href="../mcp-app-framework/">App Framework</a>
+    <a href="../testing-framework/">Testing Framework</a>
+    <a href="../mcp-app-inspector/">Inspector</a>
+    <a href="../faqs/">FAQs</a>
+    <a href="../docs/">Docs</a>
+    <a class="gh" href="https://github.com/ghiansalman30-crypto/moonpeak" aria-label="Source on GitHub"><svg viewBox="0 0 16 16" width="18" height="18"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+  </nav>
+  <button class="menu-btn" type="button" aria-label="Menu" aria-expanded="false" onclick="var n=this.closest('.nav');n.classList.toggle('open');this.setAttribute('aria-expanded',n.classList.contains('open'))"><span></span><span></span></button>
+  <span class="progress" aria-hidden="true"></span>
+</header>
+<main>
+  <section class="page-hero">
+    <p class="kicker">MCP App framework · ChatGPT Apps · Claude connectors</p>
+    <h1>The MCP App framework.</h1>
+    <p class="lede">Write an MCP tool and the UI it shows once. moonpeak renders it in ChatGPT, Claude, VS Code, Goose and every MCP Apps host, from the same code.</p>
+    <div class="cta">
+      <button class="cmd magnetic" data-copy="npx moonpeak new"><span class="prompt">$</span> npx moonpeak new <span class="copy">copy</span></button>
+      <a class="btn shine magnetic" href="../docs/">Documentation</a>
+      <a class="btn ghost" href="https://github.com/ghiansalman30-crypto/moonpeak">Source</a>
+    </div>
+  </section>
+
+  <section class="split" data-reveal>
+    <div>
+      <h2>Why use an MCP App framework?</h2>
+      <p>An MCP App is an MCP tool plus a <code>ui://</code> resource the host renders next to the conversation. Doing that by hand means a server, a bundler that inlines everything into one HTML file, host metadata for every client and a fake host to look at it. moonpeak does all of it from two folders.</p>
+      <ul class="ticks"><li>Folders are the config: tools, Views and fixtures are discovered.</li><li>Return a plain object and it becomes <code>structuredContent</code>; throw and it becomes a tool error.</li><li>Each View builds to one self-contained HTML file, ready for strict CSPs.</li><li>Resources carry MCP Apps metadata and the older <code>openai/*</code> keys, so ChatGPT renders them too.</li><li>Hot reload for Views and tools while the inspector stays open.</li></ul>
+    </div>
+    <div class="term win"><div class="bar"><i></i><i></i><i></i><span class="fname">my-app</span></div><pre class="code">my-app/
+├─ src/
+│  ├─ tools/show-moon.ts        # one MCP tool
+│  ├─ resources/moon/moon.tsx   # its View
+│  └─ lib/
+└─ tests/
+   ├─ simulations/show-moon.json
+   ├─ e2e/moon.spec.ts
+   └─ evals/moon.eval.json</pre></div>
+  </section>
+
+  <section class="split rev" data-reveal>
+    <div class="term win"><div class="bar"><i></i><i></i><i></i><span class="fname">src/tools/show-moon.ts</span></div><pre class="code">import { z } from "zod";
+
+export const tool = {
+  title: "Show moon phase",
+  description: "Show the moon phase for a date.",
+  resource: "moon",             // render src/resources/moon
+};
+
+export const schema = { date: z.string().optional() };
+
+export default async function ({ date }) {
+  return { date, phase: "Full Moon", illumination: 1 };
+}</pre></div>
+    <div>
+      <h2>A tool is one file.</h2>
+      <p>Export the tool's metadata, a zod schema and a handler. Point <code>resource</code> at a View folder to give it a UI, or leave it out for a text tool. Mark helper tools <code>visibility: ["app"]</code> and only your View can call them; the model never sees them.</p>
+    </div>
+  </section>
+
+  <section class="split" data-reveal>
+    <div>
+      <h2>A View is one React component.</h2>
+      <p>Twenty-seven typed hooks cover everything a View needs: the tool's input and output, theme, locale, safe areas, container size, display mode requests, per-View state that survives reloads, calling other tools, posting into the chat and updating model context.</p>
+      <a class="more" href="../docs/#hooks">Every hook →</a>
+    </div>
+    <div class="term win"><div class="bar"><i></i><i></i><i></i><span class="fname">src/resources/moon/moon.tsx</span></div><pre class="code">import { useToolData, useTheme, useCallTool } from "moonpeak";
+
+export default function Moon() {
+  const { output, isPending } = useToolData();
+  const theme = useTheme();
+  const callTool = useCallTool();
+  if (isPending) return &lt;p&gt;Reading the sky…&lt;/p&gt;;
+  return (
+    &lt;div className={theme}&gt;
+      &lt;h1&gt;{output.phase}&lt;/h1&gt;
+      &lt;button onClick={() =&gt; callTool("show-moon", next)}&gt;Next week&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</pre></div>
+  </section>
+
+  <section data-reveal>
+    <h2>Start from a pattern</h2>
+    <p class="sub"><code>npx moonpeak new</code> asks which resources to start with. Each one is a working View with simulations, e2e tests and evals.</p>
+    <div class="grid3" data-stagger>
+      <article class="glow-card"><span class="ic">◐</span><h3>moon</h3><p>Detail card. A date's moon phase with a 7-day strip; buttons call the tool again through the host.</p></article>
+      <article class="glow-card"><span class="ic">◑</span><h3>calendar</h3><p>Carousel. Swipeable cards of the upcoming phases; "load more" pages through the host, selection is shared with the model.</p></article>
+      <article class="glow-card"><span class="ic">◒</span><h3>review</h3><p>Review and confirm. The model proposes a stargazing night, the user confirms it through an app-only tool.</p></article>
+    </div>
+    <div class="cmdrow"><code>npx moonpeak new my-app calendar,review</code><span>pick resources up front</span></div>
+  </section>
+
+  <section class="split rev" data-reveal>
+    <div class="term win"><div class="bar"><i></i><i></i><i></i><span class="fname">deploy</span></div><pre class="code">moonpeak build      # dist/resources/*.html + dist/server.mjs
+moonpeak start      # http://localhost:8000/mcp
+
+# or mount it yourself (Workers, Hono, Deno, Bun, Next.js)
+import { createHandler } from "moonpeak/server";</pre></div>
+    <div>
+      <h2>Ship it anywhere.</h2>
+      <p><code>moonpeak build</code> inlines every View and bundles your tools. Serve the result with <code>moonpeak start</code>, or mount <code>createHandler</code> on any runtime that speaks Fetch, or <code>createNodeHandler</code> on Express and node:http. Then add the HTTPS URL as a Claude connector or a ChatGPT app.</p>
+      <a class="more" href="../docs/#deploy">Deploy docs →</a>
+    </div>
+  </section>
+  <section class="final" data-reveal>
+    <h2>Open source, MIT licensed.</h2>
+    <div class="cta center">
+      <button class="cmd magnetic" data-copy="npx moonpeak new"><span class="prompt">$</span> npx moonpeak new <span class="copy">copy</span></button>
+      <a class="btn shine magnetic" href="../docs/">Documentation →</a>
+      <a class="btn ghost" href="https://github.com/ghiansalman30-crypto/moonpeak">GitHub</a>
+    </div>
+  </section>
+</main>
+<footer class="site-foot">
+  <div class="foot-brand"><span class="logo small"><svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="mk-lit" cx="42%" cy="38%" r="64%"><stop offset="0" stop-color="#fffdf5"/><stop offset=".6" stop-color="#e7e3d6"/><stop offset="1" stop-color="#a3a094"/></radialGradient><radialGradient id="mk-limb" r="50%"><stop offset=".72" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#11131c" stop-opacity=".45"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#mk-lit)"/><filter id="mk-soft"><feGaussianBlur stdDeviation="1.6"/></filter><g filter="url(#mk-soft)" opacity=".8"><path fill="#97948a" d="M30.49 51.43 C29.66 54.60 29.97 56.99 29.16 60.14 C28.36 63.28 27.32 68.28 25.66 70.31 C24.00 72.33 21.36 72.04 19.20 72.29 C17.04 72.54 14.28 73.40 12.70 71.81 C11.13 70.23 10.43 65.86 9.73 62.77 C9.04 59.68 8.21 56.40 8.51 53.29 C8.81 50.18 10.73 47.47 11.55 44.11 C12.37 40.75 12.03 35.14 13.41 33.14 C14.80 31.14 17.91 32.39 19.86 32.11 C21.82 31.84 23.27 31.38 25.12 31.49 C26.98 31.60 29.50 31.16 31.00 32.77 C32.50 34.37 34.23 38.03 34.15 41.14 C34.06 44.25 31.32 48.27 30.49 51.43Z"/><path fill="#858279" d="M45.29 28.91 C45.46 30.72 47.49 32.39 46.96 33.83 C46.43 35.28 43.81 36.55 42.12 37.57 C40.43 38.60 38.81 39.32 36.82 39.99 C34.84 40.66 32.02 41.98 30.21 41.59 C28.39 41.20 27.23 39.00 25.91 37.66 C24.60 36.33 22.93 35.18 22.34 33.57 C21.74 31.96 21.67 29.77 22.34 28.00 C23.00 26.23 24.49 23.94 26.30 22.96 C28.11 21.99 30.99 22.47 33.20 22.13 C35.42 21.78 37.46 20.73 39.58 20.88 C41.70 21.02 44.97 21.66 45.92 23.00 C46.87 24.33 45.12 27.11 45.29 28.91Z"/><path fill="#a3a095" d="M59.74 14.86 C60.64 15.54 65.02 16.57 63.85 17.24 C62.69 17.90 56.51 18.42 52.73 18.84 C48.94 19.26 44.54 19.80 41.14 19.75 C37.75 19.69 33.63 19.10 32.36 18.51 C31.10 17.91 33.59 16.93 33.53 16.17 C33.47 15.42 30.62 14.56 32.02 13.96 C33.41 13.35 38.40 13.01 41.91 12.54 C45.42 12.06 50.32 10.99 53.07 11.10 C55.82 11.20 57.33 12.52 58.44 13.15 C59.55 13.78 58.83 14.18 59.74 14.86Z"/><path fill="#827f76" d="M62.34 31.00 C62.21 32.30 61.93 33.46 61.27 34.62 C60.62 35.78 59.65 37.46 58.39 37.96 C57.14 38.46 55.12 38.09 53.73 37.61 C52.34 37.13 50.87 36.18 50.06 35.08 C49.25 33.98 48.88 32.38 48.86 31.00 C48.83 29.62 49.05 27.81 49.90 26.82 C50.75 25.82 52.57 25.40 53.95 25.04 C55.33 24.68 56.83 24.36 58.18 24.66 C59.53 24.96 61.36 25.79 62.06 26.84 C62.75 27.90 62.47 29.70 62.34 31.00Z"/><path fill="#9a978d" d="M50.36 41.00 C50.36 41.72 50.60 42.64 50.15 43.14 C49.70 43.63 48.48 43.91 47.65 43.98 C46.82 44.04 45.94 43.85 45.19 43.54 C44.43 43.24 43.41 42.74 43.12 42.14 C42.84 41.55 43.23 40.70 43.49 39.97 C43.75 39.23 43.97 38.20 44.69 37.76 C45.41 37.31 46.89 37.11 47.81 37.30 C48.72 37.48 49.75 38.22 50.18 38.84 C50.60 39.46 50.37 40.28 50.36 41.00Z"/><path fill="#88857c" d="M71.76 46.25 C71.34 47.55 72.32 49.55 71.52 50.44 C70.72 51.34 68.59 51.24 66.97 51.62 C65.34 52.01 63.24 53.23 61.79 52.76 C60.34 52.30 59.36 50.07 58.25 48.83 C57.14 47.59 55.76 46.67 55.11 45.35 C54.47 44.02 53.97 42.15 54.39 40.87 C54.81 39.60 56.45 38.74 57.63 37.69 C58.80 36.64 59.98 34.59 61.45 34.59 C62.93 34.58 64.78 37.00 66.46 37.66 C68.15 38.32 70.30 37.72 71.56 38.54 C72.82 39.37 74.01 41.35 74.04 42.63 C74.08 43.91 72.18 44.94 71.76 46.25Z"/><path fill="#7f7c73" d="M84.98 35.45 C85.01 36.28 85.17 37.46 84.62 38.12 C84.08 38.78 82.72 39.28 81.71 39.40 C80.70 39.52 79.44 39.23 78.56 38.83 C77.68 38.42 76.91 37.67 76.43 36.96 C75.95 36.24 75.66 35.35 75.66 34.51 C75.67 33.68 75.83 32.50 76.46 31.94 C77.09 31.38 78.47 31.23 79.44 31.16 C80.41 31.09 81.43 31.20 82.26 31.53 C83.09 31.85 83.98 32.46 84.43 33.11 C84.88 33.77 84.95 34.61 84.98 35.45Z"/><path fill="#97948a" d="M78.68 57.00 C78.63 58.24 79.35 59.62 78.97 60.62 C78.60 61.62 77.42 62.33 76.43 63.02 C75.43 63.71 73.95 65.10 73.01 64.79 C72.08 64.48 71.61 62.15 70.81 61.17 C70.02 60.19 68.85 59.99 68.24 58.92 C67.63 57.84 66.85 55.91 67.14 54.72 C67.44 53.53 69.01 52.57 70.00 51.77 C70.99 50.96 72.01 50.09 73.10 49.90 C74.19 49.71 75.53 50.10 76.56 50.65 C77.59 51.19 78.91 52.11 79.26 53.17 C79.62 54.23 78.73 55.76 78.68 57.00Z"/><path fill="#9d9a8f" d="M66.74 61.00 C66.85 61.75 67.09 62.79 66.70 63.45 C66.32 64.11 65.27 64.71 64.42 64.97 C63.56 65.22 62.32 65.29 61.58 64.96 C60.84 64.64 60.55 63.66 59.97 63.00 C59.39 62.34 58.27 61.78 58.10 61.00 C57.93 60.22 58.34 58.92 58.94 58.32 C59.55 57.72 60.83 57.50 61.71 57.38 C62.59 57.26 63.49 57.33 64.22 57.60 C64.95 57.86 65.66 58.40 66.08 58.97 C66.50 59.53 66.64 60.25 66.74 61.00Z"/><path fill="#9d9a8f" d="M45.80 63.00 C45.72 64.00 45.74 65.03 45.14 65.88 C44.53 66.72 43.44 67.33 42.18 68.08 C40.91 68.82 39.13 70.31 37.55 70.34 C35.98 70.37 33.59 69.26 32.73 68.27 C31.88 67.29 32.49 65.53 32.42 64.41 C32.34 63.29 32.21 62.65 32.30 61.56 C32.38 60.48 32.03 58.77 32.93 57.89 C33.83 57.01 36.08 56.40 37.68 56.30 C39.28 56.21 41.22 56.74 42.55 57.34 C43.87 57.94 45.07 58.95 45.62 59.90 C46.16 60.84 45.88 62.00 45.80 63.00Z"/><path fill="#918e84" d="M31.55 66.00 C31.55 66.82 31.64 67.77 31.21 68.46 C30.78 69.15 29.83 69.88 28.97 70.14 C28.12 70.41 26.95 70.31 26.06 70.05 C25.17 69.79 24.19 69.25 23.61 68.58 C23.03 67.90 22.51 66.80 22.59 66.00 C22.68 65.20 23.53 64.40 24.12 63.76 C24.71 63.12 25.32 62.52 26.14 62.18 C26.96 61.84 28.17 61.51 29.02 61.74 C29.86 61.96 30.79 62.83 31.21 63.54 C31.63 64.25 31.55 65.18 31.55 66.00Z"/><path fill="#aca89e" d="M36.00 54.00 C36.09 54.68 36.67 55.60 36.30 56.22 C35.94 56.84 34.68 57.66 33.82 57.72 C32.96 57.77 31.96 56.97 31.16 56.55 C30.36 56.12 29.22 55.74 29.01 55.16 C28.80 54.59 29.50 53.67 29.89 53.09 C30.28 52.52 30.74 51.99 31.36 51.72 C31.97 51.45 32.83 51.39 33.56 51.46 C34.30 51.53 35.36 51.72 35.77 52.14 C36.17 52.57 35.91 53.32 36.00 54.00Z"/></g><circle cx="44" cy="82" r="4" fill="#fffdf5" fill-opacity=".8"/><circle cx="50" cy="50" r="50" fill="url(#mk-limb)"/></svg>moonpeak</span><p>Server-agnostic MCP testing framework and full-stack MCP App framework.</p></div>
+  <div class="foot-cols">
+    <div><b>Product</b><a href="../mcp-app-framework/">App Framework</a><a href="../testing-framework/">Testing Framework</a><a href="../mcp-app-inspector/">Inspector</a></div>
+    <div><b>Learn</b><a href="../docs/">Docs</a><a href="../faqs/">FAQs</a><a href="../llms.txt">llms.txt</a></div>
+    <div><b>Open source</b><a href="https://github.com/ghiansalman30-crypto/moonpeak">GitHub</a><a href="https://www.npmjs.com/package/moonpeak">npm</a><a href="https://github.com/ghiansalman30-crypto/moonpeak/blob/main/LICENSE">MIT License</a></div>
+  </div>
+  <p class="foot-copy">© 2026 moonpeak contributors · MIT · No token, no telemetry</p>
+</footer>
+<div class="toast" role="status" aria-live="polite">Copied</div>
+<script src="../main.js" defer></script>
+</body>
+</html>

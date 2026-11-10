@@ -12,7 +12,7 @@ const HELP = `
   ${c.bold("moonpeak")} ${c.dim("v" + VERSION)}  MCP App framework + MCP testing framework
 
   ${c.bold("Usage")}
-    moonpeak new [dir]                 scaffold a new MCP App project
+    moonpeak new [name] [resources]    scaffold a project, e.g. new my-app calendar,review
     moonpeak dev [--port 3000]         MCP server + inspector with hot reload
     moonpeak build                     bundle Views and server into dist/
     moonpeak start [--port 8000]       serve the built project at /mcp
@@ -30,6 +30,8 @@ const HELP = `
     --open            open the inspector in your browser
     --header k:v      extra header for --server (repeatable), e.g. "authorization:Bearer x"
     --filter <text>   only run tests whose tool or simulation matches
+    --install / --no-install   new: install dependencies without asking
+    -y, --yes         new: accept the defaults
 `;
 
 function parse(argv) {
@@ -43,7 +45,8 @@ function parse(argv) {
       const val = v !== undefined ? v : isFlag ? true : argv[++i];
       if (k === "header") out.header.push(val);
       else out[k] = val;
-    } else out._.push(a);
+    } else if (/^-[a-z]$/i.test(a)) out[a.slice(1)] = true;
+    else out._.push(a);
   }
   return out;
 }
@@ -57,7 +60,7 @@ function headersFrom(list) {
   return Object.keys(h).length ? h : undefined;
 }
 
-const quote = (a) => (/^[w@%+=:,./#-]+$/.test(a) ? a : `"${String(a).replace(/"/g, '\\"')}"`);
+const quote = (a) => (/^[\w@%+=:,./#-]+$/.test(a) ? a : `"${String(a).replace(/"/g, '\\"')}"`);
 
 function run(cmd, args, opts = {}) {
   return new Promise((resolve) => {
@@ -77,8 +80,9 @@ async function main() {
   if (!cmd || cmd === "help" || args.help || args.h) return console.log(HELP);
 
   if (cmd === "new") {
-    const { scaffold } = await import("../lib/new.js");
-    return scaffold(args._[1] || "my-mcp-app", { version: VERSION });
+    const { newProject } = await import("../lib/new.js");
+    const install = args["no-install"] ? false : args.install ? true : undefined;
+    return newProject(args._[1], { version: VERSION, install, yes: Boolean(args.yes || args.y), resources: args._[2] });
   }
 
   if (cmd === "dev") {

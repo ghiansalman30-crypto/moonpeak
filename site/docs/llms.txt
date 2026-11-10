@@ -1,0 +1,29 @@
+# moonpeak
+
+> Server-agnostic MCP testing framework and full-stack MCP App framework. Build, inspect and test MCP Apps (interactive UIs) for ChatGPT, Claude and every MCP Apps host. Open source, MIT, npm package `moonpeak`.
+
+Start a project with `npx moonpeak new`. A live demo MCP server runs at https://moonpeak-ai.com/mcp.
+
+## Docs
+
+- [Full documentation as Markdown](https://moonpeak-ai.com/docs/index.md): everything below on one page
+- [Quickstart](https://moonpeak-ai.com/docs/#quickstart)
+- [What you get](https://moonpeak-ai.com/docs/#what-you-get)
+- [Starter resources](https://moonpeak-ai.com/docs/#starter-resources)
+- [Project layout](https://moonpeak-ai.com/docs/#project-layout)
+- [Hooks](https://moonpeak-ai.com/docs/#hooks)
+- [Simulations](https://moonpeak-ai.com/docs/#simulations)
+- [Testing](https://moonpeak-ai.com/docs/#testing)
+- [Inspect any server](https://moonpeak-ai.com/docs/#inspect-any-server)
+- [Deploy](https://moonpeak-ai.com/docs/#deploy)
+- [CLI](https://moonpeak-ai.com/docs/#cli)
+- [License](https://moonpeak-ai.com/docs/#license)
+
+## Pages
+
+- [MCP App framework](https://moonpeak-ai.com/mcp-app-framework/)
+- [MCP testing framework](https://moonpeak-ai.com/testing-framework/)
+- [MCP App inspector](https://moonpeak-ai.com/mcp-app-inspector/)
+- [FAQs](https://moonpeak-ai.com/faqs/)
+- [Source on GitHub](https://github.com/ghiansalman30-crypto/moonpeak)
+- [Agent skill](https://github.com/ghiansalman30-crypto/moonpeak/blob/main/skills/moonpeak/SKILL.md)

@@ -1,0 +1,8 @@
+{
+  "models": ["claude-opus-5-5"],
+  "runs": 3,
+  "cases": [
+    { "prompt": "I want to go stargazing at Bromo on 2026-12-09, can you plan it?", "expect": { "tool": "plan-night", "args": { "date": "2026-12-09", "place": "Bromo" } } },
+    { "prompt": "confirm my stargazing plan for 2026-12-09", "expect": { "tool": "plan-night" } }
+  ]
+}

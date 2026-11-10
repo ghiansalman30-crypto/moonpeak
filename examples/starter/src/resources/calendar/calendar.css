@@ -1,0 +1,31 @@
+.cal-app {
+  --bg: #ffffff; --text: #16181d; --mute: #646a78; --line: #e6e8ee; --chip: #f4f5f8; --accent: #4b5bdc;
+  --lit: #f4f1e6; --dark: #2a2f3d; --rim: rgba(0,0,0,.08);
+  font: 14px/1.45 var(--font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
+  color: var(--text); background: var(--bg); padding: 20px; display: flex; flex-direction: column; gap: 16px;
+}
+.cal-app.dark { --bg: #14161d; --text: #eceef4; --mute: #9aa1b4; --line: #272b37; --chip: #1c1f29; --accent: #9fb0ff; --lit: #f2efe2; --dark: #050609; --rim: rgba(255,255,255,.12); }
+.moon-lit { fill: var(--lit); }
+.moon-dark { fill: var(--dark); }
+.moon-rim { stroke: var(--rim); stroke-width: 1.5; }
+header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+.eyebrow { margin: 0; color: var(--mute); font-size: 12.5px; }
+h1 { margin: 2px 0 0; font-size: 20px; letter-spacing: -0.01em; }
+.arrows { display: flex; gap: 6px; }
+.arrows button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--bg); color: inherit; font-size: 18px; line-height: 1; cursor: pointer; }
+.arrows button:hover { border-color: var(--accent); }
+.track { list-style: none; margin: 0 -20px; padding: 2px 20px 8px; display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 20px; scrollbar-width: thin; }
+.track li { scroll-snap-align: start; flex: 0 0 auto; }
+.card { width: 132px; height: 100%; min-height: 168px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 10px; border-radius: 16px; border: 1px solid var(--line); background: var(--chip); color: inherit; font: inherit; cursor: pointer; text-align: center; }
+.card b { font-size: 13.5px; }
+.card span { font-size: 12.5px; }
+.card small { color: var(--mute); font-size: 11.5px; }
+.card.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.card.more { justify-content: center; color: var(--accent); font-weight: 600; background: transparent; border-style: dashed; }
+footer { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.picked { margin: 0; flex: 1; color: var(--mute); }
+.picked b { color: var(--text); }
+footer button { border: 1px solid var(--line); background: var(--bg); color: inherit; border-radius: 999px; padding: 7px 14px; cursor: pointer; font: inherit; font-size: 13px; }
+footer button:hover { border-color: var(--accent); }
+.skeleton { color: var(--mute); padding: 40px 0; text-align: center; }
+.error { color: #d24545; margin: 0; }

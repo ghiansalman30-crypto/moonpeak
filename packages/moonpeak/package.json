@@ -1,7 +1,7 @@
 {
   "name": "moonpeak",
   "version": "0.1.0",
-  "description": "MCP App framework and MCP testing framework. Build, inspect and test apps for ChatGPT, Claude and every MCP Apps host.",
+  "description": "Server-agnostic MCP testing framework and full-stack MCP App framework for ChatGPT Apps, Claude connectors and every MCP Apps host.",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -51,7 +51,7 @@
     "LICENSE"
   ],
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19"
   },
   "keywords": [
     "mcp",
@@ -60,7 +60,15 @@
     "claude-connector",
     "testing",
     "inspector",
-    "framework"
+    "framework",
+    "mcp-app",
+    "model-context-protocol",
+    "chatgpt-app",
+    "chatgpt-apps-sdk",
+    "mcp-testing",
+    "mcp-inspector",
+    "react",
+    "vite"
   ],
   "dependencies": {
     "@modelcontextprotocol/client": "^2.4.0",
@@ -88,6 +96,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ghiansalman30-crypto/moonpeak.git"
+    "url": "git+https://github.com/ghiansalman30-crypto/moonpeak.git",
+    "directory": "packages/moonpeak"
+  },
+  "homepage": "https://moonpeak-ai.com",
+  "bugs": {
+    "url": "https://github.com/ghiansalman30-crypto/moonpeak/issues"
   }
 }

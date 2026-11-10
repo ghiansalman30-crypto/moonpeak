@@ -1,0 +1,19 @@
+[
+  {
+    "name": "dark new moon night",
+    "prompt": "I want to go stargazing at Bromo on Dec 9 2026",
+    "input": { "date": "2026-12-09", "place": "Bromo" },
+    "expect": { "output": { "date": "2026-12-09", "place": "Bromo", "phase": "New Moon", "darkness": "excellent", "betterNight": null, "status": "proposed" } }
+  },
+  {
+    "name": "bright full moon suggests another night",
+    "prompt": "Stargazing on Nov 24 2026?",
+    "input": { "date": "2026-11-24" },
+    "expect": { "output": { "phase": "Full Moon", "darkness": "poor", "betterNight": "re:^2026-12-0[0-9]$" } }
+  },
+  {
+    "name": "bad date",
+    "input": { "date": "next friday" },
+    "expect": { "isError": true, "text": "not a date" }
+  }
+]

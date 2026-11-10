@@ -1,0 +1,33 @@
+.review-app {
+  --bg: #ffffff; --text: #16181d; --mute: #646a78; --line: #e6e8ee; --chip: #f4f5f8; --accent: #4b5bdc; --ok: #1f9d55; --warn: #c98a12; --bad: #d24545;
+  --lit: #f4f1e6; --dark: #2a2f3d; --rim: rgba(0,0,0,.08);
+  font: 14px/1.45 var(--font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
+  color: var(--text); background: var(--bg); padding: 20px; display: flex; flex-direction: column; gap: 16px;
+}
+.review-app.dark { --bg: #14161d; --text: #eceef4; --mute: #9aa1b4; --line: #272b37; --chip: #1c1f29; --accent: #9fb0ff; --ok: #5fd28f; --warn: #f0b84a; --bad: #ff7a7a; --lit: #f2efe2; --dark: #050609; --rim: rgba(255,255,255,.12); }
+.moon-lit { fill: var(--lit); }
+.moon-dark { fill: var(--dark); }
+.moon-rim { stroke: var(--rim); stroke-width: 1.5; }
+header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.eyebrow { margin: 0; color: var(--mute); font-size: 12.5px; }
+h1 { margin: 2px 0 4px; font-size: 20px; letter-spacing: -0.01em; }
+h2 { margin: 0 0 8px; font-size: 13px; color: var(--mute); font-weight: 600; }
+.sub { margin: 0; color: var(--mute); }
+.sky { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--chip); }
+.sky span { color: var(--mute); }
+.sky.excellent b, .sky.good b { color: var(--ok); }
+.sky.fair b { color: var(--warn); }
+.sky.poor b { color: var(--bad); }
+.targets { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.targets li { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; }
+.hint { margin: 10px 0 0; color: var(--mute); font-size: 13px; }
+footer { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+footer button { border: 1px solid var(--line); background: var(--bg); color: inherit; border-radius: 999px; padding: 8px 16px; cursor: pointer; font: inherit; font-size: 13.5px; }
+footer button:hover { border-color: var(--accent); }
+footer button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.review-app.dark footer button.primary { color: #0d1020; }
+footer button:disabled { opacity: .6; cursor: default; }
+.done { margin: 0; padding: 10px 14px; border-radius: 12px; background: var(--chip); border: 1px solid var(--ok); }
+.done.declined { border-color: var(--line); color: var(--mute); }
+.skeleton { color: var(--mute); padding: 40px 0; text-align: center; }
+.error { color: var(--bad); margin: 0; }

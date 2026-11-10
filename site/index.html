@@ -12,9 +12,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="effects.css" />
 </head>
-<body>
+<body class="landing">
 <div class="sky" aria-hidden="true"></div>
+<canvas class="stars" aria-hidden="true"></canvas>
 
 <header class="nav">
   <a class="logo" href="./"><span class="mark"></span>moonpeak</a>
@@ -25,34 +27,77 @@
     <a href="docs/">Docs</a>
     <a class="gh" href="https://github.com/ghiansalman30-crypto/moonpeak" aria-label="Source on GitHub"><svg viewBox="0 0 16 16" width="18" height="18"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
   </nav>
+  <span class="progress" aria-hidden="true"></span>
 </header>
 
 <main>
   <section class="hero">
-    <div class="moon-big" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="cursor-glow" aria-hidden="true"></div>
+    <div class="moon" aria-hidden="true">
+      <svg class="disc" viewBox="0 0 100 100">
+        <defs>
+          <radialGradient id="lit" cx="38%" cy="34%" r="72%"><stop offset="0" stop-color="#fdfbf3"/><stop offset=".42" stop-color="#e9e6da"/><stop offset=".8" stop-color="#aaa79a"/><stop offset="1" stop-color="#6d6b62"/></radialGradient>
+          <radialGradient id="crater" cx="42%" cy="40%" r="60%"><stop offset="0" stop-color="#000" stop-opacity=".26"/><stop offset=".7" stop-color="#000" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity=".18"/></radialGradient>
+          <filter id="lunar" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency=".038" numOctaves="4" seed="11"/><feColorMatrix values="0 0 0 0 .18  0 0 0 0 .18  0 0 0 0 .2  0 0 0 -2.2 1.25"/></filter>
+          <clipPath id="disc-clip"><circle cx="50" cy="50" r="50"/></clipPath>
+          <filter id="soft" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.4"/></filter>
+        </defs>
+        <circle cx="50" cy="50" r="50" fill="url(#lit)"/>
+        <g clip-path="url(#disc-clip)">
+          <rect width="100" height="100" filter="url(#lunar)" opacity=".55"/>
+          <circle cx="30" cy="34" r="9" fill="url(#crater)"/><circle cx="62" cy="24" r="5.5" fill="url(#crater)"/>
+          <circle cx="58" cy="62" r="12" fill="url(#crater)"/><circle cx="33" cy="70" r="4.5" fill="url(#crater)"/>
+          <circle cx="78" cy="46" r="3.5" fill="url(#crater)"/><circle cx="46" cy="44" r="2.6" fill="url(#crater)"/>
+        </g>
+      </svg>
+      <svg class="phase" viewBox="0 0 100 100"><g clip-path="url(#disc-clip)"><path fill="#070a16" fill-opacity=".9" filter="url(#soft)" d=""/></g></svg>
+      <p class="moon-label"></p>
+    </div>
+    <svg class="ridges" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="r1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#151c3b"/><stop offset=".6" stop-color="#0c1026"/></linearGradient>
+        <linearGradient id="r2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f1430"/><stop offset=".6" stop-color="#090c1b"/></linearGradient>
+        <linearGradient id="r3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0d1f"/><stop offset=".55" stop-color="#070913"/></linearGradient>
+        <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9e6da" stop-opacity=".05"/><stop offset=".72" stop-color="#e9e6da" stop-opacity=".5"/><stop offset=".86" stop-color="#e9e6da" stop-opacity=".35"/><stop offset="1" stop-color="#e9e6da" stop-opacity=".08"/></linearGradient>
+        <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9b8ff" stop-opacity="0"/><stop offset=".5" stop-color="#a9b8ff" stop-opacity=".07"/><stop offset="1" stop-color="#a9b8ff" stop-opacity="0"/></linearGradient>
+      </defs>
+      <path fill="url(#r1)" stroke="url(#rim)" stroke-width="1.4" d="M-20 198.3 Q-20 198.3 -11 201.3 Q-2 204.3 7 200.75 Q16 197.2 25 196.2 Q34 195.2 43 195.2 Q52 195.2 61 192.95 Q70 190.7 79 181.3 Q88 171.9 97 167.25 Q106 162.6 115 159.05 Q124 155.5 133 161.15 Q142 166.8 151 155.55 Q160 144.3 169 146.10000000000002 Q178 147.9 187 144.55 Q196 141.2 205 134.7 Q214 128.2 223 127.85 Q232 127.5 241 132.5 Q250 137.5 259 131.45 Q268 125.4 277 127.3 Q286 129.2 295 133.35 Q304 137.5 313 141.35 Q322 145.2 331 149.5 Q340 153.8 349 155.35000000000002 Q358 156.9 367 169.15 Q376 181.4 385 185.15 Q394 188.9 403 188.75 Q412 188.6 421 191.3 Q430 194 439 191.65 Q448 189.3 457 197.95 Q466 206.6 475 197.45 Q484 188.3 493 185.15 Q502 182 511 187.3 Q520 192.6 529 184.5 Q538 176.4 547 179.3 Q556 182.2 565 171.3 Q574 160.4 583 158.25 Q592 156.1 601 162.95 Q610 169.8 619 167.05 Q628 164.3 637 155.9 Q646 147.5 655 156 Q664 164.5 673 154.95 Q682 145.4 691 154.9 Q700 164.4 709 169.25 Q718 174.1 727 167.5 Q736 160.9 745 165.05 Q754 169.2 763 180.6 Q772 192 781 186.1 Q790 180.2 799 191.05 Q808 201.9 817 201.4 Q826 200.9 835 204.8 Q844 208.7 853 203.95 Q862 199.2 871 199.6 Q880 200 889 201 Q898 202 907 203.3 Q916 204.6 925 202.2 Q934 199.8 943 185.35000000000002 Q952 170.9 961 169.10000000000002 Q970 167.3 979 159.10000000000002 Q988 150.9 997 146 Q1006 141.1 1015 134.45 Q1024 127.8 1033 115.25 Q1042 102.7 1051 104 Q1060 105.3 1069 98.4 Q1078 91.5 1087 87.45 Q1096 83.4 1105 83.7 Q1114 84 1123 79.5 Q1132 75 1141 65.3 Q1150 55.6 1159 56.8 Q1168 58 1177 50.9 Q1186 43.8 1195 51.7 Q1204 59.6 1213 54.45 Q1222 49.3 1231 55.45 Q1240 61.6 1249 59.85 Q1258 58.1 1267 68.1 Q1276 78.1 1285 78.9 Q1294 79.7 1303 80.75 Q1312 81.8 1321 84.5 Q1330 87.2 1339 100.05000000000001 Q1348 112.9 1357 114.7 Q1366 116.5 1375 128.85 Q1384 141.2 1393 151.75 Q1402 162.3 1411 172.95 Q1420 183.6 1429 188.75 Q1438 193.9 1447 194.4 L1460 194.9 L1460 340 L-20 340Z"/>
+      <rect class="mist" x="-20" y="170" width="1480" height="90" fill="url(#mist)"/>
+      <path fill="url(#r2)" stroke="url(#rim)" stroke-opacity=".5" stroke-width="1" d="M-20 209.4 Q-20 209.4 -9 208.35000000000002 Q2 207.3 13 201.75 Q24 196.2 35 189.95 Q46 183.7 57 186.3 Q68 188.9 79 183.25 Q90 177.6 101 177.75 Q112 177.9 123 178.60000000000002 Q134 179.3 145 182 Q156 184.7 167 187.2 Q178 189.7 189 193.89999999999998 Q200 198.1 211 206.6 Q222 215.1 233 215.14999999999998 Q244 215.2 255 220.39999999999998 Q266 225.6 277 229.25 Q288 232.9 299 235.4 Q310 237.9 321 233.9 Q332 229.9 343 225.75 Q354 221.6 365 219.7 Q376 217.8 387 218.10000000000002 Q398 218.4 409 213.45 Q420 208.5 431 204.4 Q442 200.3 453 196.35000000000002 Q464 192.4 475 187.95 Q486 183.5 497 182.4 Q508 181.3 519 184.4 Q530 187.5 541 182.2 Q552 176.9 563 179.9 Q574 182.9 585 188.2 Q596 193.5 607 197.45 Q618 201.4 629 199.2 Q640 197 651 202.5 Q662 208 673 213.8 Q684 219.6 695 217.89999999999998 Q706 216.2 717 212.85 Q728 209.5 739 211.9 Q750 214.3 761 214.25 Q772 214.2 783 205.85 Q794 197.5 805 197.75 Q816 198 827 187.4 Q838 176.8 849 178.60000000000002 Q860 180.4 871 178.8 Q882 177.2 893 177.35 Q904 177.5 915 173.25 Q926 169 937 170.25 Q948 171.5 959 179.6 Q970 187.7 981 192.89999999999998 Q992 198.1 1003 200.89999999999998 Q1014 203.7 1025 210.05 Q1036 216.4 1047 218.85000000000002 Q1058 221.3 1069 221.85000000000002 Q1080 222.4 1091 223.8 Q1102 225.2 1113 230 Q1124 234.8 1135 231.9 Q1146 229 1157 237 Q1168 245 1179 244.6 Q1190 244.2 1201 240.55 Q1212 236.9 1223 240 Q1234 243.1 1245 234.89999999999998 Q1256 226.7 1267 229.1 Q1278 231.5 1289 230.25 Q1300 229 1311 222.2 Q1322 215.4 1333 212.60000000000002 Q1344 209.8 1355 205.55 Q1366 201.3 1377 202.2 Q1388 203.1 1399 200 Q1410 196.9 1421 202.4 Q1432 207.9 1443 211.55 L1460 215.2 L1460 340 L-20 340Z"/>
+      <path fill="url(#r3)" stroke="rgba(233,230,218,.06)" stroke-width="1" d="M-20 284.9 Q-20 284.9 -5 286.6 Q10 288.3 25 287.4 Q40 286.5 55 286.85 Q70 287.2 85 283.7 Q100 280.2 115 278.35 Q130 276.5 145 276.75 Q160 277 175 274.3 Q190 271.6 205 268.85 Q220 266.1 235 262.9 Q250 259.7 265 255.75 Q280 251.8 295 252.3 Q310 252.8 325 251.7 Q340 250.6 355 250.2 Q370 249.8 385 248.3 Q400 246.8 415 248.45 Q430 250.1 445 254.45 Q460 258.8 475 258.65 Q490 258.5 505 260.9 Q520 263.3 535 264.75 Q550 266.2 565 269.54999999999995 Q580 272.9 595 270.15 Q610 267.4 625 267.75 Q640 268.1 655 269.3 Q670 270.5 685 267.55 Q700 264.6 715 263.45000000000005 Q730 262.3 745 264.15 Q760 266 775 264.2 Q790 262.4 805 263.65 Q820 264.9 835 262.54999999999995 Q850 260.2 865 259.85 Q880 259.5 895 259.95 Q910 260.4 925 261.85 Q940 263.3 955 262.6 Q970 261.9 985 261.65 Q1000 261.4 1015 258.2 Q1030 255 1045 253.8 Q1060 252.6 1075 253.7 Q1090 254.8 1105 256.6 Q1120 258.4 1135 259.29999999999995 Q1150 260.2 1165 260.2 Q1180 260.2 1195 261.29999999999995 Q1210 262.4 1225 264.1 Q1240 265.8 1255 265.85 Q1270 265.9 1285 267.7 Q1300 269.5 1315 271 Q1330 272.5 1345 272.45 Q1360 272.4 1375 276.4 Q1390 280.4 1405 279 Q1420 277.6 1435 278.70000000000005 L1460 279.8 L1460 340 L-20 340Z"/>
+    </svg>
     <p class="kicker">Open source · MIT · npm</p>
     <h1>Build MCP Apps<br />by <em>moonlight</em>.</h1>
     <p class="lede">The MCP App framework, MCP testing framework and local inspector in one package. Ship interactive apps to ChatGPT, Claude and every MCP Apps host, and test them in CI without host accounts, tunnels or AI credits.</p>
     <div class="cta">
-      <button class="cmd" data-copy="npx moonpeak new"><span class="prompt">$</span> npx moonpeak new <span class="copy">copy</span></button>
-      <a class="btn" href="docs/">Documentation</a>
+      <button class="cmd magnetic" data-copy="npx moonpeak new"><span class="prompt">$</span> npx moonpeak new <span class="copy">copy</span></button>
+      <a class="btn shine magnetic" href="docs/">Documentation</a>
       <a class="btn ghost" href="https://github.com/ghiansalman30-crypto/moonpeak">Source</a>
     </div>
-    <p class="hosts">Runs in <b>ChatGPT</b> · <b>Claude</b> · <b>VS Code</b> · <b>Goose</b> · any MCP Apps host</p>
+    <p class="hosts">Runs in <b>ChatGPT</b><b>Claude</b><b>VS Code</b><b>Goose</b><span>and any MCP Apps host</span></p>
   </section>
 
-  <section class="what">
-    <h2>What is moonpeak?</h2>
-    <p class="sub">Four tools that usually live in four repos.</p>
-    <div class="grid4">
-      <article><span class="ic">◐</span><h3>App framework</h3><p>One file per tool, one folder per View. React hooks for tool data, theme, display modes, state and host actions.</p></article>
-      <article><span class="ic">◑</span><h3>Inspector</h3><p>ChatGPT-style and Claude-style hosts on localhost. Switch theme, device and display mode. Edit tool data live.</p></article>
-      <article><span class="ic">◒</span><h3>Testing framework</h3><p>Schema, View and simulation checks in about a second. Playwright fixtures for e2e. Multi-model tool-choice evals.</p></article>
-      <article><span class="ic">◓</span><h3>CLI</h3><p><code>new</code>, <code>dev</code>, <code>build</code>, <code>start</code>, <code>inspect</code>, <code>test</code>. Hot reload for both your Views and your server code.</p></article>
+  <section class="stats" data-reveal>
+    <div class="statrow" data-stagger>
+      <div><b data-count="27">27</b><span>typed React hooks</span></div>
+      <div><b><span data-count="0.3">0.3</span><small>s</small></b><span>for 8 checks, in-process</span></div>
+      <div><b data-count="2">2</b><span>host simulators, ChatGPT and Claude</span></div>
+      <div><b data-count="1">1</b><span>npm package, MIT licensed</span></div>
     </div>
   </section>
 
-  <section id="framework" class="split">
+  <section class="what" data-reveal>
+    <h2>What is moonpeak?</h2>
+    <p class="sub">Four tools that usually live in four repos.</p>
+    <div class="grid4" data-stagger>
+      <article class="glow-card"><span class="ic">◐</span><h3>App framework</h3><p>One file per tool, one folder per View. React hooks for tool data, theme, display modes, state and host actions.</p></article>
+      <article class="glow-card"><span class="ic">◑</span><h3>Inspector</h3><p>ChatGPT-style and Claude-style hosts on localhost. Switch theme, device and display mode. Edit tool data live.</p></article>
+      <article class="glow-card"><span class="ic">◒</span><h3>Testing framework</h3><p>Schema, View and simulation checks in about a second. Playwright fixtures for e2e. Multi-model tool-choice evals.</p></article>
+      <article class="glow-card"><span class="ic">◓</span><h3>CLI</h3><p><code>new</code>, <code>dev</code>, <code>build</code>, <code>start</code>, <code>inspect</code>, <code>test</code>. Hot reload for both your Views and your server code.</p></article>
+    </div>
+  </section>
+
+  <section id="framework" class="split" data-reveal>
     <div>
       <p class="kicker">MCP App framework · ChatGPT Apps · Claude connectors</p>
       <h2>Write it once. It renders in every host.</h2>
@@ -64,7 +109,7 @@
         <li>ChatGPT and Claude extras live behind <code>moonpeak/chatgpt</code> and <code>moonpeak/claude</code>, with safe fallbacks.</li>
       </ul>
     </div>
-    <pre class="code"><span class="c">my-app/</span>
+    <div class="term win"><div class="bar"><i></i><i></i><i></i><span class="fname">my-app</span></div><pre class="code"><span class="c">my-app/</span>
 ├─ src/
 │  ├─ tools/
 │  │  └─ <b>show-moon.ts</b>        <span class="c"># one MCP tool</span>
@@ -76,11 +121,11 @@
    ├─ simulations/
    │  └─ <b>show-moon.json</b>     <span class="c"># fixtures</span>
    ├─ e2e/moon.spec.ts
-   └─ evals/moon.eval.json</pre>
+   └─ evals/moon.eval.json</pre></div>
   </section>
 
-  <section class="split rev">
-    <pre class="code"><span class="k">import</span> { useToolData, useTheme, useCallTool } <span class="k">from</span> <span class="s">"moonpeak"</span>;
+  <section class="split rev" data-reveal>
+    <div class="term win"><div class="bar"><i></i><i></i><i></i><span class="fname">src/resources/moon/moon.tsx</span></div><pre class="code"><span class="k">import</span> { useToolData, useTheme, useCallTool } <span class="k">from</span> <span class="s">"moonpeak"</span>;
 
 <span class="k">export const</span> resource = { title: <span class="s">"Moon phase"</span> };
 
@@ -98,7 +143,7 @@
       &lt;/button&gt;
     &lt;/Card&gt;
   );
-}</pre>
+}</pre></div>
     <div>
       <h2>Twenty-seven hooks, zero host glue.</h2>
       <p>Everything a View needs, typed: the tool's input and output, theme, locale, safe areas, container size, display mode requests, per-View state that survives reloads, calling other tools, posting into the chat and updating model context.</p>
@@ -106,7 +151,7 @@
     </div>
   </section>
 
-  <section id="testing" class="split">
+  <section id="testing" class="split" data-reveal>
     <div>
       <p class="kicker">MCP testing framework</p>
       <h2>Test MCP Apps in CI. No accounts, no keys.</h2>
@@ -114,8 +159,8 @@
       <p>Need more? <code>--e2e</code> drives the inspector with Playwright, <code>--eval</code> asks real models whether they pick the right tool, and <code>--server</code> points all of it at any MCP server, in any language.</p>
       <a class="more" href="docs/#testing">Testing docs →</a>
     </div>
-    <div class="term">
-      <div class="bar"><i></i><i></i><i></i></div>
+    <div class="term" data-typing>
+      <div class="bar"><i></i><i></i><i></i><span class="fname">zsh</span><button class="replay" type="button">replay</button></div>
 <pre><span class="d">$</span> moonpeak test
 
   <b>moonpeak test</b> <span class="d">starter</span>
@@ -134,7 +179,7 @@
     </div>
   </section>
 
-  <section id="inspector" class="inspector">
+  <section id="inspector" class="inspector" data-reveal>
     <p class="kicker">Inspector</p>
     <h2>ChatGPT and Claude, on localhost.</h2>
     <p class="sub">Flip host, theme, device and display mode while your View hot-reloads. Every setting lives in the URL, so a bug report is a link.</p>
@@ -148,17 +193,17 @@
     </div>
   </section>
 
-  <section class="docs">
+  <section class="docs" data-reveal>
     <h2>Popular docs</h2>
-    <div class="grid4">
-      <a href="docs/#quickstart"><h3>Quickstart</h3><p>From <code>npx moonpeak new</code> to a View in Claude.</p></a>
-      <a href="docs/#hooks"><h3>Hooks</h3><p>Every hook, what it returns, and where it works.</p></a>
-      <a href="docs/#simulations"><h3>Simulations</h3><p>Fixtures, mocked output and expectations.</p></a>
-      <a href="docs/#deploy"><h3>Deploying</h3><p>Node, Workers, Express, Deno and Bun.</p></a>
+    <div class="grid4" data-stagger>
+      <a class="glow-card" href="docs/#quickstart"><h3>Quickstart</h3><p>From <code>npx moonpeak new</code> to a View in Claude.</p></a>
+      <a class="glow-card" href="docs/#hooks"><h3>Hooks</h3><p>Every hook, what it returns, and where it works.</p></a>
+      <a class="glow-card" href="docs/#simulations"><h3>Simulations</h3><p>Fixtures, mocked output and expectations.</p></a>
+      <a class="glow-card" href="docs/#deploy"><h3>Deploying</h3><p>Node, Workers, Express, Deno and Bun.</p></a>
     </div>
   </section>
 
-  <section class="faq">
+  <section class="faq" data-reveal>
     <h2>Frequently asked questions</h2>
     <table class="facts">
       <tr><th>Product</th><td>moonpeak</td></tr>
@@ -176,12 +221,12 @@
     <details><summary>Is it free?</summary><p>Yes. MIT licensed, no account, no telemetry.</p></details>
   </section>
 
-  <section class="final">
-    <div class="moon-small" aria-hidden="true"></div>
+  <section class="final" data-reveal>
+    <div class="rise" aria-hidden="true"><div class="moon-small"></div><svg viewBox="0 0 400 60" preserveAspectRatio="none"><linearGradient id="rise-rim" x1="0" x2="1"><stop offset="0" stop-color="#e9e6da" stop-opacity="0"/><stop offset=".5" stop-color="#e9e6da" stop-opacity=".55"/><stop offset="1" stop-color="#e9e6da" stop-opacity="0"/></linearGradient><path d="M0 46 Q30 40 60 30 T110 38 Q140 26 170 14 T220 32 Q245 24 270 22 T330 40 Q365 34 400 32 V62 H0Z" fill="#070913"/><path d="M0 46 Q30 40 60 30 T110 38 Q140 26 170 14 T220 32 Q245 24 270 22 T330 40 Q365 34 400 32" fill="none" stroke="url(#rise-rim)" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg></div>
     <h2>Open source, MIT licensed.</h2>
     <div class="cta center">
-      <button class="cmd" data-copy="npx moonpeak new"><span class="prompt">$</span> npx moonpeak new <span class="copy">copy</span></button>
-      <a class="btn" href="docs/">Documentation →</a>
+      <button class="cmd magnetic" data-copy="npx moonpeak new"><span class="prompt">$</span> npx moonpeak new <span class="copy">copy</span></button>
+      <a class="btn shine magnetic" href="docs/">Documentation →</a>
     </div>
   </section>
 </main>
@@ -192,14 +237,7 @@
   <a href="https://github.com/ghiansalman30-crypto/moonpeak">GitHub</a>
 </footer>
 
-<script>
-  for (const b of document.querySelectorAll("[data-copy]")) {
-    b.addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText(b.dataset.copy); } catch {}
-      const s = b.querySelector(".copy");
-      if (s) { s.textContent = "copied"; setTimeout(() => (s.textContent = "copy"), 1400); }
-    });
-  }
-</script>
+<div class="toast" role="status" aria-live="polite">Copied <code>npx moonpeak new</code></div>
+<script src="main.js" defer></script>
 </body>
 </html>

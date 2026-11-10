@@ -12,16 +12,21 @@ import { createMcpHandler } from "@modelcontextprotocol/server";
 import { toNodeHandler } from "@modelcontextprotocol/node";
 import { createMcpServer } from "./server/index.js";
 import { discoverResources, discoverSimulations, discoverTools, loadConfig } from "./project.js";
-import { baseConfig, buildViewHtml, devViewHtml, PKG_DIR } from "./vite.js";
+import { baseConfig, buildViewHtml, devViewHtml, OPTIMIZE_DEPS, PKG_DIR } from "./vite.js";
 import { c } from "./log.js";
 
 export async function freePort(start) {
   for (let p = start; p < start + 50; p++) {
-    const ok = await new Promise((resolve) => {
-      const s = net.createServer();
-      s.once("error", () => resolve(false));
-      s.listen({ port: p, host: "::", ipv6Only: false }, () => s.close(() => resolve(true)));
-    });
+    // Free only if nothing holds it on IPv4 loopback, IPv6 loopback or the wildcard.
+    let ok = true;
+    for (const opts of [{ host: "127.0.0.1" }, { host: "::1", ipv6Only: true }, { host: "::", ipv6Only: false }]) {
+      ok = await new Promise((resolve) => {
+        const s = net.createServer();
+        s.once("error", (e) => resolve(e.code === "EADDRNOTAVAIL" || e.code === "EAFNOSUPPORT"));
+        s.listen({ port: p, ...opts }, () => s.close(() => resolve(true)));
+      });
+      if (!ok) break;
+    }
     if (ok) return p;
   }
   throw new Error(`no free port near ${start}`);
@@ -77,15 +82,17 @@ export async function loadProject(vite, root, cfg, viewCache) {
 
 export async function startDev({ root, port, remote, open = false, quiet = false } = {}) {
   const cfg = remote ? { name: "inspect" } : await loadConfig(root);
+  // One HTTP server for everything, including Vite's HMR websocket (no second port).
+  const server = http.createServer();
   const vite = await createVite({
     ...baseConfig({ root: remote ? PKG_DIR : root, appName: cfg.name, userVite: cfg.vite }),
     appType: "custom",
     server: {
       middlewareMode: true,
-      hmr: { port: await freePort(24678) },
+      hmr: { server },
       fs: { allow: [root || PKG_DIR, PKG_DIR, path.resolve(PKG_DIR, "..", "..")] },
     },
-    optimizeDeps: { include: ["react", "react-dom", "react-dom/client", "react/jsx-runtime", "react/jsx-dev-runtime"].filter(() => !remote) },
+    optimizeDeps: remote ? { include: ["@modelcontextprotocol/ext-apps/app-bridge", "@modelcontextprotocol/client"] } : OPTIMIZE_DEPS,
   });
 
   const viewCache = new Map();
@@ -128,7 +135,7 @@ export async function startDev({ root, port, remote, open = false, quiet = false
     }
   }
 
-  const server = http.createServer(async (req, res) => {
+  server.on("request", async (req, res) => {
     const url = new URL(req.url, "http://localhost");
     // Dev server answers on every interface (IPv4 + IPv6) but only to local host names.
     const hostname = String(req.headers.host || "").replace(/:\d+$/, "").replace(/^\[|\]$/g, "");

@@ -1,0 +1,1 @@
+{ "name": "fails cleanly", "tool": "explode", "input": {}, "expect": { "isError": true, "text": "boom" } }

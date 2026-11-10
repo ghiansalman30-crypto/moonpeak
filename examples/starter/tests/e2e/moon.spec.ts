@@ -30,3 +30,10 @@ test("tool returns structured content", async ({ mcp }) => {
   const res = await mcp.call("show-moon", { date: "2026-11-24" });
   expect(res).toHaveStructuredContent({ phase: "Full Moon" });
 });
+
+test("@visual mocked crescent, both hosts", async ({ inspector }) => {
+  for (const host of ["chatgpt", "claude"] as const) {
+    const view = await inspector.open({ tool: "show-moon", sim: "show-moon#mocked-waxing-crescent", host });
+    await expect(view.locator(".moon-app")).toHaveScreenshot(`crescent-${host}.png`, { maxDiffPixelRatio: 0.01 });
+  }
+});

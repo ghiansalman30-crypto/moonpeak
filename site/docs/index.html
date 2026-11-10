@@ -194,12 +194,13 @@ export default function Moon() {
 </ul>
 <h2 id="testing"><a href="#testing">Testing</a></h2><pre><code class="language-bash">moonpeak test                     # schema + View + simulation checks, in-process, ~1s
 moonpeak test --e2e               # Playwright against the inspector (starts it for you)
-moonpeak test --e2e --update      # refresh screenshot baselines
+moonpeak test --visual            # screenshot tests tagged @visual (first run records baselines)
+moonpeak test --visual --update   # re-record baselines after an intended change
 moonpeak test --eval              # model evals, needs ANTHROPIC_API_KEY / OPENAI_API_KEY
 moonpeak test init --server URL   # write simulations for an existing server
 moonpeak test --server URL        # test any MCP server, any language
 </code></pre>
-<p>E2E tests get two fixtures:</p>
+<p>Run <code>npx playwright install chromium</code> once before the first e2e run. E2E tests get two fixtures:</p>
 <pre><code class="language-ts">import { test, expect } from &quot;moonpeak/test&quot;;
 
 test(&quot;renders in Claude dark mode&quot;, async ({ inspector }) =&gt; {
@@ -255,7 +256,7 @@ app.all(&quot;/mcp&quot;, await createNodeHandler(opts));
 <td>inspector for any MCP server</td>
 </tr>
 <tr>
-<td><code>moonpeak test [init] [--e2e] [--eval] [--server &lt;url&gt;]</code></td>
+<td><code>moonpeak test [init] [--e2e] [--visual] [--eval] [--server &lt;url&gt;]</code></td>
 <td>tests</td>
 </tr>
 <tr>

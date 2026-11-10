@@ -30,6 +30,8 @@ export function mount(App, info = {}) {
     document.body.appendChild(el);
   }
   const root = createRoot(el);
-  root.render(createElement(StrictMode, null, createElement(Boundary, null, createElement(App))));
-  return root;
+  const render = (C) => root.render(createElement(StrictMode, null, createElement(Boundary, { key: Math.random() }, createElement(C))));
+  render(App);
+  // Used by the dev entry for hot updates: swap the component, keep the host connection and app state.
+  return { root, update: render };
 }

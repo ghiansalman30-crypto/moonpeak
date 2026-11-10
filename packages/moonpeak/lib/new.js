@@ -4,7 +4,7 @@ import path from "node:path";
 import { PKG_DIR } from "./vite.js";
 import { c } from "./log.js";
 
-const SKIP = new Set(["node_modules", "dist", "test-results", "playwright-report", ".moonpeak"]);
+const SKIP = new Set(["node_modules", "dist", "test-results", "playwright-report", ".moonpeak", ".vite", "__screenshots__"]);
 
 function copy(from, to) {
   fs.mkdirSync(to, { recursive: true });
@@ -41,6 +41,7 @@ export function scaffold(dir, { version }) {
     cd ${rel}
     npm install
     npm run dev        ${c.dim("# inspector at http://localhost:3000")}
+    npx playwright install chromium   ${c.dim("# once, for moonpeak test --e2e")}
 
   ${c.dim("Tools live in src/tools, Views in src/resources, fixtures in tests/simulations.")}
 `);

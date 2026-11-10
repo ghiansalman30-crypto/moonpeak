@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const from = path.resolve(here, "..", "..", "examples", "starter");
 const to = path.join(here, "templates", "starter");
-const SKIP = new Set(["node_modules", "dist", "test-results", "playwright-report", ".vite"]);
+const SKIP = new Set(["node_modules", "dist", "test-results", "playwright-report", ".vite", "__screenshots__"]);
 
 function copy(a, b) {
   fs.mkdirSync(b, { recursive: true });

@@ -36,6 +36,9 @@
     "./test/client": {
       "types": "./types/test.d.ts",
       "default": "./lib/test/runner.js"
+    },
+    "./mount": {
+      "default": "./lib/runtime/mount.js"
     }
   },
   "files": [

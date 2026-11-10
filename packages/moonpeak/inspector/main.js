@@ -114,20 +114,37 @@ function applySim() {
   S.modelContext = null;
 }
 
+/** Required fields (and fields with defaults) only, with values that match their format. */
 function exampleInput(tool) {
-  const props = tool?.inputSchema?.properties || {};
+  return exampleArgs(tool?.inputSchema);
+}
+
+function exampleArgs(schema = {}) {
+  const required = new Set(schema.required || []);
   const out = {};
-  for (const [k, p] of Object.entries(props)) {
-    if (p.default !== undefined) out[k] = p.default;
-    else if (p.examples?.length) out[k] = p.examples[0];
-    else if (p.enum?.length) out[k] = p.enum[0];
-    else if (p.type === "number" || p.type === "integer") out[k] = 0;
-    else if (p.type === "boolean") out[k] = false;
-    else if (p.type === "array") out[k] = [];
-    else if (p.type === "object") out[k] = {};
-    else out[k] = "";
+  for (const [k, p] of Object.entries(schema.properties || {})) {
+    if (!required.has(k) && p.default === undefined) continue;
+    out[k] = exampleValue(p, k);
   }
   return out;
+}
+
+function exampleValue(p = {}, key = "") {
+  if (p.default !== undefined) return p.default;
+  if (p.examples?.length) return p.examples[0];
+  if (p.const !== undefined) return p.const;
+  if (p.enum?.length) return p.enum[0];
+  const type = Array.isArray(p.type) ? p.type.find((t) => t !== "null") : p.type;
+  const hint = `${key} ${p.format || ""} ${p.description || ""} ${p.pattern || ""}`.toLowerCase();
+  if (type === "integer" || type === "number") return p.minimum ?? (p.exclusiveMinimum !== undefined ? p.exclusiveMinimum + 1 : 1);
+  if (type === "boolean") return true;
+  if (type === "array") return p.minItems ? Array.from({ length: p.minItems }, () => exampleValue(p.items)) : [];
+  if (type === "object") return exampleArgs(p);
+  if (/date-time|timestamp/.test(hint)) return new Date().toISOString();
+  if (/yyyy-mm-dd|\bdate\b/.test(hint)) return new Date().toISOString().slice(0, 10);
+  if (/email/.test(hint)) return "pilot@example.com";
+  if (/\buri\b|\burl\b|link/.test(hint)) return "https://example.com";
+  return "example";
 }
 
 async function runLive() {
@@ -234,7 +251,7 @@ function setMode(mode) {
   syncUrl();
   renderSide();
   applyMode();
-  bridge?.sendHostContextChange({ displayMode: mode, containerDimensions: hostContext().containerDimensions });
+  safeContext({ displayMode: mode, containerDimensions: hostContext().containerDimensions });
 }
 
 async function mountView(slot) {
@@ -261,20 +278,26 @@ async function mountView(slot) {
     logging: {},
     updateModelContext: { text: {} },
     message: { text: {} },
-  });
-  bridge.setHostContext(hostContext());
+  }, { hostContext: hostContext() }); // passed up front: setHostContext() before connect() would try to notify a View that isn't there yet
 
   const input = S.input;
   const result = S.result;
-  bridge.oninitialized = async () => {
-    log("←", "ui/initialized", bridge.getAppVersion());
-    frame?.setAttribute("data-ready", "true");
-    await bridge.sendToolInput({ arguments: input });
-    log("→", "ui/notifications/tool-input", input);
-    if (result) {
-      await bridge.sendToolResult(result);
-      log("→", "ui/notifications/tool-result", result);
+  const b = bridge;
+  const fr = frame;
+  b.oninitialized = async () => {
+    if (b !== bridge) return; // a newer View replaced this one
+    log("←", "ui/initialized", b.getAppVersion());
+    try {
+      await b.sendToolInput({ arguments: input });
+      log("→", "ui/notifications/tool-input", input);
+      if (result) {
+        await b.sendToolResult(result);
+        log("→", "ui/notifications/tool-result", result);
+      }
+    } catch (e) {
+      log("!", "send to View failed", e.message);
     }
+    fr.setAttribute("data-ready", "true");
   };
   bridge.onsizechange = ({ height }) => {
     if (frame && height && S.mode === "inline") frame.style.height = Math.min(Math.ceil(height), 2000) + "px";
@@ -313,21 +336,42 @@ async function mountView(slot) {
   };
   bridge.onrequestteardown = () => log("←", "ui/request-teardown");
 
-  await bridge.connect(new PostMessageTransport(frame.contentWindow, frame.contentWindow));
+  await b.connect(new PostMessageTransport(fr.contentWindow, fr.contentWindow));
+  if (b !== bridge) {
+    // replaced while connecting
+    try { b.close?.(); } catch {}
+    return;
+  }
 
   if (S.project?.remote) {
     try {
       const res = await client.readResource({ uri });
       const html = res.contents?.[0]?.text ?? "";
       log("→", "resources/read", uri);
-      frame.srcdoc = html;
+      if (b === bridge) fr.srcdoc = html;
     } catch (e) {
       slot.replaceChildren(h("div", { class: "card error" }, `could not read ${uri}: ${e.message}`));
     }
   } else {
     const name = uri.split("/").pop().replace(/\.html$/, "");
-    frame.src = `/__moonpeak/view/${encodeURIComponent(name)}`;
+    fr.src = `/__moonpeak/view/${encodeURIComponent(name)}`;
   }
+}
+
+/** Push a host context change to the live View; a View that is gone is not an error. */
+function safeContext(patch) {
+  if (!bridge) return;
+  try {
+    const p = bridge.sendHostContextChange(patch);
+    if (p?.catch) p.catch(() => {});
+  } catch {}
+}
+
+/** After picking a tool or simulation: show it, and call the real handler unless the data is mocked. */
+function afterPick() {
+  syncUrl();
+  render();
+  if (!S.result && currentTool()) runLive();
 }
 
 function teardown() {
@@ -394,7 +438,7 @@ function sidebar() {
     h("label", { class: "lbl" }, "Tool"),
     h(
       "select",
-      { "data-testid": "tool", onchange: (e) => (pickTool(e.target.value), syncUrl(), render()) },
+      { "data-testid": "tool", onchange: (e) => (pickTool(e.target.value), afterPick()) },
       S.tools.length ? null : h("option", {}, "no tools found"),
       S.tools.map((t) => h("option", { value: t.name, selected: t.name === S.tool }, (getToolUiResourceUri(t) ? "◐ " : "  ") + t.name)),
     ),
@@ -403,7 +447,7 @@ function sidebar() {
     h("label", { class: "lbl" }, "Simulation"),
     h(
       "select",
-      { "data-testid": "simulation", onchange: (e) => ((S.sim = e.target.value), applySim(), syncUrl(), render()) },
+      { "data-testid": "simulation", onchange: (e) => ((S.sim = e.target.value), applySim(), afterPick()) },
       h("option", { value: "", selected: !S.sim }, "none (edit input, then run)"),
       sims.map((s) => h("option", { value: s.id, selected: s.id === S.sim }, s.name + (s.output !== undefined || s.result ? "  · mocked" : ""))),
     ),
@@ -415,7 +459,7 @@ function sidebar() {
       S.theme = v;
       syncUrl();
       renderSide();
-      bridge?.sendHostContextChange({ theme: v, styles: { variables: hostVars() } });
+      safeContext({ theme: v, styles: { variables: hostVars() } });
     }),
     h("label", { class: "lbl" }, "Device"),
     seg("device", S.device, [["desktop", "Desktop"], ["tablet", "Tablet"], ["mobile", "Mobile"]], (v) => ((S.device = v), syncUrl(), render())),

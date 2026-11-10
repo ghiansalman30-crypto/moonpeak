@@ -1,0 +1,5 @@
+[
+  { "name": "defaults", "input": { "label": "hello", "count": 3 }, "expect": { "output": { "label": "hello", "items": [1, 2, 3] } } },
+  { "name": "mocked", "input": { "label": "mock" }, "output": { "label": "mocked!", "items": [9], "at": "mock" } },
+  { "name": "out of range is rejected", "input": { "label": "x", "count": 500 }, "expect": { "isError": true } }
+]

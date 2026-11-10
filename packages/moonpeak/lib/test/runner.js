@@ -13,14 +13,18 @@ import { c } from "../log.js";
 export async function connect({ root, server, headers } = {}) {
   const client = new Client({ name: "moonpeak-test", version: "1.0.0" });
   if (server) {
-    await client.connect(new StreamableHTTPClientTransport(new URL(server), { requestInit: { headers } }));
+    try {
+      await client.connect(new StreamableHTTPClientTransport(new URL(server), { requestInit: { headers } }));
+    } catch (e) {
+      throw new Error(`could not connect to ${server} (${e?.cause?.code || e.message}). Is the server running, and is the URL its MCP endpoint?`);
+    }
     return { client, close: () => client.close() };
   }
   const { createServer } = await import("vite");
   const { baseConfig } = await import("../vite.js");
   const { loadProject } = await import("../dev.js");
   const cfg = await loadConfig(root);
-  const vite = await createServer({ ...baseConfig({ root, appName: cfg.name, userVite: cfg.vite }), appType: "custom", server: { middlewareMode: true, hmr: false, watch: null }, optimizeDeps: { noDiscovery: true, include: [] } });
+  const vite = await createServer({ ...baseConfig({ root, appName: cfg.name, userVite: cfg.vite }), appType: "custom", server: { middlewareMode: true, hmr: false, ws: false, watch: null }, optimizeDeps: { noDiscovery: true, include: [] } });
   const project = await loadProject(vite, root, cfg, new Map());
   const mcp = createMcpServer({ name: cfg.name, version: cfg.version, instructions: cfg.instructions, ...project });
   const [a, b] = InMemoryTransport.createLinkedPair();
@@ -103,6 +107,7 @@ export async function runTests({ root, server, headers, filter, quiet = false } 
 
   try {
     const { tools } = await client.listTools();
+    if (!tools.length) record("setup", server ? "server exposes no tools" : "no tools found in src/tools", ["add a tool first (see examples/starter)"], 0);
 
     // 1. Static checks on every tool
     for (const t of tools) {
@@ -165,6 +170,37 @@ export async function runTests({ root, server, headers, filter, quiet = false } 
   return { results, failed };
 }
 
+/** A plausible input for a JSON schema: required fields only, with format-aware values. */
+export function exampleArgs(schema = {}) {
+  const required = new Set(schema.required || []);
+  const out = {};
+  for (const [k, p] of Object.entries(schema.properties || {})) {
+    if (!required.has(k) && p.default === undefined) continue;
+    out[k] = exampleValue(p, k);
+  }
+  return out;
+}
+
+function exampleValue(p = {}, key = "") {
+  if (p.default !== undefined) return p.default;
+  if (p.examples?.length) return p.examples[0];
+  if (p.const !== undefined) return p.const;
+  if (p.enum?.length) return p.enum[0];
+  const type = Array.isArray(p.type) ? p.type.find((t) => t !== "null") : p.type;
+  const hint = `${key} ${p.format || ""} ${p.description || ""} ${p.pattern || ""}`.toLowerCase();
+  if (type === "integer" || type === "number") return p.minimum ?? (p.exclusiveMinimum !== undefined ? p.exclusiveMinimum + 1 : 1);
+  if (type === "boolean") return true;
+  if (type === "array") return p.minItems ? Array.from({ length: p.minItems }, () => exampleValue(p.items)) : [];
+  if (type === "object") return exampleArgs(p);
+  if (/date-time|timestamp/.test(hint)) return new Date().toISOString();
+  if (/yyyy-mm-dd|date/.test(hint)) return new Date().toISOString().slice(0, 10);
+  if (/email/.test(hint)) return "pilot@example.com";
+  if (/uri|url|link/.test(hint)) return "https://example.com";
+  if (/uuid/.test(hint)) return "00000000-0000-4000-8000-000000000000";
+  const s = "example";
+  return p.minLength && s.length < p.minLength ? s.padEnd(p.minLength, "x") : s;
+}
+
 /** `moonpeak test init`: write a simulation per tool from the live schema. */
 export async function initTests({ root, server, headers }) {
   const { client, close } = await connect({ root: server ? undefined : root, server, headers });
@@ -176,10 +212,7 @@ export async function initTests({ root, server, headers }) {
     for (const t of tools) {
       const file = path.join(dir, `${t.name}.json`);
       if (fs.existsSync(file)) continue;
-      const input = {};
-      for (const [k, p] of Object.entries(t.inputSchema?.properties || {})) {
-        input[k] = p.default ?? p.examples?.[0] ?? p.enum?.[0] ?? (p.type === "number" || p.type === "integer" ? 1 : p.type === "boolean" ? true : p.type === "array" ? [] : p.type === "object" ? {} : "example");
-      }
+      const input = exampleArgs(t.inputSchema);
       fs.writeFileSync(file, JSON.stringify({ name: `${t.name} happy path`, tool: t.name, prompt: `Use ${t.title || t.name}`, input, expect: { isError: false } }, null, 2) + "\n");
       written.push(path.relative(root, file));
     }

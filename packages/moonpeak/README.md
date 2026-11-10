@@ -115,13 +115,14 @@ Host extras, safe to call anywhere: `moonpeak/chatgpt` (`useWidgetState`, `useUp
 ```bash
 moonpeak test                     # schema + View + simulation checks, in-process, ~1s
 moonpeak test --e2e               # Playwright against the inspector (starts it for you)
-moonpeak test --e2e --update      # refresh screenshot baselines
+moonpeak test --visual            # screenshot tests tagged @visual (first run records baselines)
+moonpeak test --visual --update   # re-record baselines after an intended change
 moonpeak test --eval              # model evals, needs ANTHROPIC_API_KEY / OPENAI_API_KEY
 moonpeak test init --server URL   # write simulations for an existing server
 moonpeak test --server URL        # test any MCP server, any language
 ```
 
-E2E tests get two fixtures:
+Run `npx playwright install chromium` once before the first e2e run. E2E tests get two fixtures:
 
 ```ts
 import { test, expect } from "moonpeak/test";
@@ -176,7 +177,7 @@ Then add the URL as a connector in Claude, or as an app in ChatGPT developer mod
 | `moonpeak build` | `dist/resources/*.html` + `dist/server.mjs` |
 | `moonpeak start` | serve the build at `/mcp` |
 | `moonpeak inspect --server <url>` | inspector for any MCP server |
-| `moonpeak test [init] [--e2e] [--eval] [--server <url>]` | tests |
+| `moonpeak test [init] [--e2e] [--visual] [--eval] [--server <url>]` | tests |
 | `moonpeak upgrade` | update moonpeak |
 
 ## License

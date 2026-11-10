@@ -19,7 +19,8 @@ const HELP = `
     moonpeak inspect --server <url>    inspect any MCP server in ChatGPT/Claude style hosts
     moonpeak test                      schema checks, View checks and simulations
     moonpeak test init [--server <url>]  write a simulation per tool
-    moonpeak test --e2e [--update]     Playwright tests against the inspector
+    moonpeak test --e2e                Playwright tests against the inspector
+    moonpeak test --visual [--update]  screenshot tests (tag them @visual)
     moonpeak test --eval               check models pick the right tool (needs API keys)
     moonpeak test --server <url>       test any MCP server, in any language
     moonpeak upgrade                   update moonpeak in this project
@@ -72,8 +73,8 @@ async function main() {
   const { findRoot } = await import("../lib/project.js");
   const root = findRoot();
 
-  if (!cmd || cmd === "help" || args.help) return console.log(HELP);
-  if (cmd === "--version" || cmd === "version" || args.version) return console.log(VERSION);
+  if (cmd === "version" || args.version || args.v) return console.log(VERSION);
+  if (!cmd || cmd === "help" || args.help || args.h) return console.log(HELP);
 
   if (cmd === "new") {
     const { scaffold } = await import("../lib/new.js");
@@ -124,11 +125,28 @@ async function main() {
       const { discoverSimulations } = await import("../lib/project.js");
       const dev = await startDev({ root, quiet: true, port: Number(args.port) || 3100, remote: server ? { url: server, headers, simulations: discoverSimulations(root) } : undefined });
       console.log(`\n  ${c.bold("moonpeak test --e2e")} ${c.dim("inspector at " + dev.url)}\n`);
-      const pw = ["playwright", "test"];
+      // Run the project's own Playwright CLI with node directly: no npx, no shell,
+      // so it behaves the same under `npx moonpeak`, npm scripts and CI.
+      const { createRequire } = await import("node:module");
+      let cli;
+      try {
+        cli = createRequire(path.join(root, "package.json")).resolve("@playwright/test/cli");
+      } catch {
+        await dev.close();
+        throw new Error("e2e tests need Playwright in this project: npm i -D @playwright/test && npx playwright install chromium");
+      }
+      const pw = [cli, "test"];
+      // --e2e is functional tests only; screenshots are opt-in with --visual
+      // (baselines are per machine, so they shouldn't break a plain e2e run).
       if (args.visual) pw.push("--grep", "@visual");
+      else pw.push("--grep-invert", "@visual");
       if (args.update) pw.push("--update-snapshots");
+      else if (args.visual) pw.push("--update-snapshots=missing"); // first run records baselines instead of failing
       for (const extra of args._.slice(1)) pw.push(extra);
-      const code = await run("npx", pw, { cwd: root, env: { ...process.env, MOONPEAK_URL: dev.url } });
+      const code = await new Promise((resolve) => {
+        const p = spawn(process.execPath, pw, { cwd: root, stdio: "inherit", env: { ...process.env, MOONPEAK_URL: dev.url } });
+        p.on("exit", (c) => resolve(c ?? 1));
+      });
       await dev.close();
       process.exit(code);
     }
@@ -145,7 +163,11 @@ async function main() {
   }
 
   if (cmd === "upgrade") {
-    const code = await run("npm", ["install", "moonpeak@latest"], { cwd: root });
+    // Prefer the npm that launched us (npm_execpath), so the right npm is used even under npx.
+    const npmCli = process.env.npm_execpath && /npm-cli\.js$/.test(process.env.npm_execpath) ? process.env.npm_execpath : null;
+    const code = npmCli
+      ? await new Promise((resolve) => spawn(process.execPath, [npmCli, "install", "moonpeak@latest"], { cwd: root, stdio: "inherit" }).on("exit", (c) => resolve(c ?? 1)))
+      : await run("npm", ["install", "moonpeak@latest"], { cwd: root });
     process.exit(code);
   }
 

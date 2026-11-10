@@ -6,7 +6,9 @@ import react from "@vitejs/plugin-react";
 import { discoverResources } from "./project.js";
 
 export const PKG_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MOUNT = path.join(PKG_DIR, "lib", "runtime", "mount.js").replace(/\\/g, "/");
+// Imported by bare name so it resolves to the very same runtime module the user's
+// View gets from "moonpeak" (one store, one host connection).
+const MOUNT = "moonpeak/mount";
 const INSPECTOR = path.join(PKG_DIR, "inspector").replace(/\\/g, "/");
 
 const VIEW = "virtual:moonpeak/view/";
@@ -16,10 +18,29 @@ export function moonpeakPlugin({ root, appName }) {
   return {
     name: "moonpeak",
     enforce: "pre",
+    // Tools and resource configs are loaded server-side with ssrLoadModule. Vite's
+    // default for a changed SSR module is a full page reload, which would wipe the
+    // View's state on every save. Invalidate the SSR copies and let the client
+    // graph do a normal hot update instead.
+    hotUpdate(options) {
+      if (this.environment?.name !== "ssr") return;
+      for (const mod of options.modules) this.environment.moduleGraph.invalidateModule(mod);
+      return [];
+    },
     resolveId(id) {
       if (id.startsWith(VIEW)) return "\0" + id;
       if (id.startsWith("/@moonpeak/inspector/")) return path.join(INSPECTOR, id.slice("/@moonpeak/inspector/".length)).replace(/\\/g, "/");
       return null;
+    },
+    // `export const resource = {...}` is server metadata. Dropping the export in the
+    // browser keeps the file "components only", so React Fast Refresh can hot-swap
+    // the View and keep its state instead of reloading the page.
+    transform(code, id, options) {
+      if (options?.ssr) return null;
+      const file = id.split("?")[0].replace(/\\/g, "/");
+      if (!/\/src\/resources\/.+\.[jt]sx?$/.test(file)) return null;
+      if (!/export\s+const\s+resource\b/.test(code)) return null;
+      return { code: code.replace(/export\s+const\s+resource\b/, "const resource"), map: null };
     },
     load(id) {
       if (!id.startsWith("\0" + VIEW)) return null;
@@ -32,7 +53,8 @@ export function moonpeakPlugin({ root, appName }) {
         css ? `import ${JSON.stringify(css.replace(/\\/g, "/"))};` : "",
         `import Component from ${JSON.stringify(file)};`,
         `import { mount } from ${JSON.stringify(MOUNT)};`,
-        `mount(Component, { name: ${JSON.stringify(appName + "/" + name)} });`,
+        `const view = mount(Component, { name: ${JSON.stringify(appName + "/" + name)} });`,
+        `if (import.meta.hot) import.meta.hot.accept(${JSON.stringify(file)}, (m) => { if (m?.default) view.update(m.default); });`,
       ].join("\n");
     },
   };
@@ -53,6 +75,25 @@ export function baseConfig({ root, appName, userVite = {} }) {
 }
 
 export const VIEW_ID = (name) => VIEW + name;
+
+/**
+ * moonpeak itself is never pre-bundled: if it were, the View's "moonpeak" import
+ * and the entry's "moonpeak/mount" could become two copies of the runtime.
+ * Its own dependencies are pre-bundled up front so the first load doesn't reload.
+ */
+export const OPTIMIZE_DEPS = {
+  exclude: ["moonpeak"],
+  include: [
+    "react",
+    "react-dom",
+    "react-dom/client",
+    "react/jsx-runtime",
+    "react/jsx-dev-runtime",
+    "moonpeak > @modelcontextprotocol/ext-apps",
+    "moonpeak > @modelcontextprotocol/ext-apps/app-bridge",
+    "moonpeak > @modelcontextprotocol/client",
+  ],
+};
 
 /** A View page as served by the dev server (with HMR). */
 export function devViewHtml(name) {

@@ -123,6 +123,17 @@ export async function startDev({ root, port, remote, open = false, quiet = false
     if (remote.headers) Object.assign(headers, remote.headers);
     try {
       const r = await fetch(remote.url, { method: req.method, headers, body });
+      // Servers without a push stream answer the optional GET with 405, which the
+      // browser logs as a failed request. Hand the inspector an idle stream instead;
+      // nothing is lost, since such a server never sends anything on it.
+      if (req.method === "GET" && r.status === 405) {
+        await r.body?.cancel().catch(() => {});
+        res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache", connection: "keep-alive" });
+        res.write(": moonpeak idle stream\n\n");
+        const ping = setInterval(() => res.write(": ping\n\n"), 25000);
+        req.on("close", () => clearInterval(ping));
+        return;
+      }
       const out = {};
       r.headers.forEach((v, k) => {
         if (!["content-encoding", "content-length", "transfer-encoding", "connection"].includes(k)) out[k] = v;

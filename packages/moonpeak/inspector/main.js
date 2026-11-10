@@ -79,7 +79,15 @@ function log(dir, method, data) {
 let client;
 async function connectClient() {
   client = new Client({ name: "moonpeak-inspector", version: "1.0.0" });
-  await client.connect(new StreamableHTTPClientTransport(new URL("/mcp", location.origin)));
+  // A moonpeak project server is stateless and never pushes, so its answer to the
+  // optional GET stream is always 405. Answer that locally instead of sending it,
+  // which keeps the browser console free of a red "Failed to load resource".
+  // Remote servers keep the real GET: they may push notifications over it.
+  const local = S.project && !S.project.remote;
+  const fetchImpl = local
+    ? (input, init) => ((init?.method || "GET").toUpperCase() === "GET" ? Promise.resolve(new Response(null, { status: 405, statusText: "Method Not Allowed" })) : fetch(input, init))
+    : undefined;
+  await client.connect(new StreamableHTTPClientTransport(new URL("/mcp", location.origin), fetchImpl ? { fetch: fetchImpl } : undefined));
 }
 
 async function loadTools() {

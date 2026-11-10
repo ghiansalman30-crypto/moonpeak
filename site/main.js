@@ -11,6 +11,7 @@ document.documentElement.classList.add("js");
   const cv = $("canvas.stars");
   if (!cv) return;
   const ctx = cv.getContext("2d");
+  const pointer = { x: 0, y: 0, on: false, fade: 0 };
   let w, h, dpr, stars = [], meteors = [], mx = 0, my = 0, tx = 0, ty = 0, scrollY = 0, last = 0, nextMeteor = 2500;
   function resize() {
     dpr = Math.min(devicePixelRatio || 1, 2);
@@ -36,10 +37,15 @@ document.documentElement.classList.add("js");
     const dt = Math.min(48, t - last || 16); last = t;
     tx += (mx - tx) * 0.05; ty += (my - ty) * 0.05;
     ctx.clearRect(0, 0, w, h);
+    const near = [];
     for (const s of stars) {
       const a = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * 0.001 * s.s + s.p));
-      const px = (s.x + tx * 18 * s.z * dpr) % w;
+      const px = (((s.x + tx * 18 * s.z * dpr) % w) + w) % w;
       const py = ((s.y - scrollY * 0.12 * s.z * dpr + ty * 12 * s.z * dpr) % h + h) % h;
+      if (pointer.on && s.z > 0.3) {
+        const dx = px - pointer.x * dpr, dy = py - pointer.y * dpr, dd = dx * dx + dy * dy, R = 170 * dpr;
+        if (dd < R * R) near.push({ x: px, y: py, k: 1 - Math.sqrt(dd) / R });
+      }
       ctx.globalAlpha = a * (0.4 + s.z * 0.6);
       ctx.fillStyle = s.hue === 220 ? "#c7d2ff" : s.hue === 40 ? "#ffe7c2" : "#ffffff";
       ctx.beginPath(); ctx.arc(px < 0 ? px + w : px, py, s.r * (0.6 + s.z * 0.6), 0, 7); ctx.fill();
@@ -49,6 +55,28 @@ document.documentElement.classList.add("js");
         ctx.fillRect(px - 0.25 * dpr, py - 4 * dpr, 0.5 * dpr, 8 * dpr);
       }
     }
+    // constellation: stars near the cursor link up with faint moonlit lines
+    if (near.length > 1) {
+      ctx.lineWidth = 0.7 * dpr;
+      ctx.strokeStyle = "#c9d2ff";
+      const L = 115 * dpr;
+      for (let i = 0; i < near.length; i++) {
+        let links = 0;
+        for (let j = i + 1; j < near.length && links < 3; j++) {
+          const A = near[i], B = near[j], dx = A.x - B.x, dy = A.y - B.y, d = Math.sqrt(dx * dx + dy * dy);
+          if (d > L) continue;
+          links++;
+          ctx.globalAlpha = Math.min(A.k, B.k) * (1 - d / L) * 0.9 * pointer.fade;
+          ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+        }
+        if (links) { // linked stars light up a little
+          ctx.globalAlpha = near[i].k * 0.8 * pointer.fade;
+          ctx.fillStyle = "#e9edff";
+          ctx.beginPath(); ctx.arc(near[i].x, near[i].y, 1.6 * dpr, 0, 7); ctx.fill();
+        }
+      }
+    }
+    pointer.fade += ((pointer.on ? 1 : 0) - pointer.fade) * 0.08;
     nextMeteor -= dt;
     if (nextMeteor < 0) { meteor(); nextMeteor = 4000 + Math.random() * 7000; }
     meteors = meteors.filter((m) => (m.life += dt) < m.max);
@@ -67,7 +95,15 @@ document.documentElement.classList.add("js");
   resize();
   addEventListener("resize", resize);
   addEventListener("scroll", () => (scrollY = window.scrollY), { passive: true });
-  if (fine) addEventListener("pointermove", (e) => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; }, { passive: true });
+  if (fine) {
+    addEventListener("pointermove", (e) => {
+      mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5;
+      pointer.x = e.clientX; pointer.y = e.clientY;
+      // only over open sky, not while reading cards or code
+      pointer.on = !e.target.closest?.("a, button, pre, .term, .glow-card, figure, details, table, .statrow, p, h1, h2, h3, li");
+    }, { passive: true });
+    document.addEventListener("pointerleave", () => (pointer.on = false));
+  }
   document.addEventListener("visibilitychange", () => {
     if (reduce) return;
     cancelAnimationFrame(raf);
@@ -173,8 +209,12 @@ function shadowPath(p) {
     mx = (e.clientX - r.left) / r.width - 0.5; my = (e.clientY - r.top) / r.height - 0.5;
     if (glow) glow.style.transform = `translate(${e.clientX - r.left}px, ${e.clientY - r.top}px)`;
   });
-  addEventListener("scroll", () => (sy = scrollY), { passive: true });
-  (function loop() {
+  // Runs only while something is still easing, then sleeps until the next input.
+  let running = false;
+  const wake = () => { if (!running) { running = true; requestAnimationFrame(loop); } };
+  addEventListener("scroll", () => { sy = scrollY; wake(); }, { passive: true });
+  if (fine) hero.addEventListener("pointermove", wake);
+  function loop() {
     cx += (mx - cx) * 0.06; cy += (my - cy) * 0.06;
     if (sy < innerHeight * 1.4) {
       if (moon) moon.style.transform = `translate3d(${cx * -22}px, ${cy * -16 + sy * 0.35}px, 0)`;
@@ -183,8 +223,10 @@ function shadowPath(p) {
         p.style.transform = `translate3d(${cx * -30 * d}px, ${sy * (0.18 - d * 0.14)}px, 0)`;
       });
     }
-    requestAnimationFrame(loop);
-  })();
+    if (Math.abs(mx - cx) + Math.abs(my - cy) > 0.0005) requestAnimationFrame(loop);
+    else running = false;
+  }
+  wake();
 })();
 
 /* ---------- nav: progress line, compact on scroll, active section ---------- */
@@ -196,7 +238,10 @@ function shadowPath(p) {
   function update() {
     tick = false;
     const max = document.documentElement.scrollHeight - innerHeight;
-    if (bar) bar.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+    const f = max > 0 ? Math.min(1, scrollY / max) : 0;
+    if (bar) bar.style.transform = `scaleX(${f})`;
+    // logo moon: crescent at the top of the page, full by the footer
+    document.documentElement.style.setProperty("--mk", 42 + f * 64 + "%");
     nav?.classList.toggle("scrolled", scrollY > 20);
     let cur = null;
     for (const s of secs) if (s.getBoundingClientRect().top < innerHeight * 0.4) cur = s.id;

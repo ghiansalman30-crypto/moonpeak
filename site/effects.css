@@ -148,7 +148,8 @@ details[open] summary::after { content: "+"; transform: rotate(45deg); }
   .split.rev > .term { order: 2; }
 }
 @media (max-width: 560px) {
-  .moon { right: -110px; top: 30px; width: 240px; opacity: .45; }
+  .moon { right: -70px; top: 40px; width: 210px; opacity: .8; }
+  .hero h1 { text-shadow: 0 2px 24px rgba(7, 9, 19, .9); }
   .moon-label { display: none; }
   .split::before, .cursor-glow { display: none; }
   .ridges { height: 130px; }
@@ -161,3 +162,22 @@ details[open] summary::after { content: "+"; transform: rotate(45deg); }
 
 /* inline code never splits on its hyphens (--e2e, --eval) */
 p code, li code { white-space: nowrap; }
+
+/* ---- polish pass ---- */
+/* film grain over everything, very faint */
+.grain { position: fixed; inset: -50%; z-index: 40; pointer-events: none; opacity: .055; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 1.2s steps(6) infinite; }
+@keyframes grain { 0% { transform: translate(0, 0); } 20% { transform: translate(-3%, 2%); } 40% { transform: translate(2%, -3%); } 60% { transform: translate(-2%, -1%); } 80% { transform: translate(3%, 3%); } 100% { transform: translate(0, 0); } }
+/* ridges dissolve into the sky instead of ending on a seam */
+.ridges { -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent); mask-image: linear-gradient(to bottom, #000 72%, transparent); }
+.mist-drift { animation: mist 26s ease-in-out infinite alternate; }
+@keyframes mist { to { transform: translateX(-120px); } }
+/* the logo's moon waxes with your reading progress */
+.mark::after { transform: translateX(var(--mk, 42%)); transition: transform .25s linear; }
+/* slow libration so the moon never feels like a sticker */
+.moon .disc { transform-origin: 50% 50%; }
+.moon .disc { animation: moonrise 1.8s cubic-bezier(.2,.7,.2,1) both, librate 22s ease-in-out 2s infinite alternate; }
+@keyframes librate { from { rotate: -3deg; } to { rotate: 4deg; } }
+.hero h1 em { display: inline-block; filter: drop-shadow(0 0 24px rgba(233, 230, 218, 0.22)); }
+@media (prefers-reduced-motion: reduce) { .grain { display: none; } }

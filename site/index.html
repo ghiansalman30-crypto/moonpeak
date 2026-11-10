@@ -17,6 +17,7 @@
 <body class="landing">
 <div class="sky" aria-hidden="true"></div>
 <canvas class="stars" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
 
 <header class="nav">
   <a class="logo" href="./"><span class="mark"></span>moonpeak</a>
@@ -36,18 +37,40 @@
     <div class="moon" aria-hidden="true">
       <svg class="disc" viewBox="0 0 100 100">
         <defs>
-          <radialGradient id="lit" cx="38%" cy="34%" r="72%"><stop offset="0" stop-color="#fdfbf3"/><stop offset=".42" stop-color="#e9e6da"/><stop offset=".8" stop-color="#aaa79a"/><stop offset="1" stop-color="#6d6b62"/></radialGradient>
-          <radialGradient id="crater" cx="42%" cy="40%" r="60%"><stop offset="0" stop-color="#000" stop-opacity=".26"/><stop offset=".7" stop-color="#000" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity=".18"/></radialGradient>
-          <filter id="lunar" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency=".038" numOctaves="4" seed="11"/><feColorMatrix values="0 0 0 0 .18  0 0 0 0 .18  0 0 0 0 .2  0 0 0 -2.2 1.25"/></filter>
+          <radialGradient id="lit" cx="44%" cy="40%" r="62%"><stop offset="0" stop-color="#f6f3e8"/><stop offset=".55" stop-color="#e6e2d4"/><stop offset=".86" stop-color="#c4c0b1"/><stop offset="1" stop-color="#8f8c80"/></radialGradient>
+          <radialGradient id="limb" cx="50%" cy="50%" r="50%"><stop offset=".72" stop-color="#000" stop-opacity="0"/><stop offset=".94" stop-color="#1a1d2e" stop-opacity=".28"/><stop offset="1" stop-color="#1a1d2e" stop-opacity=".55"/></radialGradient>
+          <radialGradient id="ray" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fffdf5" stop-opacity=".95"/><stop offset=".25" stop-color="#fffdf5" stop-opacity=".35"/><stop offset="1" stop-color="#fffdf5" stop-opacity="0"/></radialGradient>
+          <filter id="mare" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".07" numOctaves="4" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="11"/><feGaussianBlur stdDeviation="1.7"/></filter>
+          <filter id="lunar" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency=".16" numOctaves="5" seed="11"/><feColorMatrix values="0 0 0 0 .4  0 0 0 0 .39  0 0 0 0 .36  0 0 0 -1.8 1.05"/></filter>
+          <filter id="glowf"><feGaussianBlur stdDeviation=".5"/></filter>
           <clipPath id="disc-clip"><circle cx="50" cy="50" r="50"/></clipPath>
           <filter id="soft" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="1.4"/></filter>
         </defs>
         <circle cx="50" cy="50" r="50" fill="url(#lit)"/>
         <g clip-path="url(#disc-clip)">
-          <rect width="100" height="100" filter="url(#lunar)" opacity=".55"/>
-          <circle cx="30" cy="34" r="9" fill="url(#crater)"/><circle cx="62" cy="24" r="5.5" fill="url(#crater)"/>
-          <circle cx="58" cy="62" r="12" fill="url(#crater)"/><circle cx="33" cy="70" r="4.5" fill="url(#crater)"/>
-          <circle cx="78" cy="46" r="3.5" fill="url(#crater)"/><circle cx="46" cy="44" r="2.6" fill="url(#crater)"/>
+          <!-- maria: the dark basaltic plains of the near side -->
+          <g fill="#86837a" fill-opacity=".5" filter="url(#mare)">
+            <ellipse cx="34" cy="30" rx="13" ry="11"/>                 <!-- Imbrium -->
+            <ellipse cx="22" cy="48" rx="11" ry="18" fill-opacity=".5"/> <!-- Procellarum -->
+            <ellipse cx="55" cy="31" rx="7.5" ry="7"/>                 <!-- Serenitatis -->
+            <ellipse cx="64" cy="44" rx="10" ry="8"/>                  <!-- Tranquillitatis -->
+            <ellipse cx="80" cy="34" rx="5" ry="4.2"/>                 <!-- Crisium -->
+            <ellipse cx="73" cy="58" rx="6.5" ry="6"/>                 <!-- Fecunditatis -->
+            <ellipse cx="62" cy="62" rx="5" ry="4" fill-opacity=".45"/><!-- Nectaris -->
+            <ellipse cx="38" cy="64" rx="8" ry="6" fill-opacity=".48"/> <!-- Nubium -->
+            <ellipse cx="27" cy="68" rx="4.5" ry="4" fill-opacity=".52"/><!-- Humorum -->
+            <ellipse cx="48" cy="16" rx="14" ry="3.5" fill-opacity=".42"/><!-- Frigoris -->
+          </g>
+          <rect width="100" height="100" filter="url(#lunar)" opacity=".3"/>
+          <!-- bright ray craters: Tycho, Copernicus, Kepler, Aristarchus -->
+          <g stroke="#fffdf5" stroke-opacity=".2" stroke-width=".55" filter="url(#glowf)">
+            <path d="M44 82 L30 98 M44 82 L60 99 M44 82 L20 74 M44 82 L70 70 M44 82 L38 60 M44 82 L52 56 M44 82 L26 88 M44 82 L66 86"/>
+          </g>
+          <circle cx="44" cy="82" r="6" fill="url(#ray)"/>
+          <circle cx="40" cy="45" r="4.2" fill="url(#ray)" opacity=".8"/>
+          <circle cx="27" cy="44" r="2.8" fill="url(#ray)" opacity=".7"/>
+          <circle cx="19" cy="34" r="2.4" fill="url(#ray)"/>
+          <circle cx="50" cy="50" r="50" fill="url(#limb)"/>
         </g>
       </svg>
       <svg class="phase" viewBox="0 0 100 100"><g clip-path="url(#disc-clip)"><path fill="#070a16" fill-opacity=".9" filter="url(#soft)" d=""/></g></svg>
@@ -63,6 +86,7 @@
       </defs>
       <path fill="url(#r1)" stroke="url(#rim)" stroke-width="1.4" d="M-20 198.3 Q-20 198.3 -11 201.3 Q-2 204.3 7 200.75 Q16 197.2 25 196.2 Q34 195.2 43 195.2 Q52 195.2 61 192.95 Q70 190.7 79 181.3 Q88 171.9 97 167.25 Q106 162.6 115 159.05 Q124 155.5 133 161.15 Q142 166.8 151 155.55 Q160 144.3 169 146.10000000000002 Q178 147.9 187 144.55 Q196 141.2 205 134.7 Q214 128.2 223 127.85 Q232 127.5 241 132.5 Q250 137.5 259 131.45 Q268 125.4 277 127.3 Q286 129.2 295 133.35 Q304 137.5 313 141.35 Q322 145.2 331 149.5 Q340 153.8 349 155.35000000000002 Q358 156.9 367 169.15 Q376 181.4 385 185.15 Q394 188.9 403 188.75 Q412 188.6 421 191.3 Q430 194 439 191.65 Q448 189.3 457 197.95 Q466 206.6 475 197.45 Q484 188.3 493 185.15 Q502 182 511 187.3 Q520 192.6 529 184.5 Q538 176.4 547 179.3 Q556 182.2 565 171.3 Q574 160.4 583 158.25 Q592 156.1 601 162.95 Q610 169.8 619 167.05 Q628 164.3 637 155.9 Q646 147.5 655 156 Q664 164.5 673 154.95 Q682 145.4 691 154.9 Q700 164.4 709 169.25 Q718 174.1 727 167.5 Q736 160.9 745 165.05 Q754 169.2 763 180.6 Q772 192 781 186.1 Q790 180.2 799 191.05 Q808 201.9 817 201.4 Q826 200.9 835 204.8 Q844 208.7 853 203.95 Q862 199.2 871 199.6 Q880 200 889 201 Q898 202 907 203.3 Q916 204.6 925 202.2 Q934 199.8 943 185.35000000000002 Q952 170.9 961 169.10000000000002 Q970 167.3 979 159.10000000000002 Q988 150.9 997 146 Q1006 141.1 1015 134.45 Q1024 127.8 1033 115.25 Q1042 102.7 1051 104 Q1060 105.3 1069 98.4 Q1078 91.5 1087 87.45 Q1096 83.4 1105 83.7 Q1114 84 1123 79.5 Q1132 75 1141 65.3 Q1150 55.6 1159 56.8 Q1168 58 1177 50.9 Q1186 43.8 1195 51.7 Q1204 59.6 1213 54.45 Q1222 49.3 1231 55.45 Q1240 61.6 1249 59.85 Q1258 58.1 1267 68.1 Q1276 78.1 1285 78.9 Q1294 79.7 1303 80.75 Q1312 81.8 1321 84.5 Q1330 87.2 1339 100.05000000000001 Q1348 112.9 1357 114.7 Q1366 116.5 1375 128.85 Q1384 141.2 1393 151.75 Q1402 162.3 1411 172.95 Q1420 183.6 1429 188.75 Q1438 193.9 1447 194.4 L1460 194.9 L1460 340 L-20 340Z"/>
       <rect class="mist" x="-20" y="170" width="1480" height="90" fill="url(#mist)"/>
+      <filter id="mistblur" x="-20%" y="-200%" width="140%" height="500%"><feGaussianBlur stdDeviation="16"/></filter><g class="mist-drift" filter="url(#mistblur)"><ellipse cx="300" cy="215" rx="340" ry="16" fill="#a9b8ff" fill-opacity=".09"/><ellipse cx="1060" cy="222" rx="400" ry="18" fill="#a9b8ff" fill-opacity=".08"/></g>
       <path fill="url(#r2)" stroke="url(#rim)" stroke-opacity=".5" stroke-width="1" d="M-20 209.4 Q-20 209.4 -9 208.35000000000002 Q2 207.3 13 201.75 Q24 196.2 35 189.95 Q46 183.7 57 186.3 Q68 188.9 79 183.25 Q90 177.6 101 177.75 Q112 177.9 123 178.60000000000002 Q134 179.3 145 182 Q156 184.7 167 187.2 Q178 189.7 189 193.89999999999998 Q200 198.1 211 206.6 Q222 215.1 233 215.14999999999998 Q244 215.2 255 220.39999999999998 Q266 225.6 277 229.25 Q288 232.9 299 235.4 Q310 237.9 321 233.9 Q332 229.9 343 225.75 Q354 221.6 365 219.7 Q376 217.8 387 218.10000000000002 Q398 218.4 409 213.45 Q420 208.5 431 204.4 Q442 200.3 453 196.35000000000002 Q464 192.4 475 187.95 Q486 183.5 497 182.4 Q508 181.3 519 184.4 Q530 187.5 541 182.2 Q552 176.9 563 179.9 Q574 182.9 585 188.2 Q596 193.5 607 197.45 Q618 201.4 629 199.2 Q640 197 651 202.5 Q662 208 673 213.8 Q684 219.6 695 217.89999999999998 Q706 216.2 717 212.85 Q728 209.5 739 211.9 Q750 214.3 761 214.25 Q772 214.2 783 205.85 Q794 197.5 805 197.75 Q816 198 827 187.4 Q838 176.8 849 178.60000000000002 Q860 180.4 871 178.8 Q882 177.2 893 177.35 Q904 177.5 915 173.25 Q926 169 937 170.25 Q948 171.5 959 179.6 Q970 187.7 981 192.89999999999998 Q992 198.1 1003 200.89999999999998 Q1014 203.7 1025 210.05 Q1036 216.4 1047 218.85000000000002 Q1058 221.3 1069 221.85000000000002 Q1080 222.4 1091 223.8 Q1102 225.2 1113 230 Q1124 234.8 1135 231.9 Q1146 229 1157 237 Q1168 245 1179 244.6 Q1190 244.2 1201 240.55 Q1212 236.9 1223 240 Q1234 243.1 1245 234.89999999999998 Q1256 226.7 1267 229.1 Q1278 231.5 1289 230.25 Q1300 229 1311 222.2 Q1322 215.4 1333 212.60000000000002 Q1344 209.8 1355 205.55 Q1366 201.3 1377 202.2 Q1388 203.1 1399 200 Q1410 196.9 1421 202.4 Q1432 207.9 1443 211.55 L1460 215.2 L1460 340 L-20 340Z"/>
       <path fill="url(#r3)" stroke="rgba(233,230,218,.06)" stroke-width="1" d="M-20 284.9 Q-20 284.9 -5 286.6 Q10 288.3 25 287.4 Q40 286.5 55 286.85 Q70 287.2 85 283.7 Q100 280.2 115 278.35 Q130 276.5 145 276.75 Q160 277 175 274.3 Q190 271.6 205 268.85 Q220 266.1 235 262.9 Q250 259.7 265 255.75 Q280 251.8 295 252.3 Q310 252.8 325 251.7 Q340 250.6 355 250.2 Q370 249.8 385 248.3 Q400 246.8 415 248.45 Q430 250.1 445 254.45 Q460 258.8 475 258.65 Q490 258.5 505 260.9 Q520 263.3 535 264.75 Q550 266.2 565 269.54999999999995 Q580 272.9 595 270.15 Q610 267.4 625 267.75 Q640 268.1 655 269.3 Q670 270.5 685 267.55 Q700 264.6 715 263.45000000000005 Q730 262.3 745 264.15 Q760 266 775 264.2 Q790 262.4 805 263.65 Q820 264.9 835 262.54999999999995 Q850 260.2 865 259.85 Q880 259.5 895 259.95 Q910 260.4 925 261.85 Q940 263.3 955 262.6 Q970 261.9 985 261.65 Q1000 261.4 1015 258.2 Q1030 255 1045 253.8 Q1060 252.6 1075 253.7 Q1090 254.8 1105 256.6 Q1120 258.4 1135 259.29999999999995 Q1150 260.2 1165 260.2 Q1180 260.2 1195 261.29999999999995 Q1210 262.4 1225 264.1 Q1240 265.8 1255 265.85 Q1270 265.9 1285 267.7 Q1300 269.5 1315 271 Q1330 272.5 1345 272.45 Q1360 272.4 1375 276.4 Q1390 280.4 1405 279 Q1420 277.6 1435 278.70000000000005 L1460 279.8 L1460 340 L-20 340Z"/>
     </svg>

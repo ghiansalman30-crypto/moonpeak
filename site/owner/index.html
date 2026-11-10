@@ -130,7 +130,7 @@ async function api(p, body) {
 async function load() {
   info = await api("token");
   $("ownerSet").textContent = info.owner || (info.claimable ? "not claimed yet: the first wallet that signs in here becomes the owner" : "not set yet");
-  const first = !info.owner && info.claimable;
+  const first = !info.owner && info.claimable && !info.passwordSet;
   $("pw2Box").hidden = !first; $("pw").placeholder = first ? "pick a password (8+ characters)" : "password"; $("pw").autocomplete = first ? "new-password" : "current-password";
   $("chainInfo").textContent = "id " + info.chainId + " · " + info.explorer;
   $("ca").value = $("ca").value || info.ca || ""; $("buyUrl").value = $("buyUrl").value || info.buyUrl || ""; $("telegram").value = $("telegram").value || info.telegram || "";
@@ -153,7 +153,7 @@ async function connect() {
 async function signin() {
   const password = $("pw").value;
   if (!password) throw new Error("Type the panel password first.");
-  if (!info?.owner && info?.claimable) {
+  if (!info?.owner && info?.claimable && !info?.passwordSet) {
     if (password.length < 8) throw new Error("Pick a password of at least 8 characters.");
     if (password !== $("pw2").value) throw new Error("The two passwords don't match.");
   }

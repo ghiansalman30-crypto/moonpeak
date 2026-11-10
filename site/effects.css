@@ -53,8 +53,8 @@ canvas.stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 .js .hero .lede { animation-delay: .55s; } .js .hero .cta { animation-delay: .7s; } .js .hero .hosts { animation-delay: .85s; }
 @keyframes up { from { opacity: 0; transform: translateY(18px); } }
 .hosts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.hosts b { padding: 4px 11px; border: 1px solid var(--line); border-radius: 999px; background: rgba(17, 22, 40, 0.6); font-size: 13px; transition: border-color .2s, transform .2s; }
-.hosts b:hover { border-color: #3a4775; transform: translateY(-2px); }
+.hosts b, .hosts a.host { display: inline-block; padding: 4px 11px; border: 1px solid var(--line); border-radius: 999px; background: rgba(17, 22, 40, 0.6); font-size: 13px; transition: border-color .2s, transform .2s; }
+.hosts b:hover, .hosts a.host:hover { border-color: #3a4775; transform: translateY(-2px); }
 .hosts span { color: var(--mute); }
 
 /* buttons */

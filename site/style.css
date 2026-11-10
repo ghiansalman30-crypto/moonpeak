@@ -57,7 +57,10 @@ p { color: #c3c8dc; }
 .hero h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--moon); }
 .lede { font-size: clamp(17px, 1.6vw, 20px); max-width: 620px; color: #c3c8dc; }
 .hosts { margin-top: 28px; color: var(--mute); font-size: 14px; }
-.hosts b { color: var(--text); font-weight: 500; }
+.hosts b, .hosts a.host { color: var(--text); font-weight: 500; text-decoration: none; }
+.hosts a.host-more { color: var(--mute); text-decoration: none; border-bottom: 1px dashed transparent; transition: color .2s, border-color .2s; }
+.hosts a.host-more:hover { color: var(--text); border-bottom-color: var(--line); }
+.hosts a.host:focus-visible, .hosts a.host-more:focus-visible { outline: 2px solid var(--moon); outline-offset: 3px; }
 
 .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; align-items: center; }
 .cta.center { justify-content: center; }

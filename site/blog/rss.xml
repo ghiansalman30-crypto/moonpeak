@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel>
+<title>moonpeak blog</title><link>https://moonpeak-ai.com/blog/</link><description>Tutorials, releases and notes about MCP Apps.</description>
+<item><title>Introducing moonpeak: build, inspect and test MCP Apps</title><link>https://moonpeak-ai.com/blog/introducing-moonpeak/</link><guid>https://moonpeak-ai.com/blog/introducing-moonpeak/</guid><pubDate>Tue, 10 Nov 2026 12:00:00 GMT</pubDate><description>An open-source MCP App framework, MCP testing framework and local inspector with ChatGPT and Claude style hosts, in one npm package.</description></item>
+<item><title>Build your first MCP App in ten minutes</title><link>https://moonpeak-ai.com/blog/build-your-first-mcp-app/</link><guid>https://moonpeak-ai.com/blog/build-your-first-mcp-app/</guid><pubDate>Tue, 10 Nov 2026 12:00:00 GMT</pubDate><description>A step-by-step tutorial: scaffold a project, write a tool and its View, test it, and run it in Claude.</description></item>
+<item><title>Review and confirm: safe actions in MCP Apps with app-only tools</title><link>https://moonpeak-ai.com/blog/review-and-confirm-app-only-tools/</link><guid>https://moonpeak-ai.com/blog/review-and-confirm-app-only-tools/</guid><pubDate>Tue, 10 Nov 2026 12:00:00 GMT</pubDate><description>How to let the model propose an action that only the user can approve, and a visibility bug we fixed on the way.</description></item>
+</channel></rss>

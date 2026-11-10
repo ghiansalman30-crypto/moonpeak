@@ -18,3 +18,5 @@ export function createHandler(opts: ServerOptions): (request: Request) => Promis
 /** Node (req, res) handler for http.createServer or Express. */
 export function createNodeHandler(opts: ServerOptions): Promise<(req: any, res: any) => Promise<void>>;
 export const createMcpHandlerFor: typeof createHandler;
+/** Load a `moonpeak build` output as server options (Node only). */
+export function loadBuilt(root?: string, outDir?: string): Promise<ServerOptions>;

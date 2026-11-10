@@ -1,16 +1,16 @@
-<div align="center">
+<a href="https://moonpeak-ai.com"><img src=".github/assets/banner.png" alt="moonpeak: build, inspect and test MCP Apps for ChatGPT, Claude and every MCP Apps host" width="100%" /></a>
 
-<a href="https://moonpeak-ai.com"><img src=".github/assets/moonpeak.svg" width="120" alt="moonpeak" /></a>
+<div align="center">
 
 # moonpeak
 
-[![npm version](https://img.shields.io/npm/v/moonpeak.svg?color=a9b8ff)](https://www.npmjs.com/package/moonpeak)
-[![npm downloads](https://img.shields.io/npm/dm/moonpeak.svg?color=a9b8ff)](https://www.npmjs.com/package/moonpeak)
-[![GitHub stars](https://img.shields.io/github/stars/ghiansalman30-crypto/moonpeak?style=flat&color=a9b8ff)](https://github.com/ghiansalman30-crypto/moonpeak)
 [![CI](https://github.com/ghiansalman30-crypto/moonpeak/actions/workflows/ci.yml/badge.svg)](https://github.com/ghiansalman30-crypto/moonpeak/actions/workflows/ci.yml)
+[![GitHub stars](https://img.shields.io/github/stars/ghiansalman30-crypto/moonpeak?style=flat&color=a9b8ff)](https://github.com/ghiansalman30-crypto/moonpeak/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-a9b8ff.svg)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-ready-3178c6.svg)](./packages/moonpeak/types)
 [![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev)
+[![MCP Apps](https://img.shields.io/badge/MCP%20Apps-ext--apps%202.0-e9e6da.svg)](https://github.com/modelcontextprotocol/ext-apps)
+[![Docs](https://img.shields.io/badge/docs-moonpeak--ai.com-a9b8ff.svg)](https://moonpeak-ai.com/docs/)
 
 **Server-agnostic MCP testing framework and full-stack MCP App framework.**
 
@@ -18,7 +18,7 @@
 npx moonpeak new
 ```
 
-[Website](https://moonpeak-ai.com) · [Live demo server](https://moonpeak-ai.com/mcp) · [Documentation](https://moonpeak-ai.com/docs/) · [npm](https://www.npmjs.com/package/moonpeak) · [GitHub](https://github.com/ghiansalman30-crypto/moonpeak)
+[Website](https://moonpeak-ai.com) · [Live demo server](https://moonpeak-ai.com/mcp) · [Documentation](https://moonpeak-ai.com/docs/) · [Blog](https://moonpeak-ai.com/blog/) · [GitHub](https://github.com/ghiansalman30-crypto/moonpeak)
 
 </div>
 
@@ -102,7 +102,8 @@ The starter app runs at **https://moonpeak-ai.com/mcp**. Add it as a custom conn
 
 ## Resources
 
-- [Documentation](https://moonpeak-ai.com/docs/) and the [package README](./packages/moonpeak/README.md)
+- [Documentation](https://moonpeak-ai.com/docs/) (78 pages, also as [llms.txt](https://moonpeak-ai.com/docs/llms.txt)) and the [package README](./packages/moonpeak/README.md)
+- [Blog](https://moonpeak-ai.com/blog/): tutorials and release notes
 - [Starter example](./examples/starter) · [Kitchen sink](./examples/kitchen-sink) (every hook, for testing hosts)
 - [Agent skill](./skills/moonpeak/SKILL.md) for Claude Code and other coding agents
 - [MCP Apps specification](https://github.com/modelcontextprotocol/ext-apps)

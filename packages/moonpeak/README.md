@@ -120,7 +120,7 @@ Host extras, safe to call anywhere: `moonpeak/chatgpt` (`useWidgetState`, `useUp
 
 - `output` / `result` mock the tool result in the inspector, so you can design a View without a backend.
 - `expect` is checked by `moonpeak test`: partial match on `output`, `"re:..."` for regexes, `"*"` for "any value", `$length` / `$minLength` for arrays.
-- `host` sets theme, display mode, device, locale or host for that scenario.
+- `host` sets inspector settings for that scenario: `name` (`chatgpt` or `claude`), `theme`, `displayMode`, `device`, `locale`.
 
 ## Testing
 

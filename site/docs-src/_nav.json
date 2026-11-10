@@ -1,0 +1,11 @@
+[
+  { "title": "Get started", "items": ["", "quickstart", "project-scaffold", "configuration"] },
+  { "title": "App Framework", "items": ["app-framework/tools", "app-framework/views", "app-framework/runtime-apis", "app-framework/chatgpt", "app-framework/claude", "app-framework/mcp-server", "app-framework/production-server"] },
+  { "title": "Hooks", "items": ["@hooks"] },
+  { "title": "Starter resources", "items": ["resources/moon", "resources/calendar", "resources/review"] },
+  { "title": "CLI", "items": ["cli/new", "cli/dev", "cli/build", "cli/start", "cli/inspect", "cli/test", "cli/upgrade"] },
+  { "title": "Testing Framework", "items": ["testing", "testing/simulations", "testing/unit", "testing/e2e", "testing/visual", "testing/evals", "testing/any-server", "testing/ci"] },
+  { "title": "Inspector", "items": ["inspector", "inspector/url-parameters", "inspector/remote"] },
+  { "title": "MCP Apps", "items": ["mcp-apps", "mcp-apps/lifecycle", "mcp-apps/display-modes", "mcp-apps/state", "mcp-apps/visibility", "mcp-apps/security", "mcp-apps/tool-results"] },
+  { "title": "Guides", "items": ["guides/deployment", "guides/authorization", "guides/patterns", "guides/troubleshooting"] }
+]

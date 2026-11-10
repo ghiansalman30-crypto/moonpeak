@@ -193,7 +193,7 @@ export async function startDev({ root, port, remote, open = false, quiet = false
     }
   });
 
-  const p = await freePort(port || 3000);
+  const p = await freePort(port || Number(cfg.port) || 3000);
   await new Promise((r) => server.listen({ port: p, host: "::", ipv6Only: false }, r));
   const base = `http://localhost:${p}`;
   if (!quiet) {

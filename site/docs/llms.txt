@@ -2,28 +2,117 @@
 
 > Server-agnostic MCP testing framework and full-stack MCP App framework. Build, inspect and test MCP Apps (interactive UIs) for ChatGPT, Claude and every MCP Apps host. Open source, MIT, npm package `moonpeak`.
 
-Start a project with `npx moonpeak new`. A live demo MCP server runs at https://moonpeak-ai.com/mcp.
+Start a project with `npx moonpeak new`. A live demo MCP server runs at https://moonpeak-ai.com/mcp. Every page below is also available as Markdown, and https://moonpeak-ai.com/docs/llms-full.txt has all of them in one file.
 
-## Docs
+## Get started
 
-- [Full documentation as Markdown](https://moonpeak-ai.com/docs/index.md): everything below on one page
-- [Quickstart](https://moonpeak-ai.com/docs/#quickstart)
-- [What you get](https://moonpeak-ai.com/docs/#what-you-get)
-- [Starter resources](https://moonpeak-ai.com/docs/#starter-resources)
-- [Project layout](https://moonpeak-ai.com/docs/#project-layout)
-- [Hooks](https://moonpeak-ai.com/docs/#hooks)
-- [Simulations](https://moonpeak-ai.com/docs/#simulations)
-- [Testing](https://moonpeak-ai.com/docs/#testing)
-- [Inspect any server](https://moonpeak-ai.com/docs/#inspect-any-server)
-- [Deploy](https://moonpeak-ai.com/docs/#deploy)
-- [CLI](https://moonpeak-ai.com/docs/#cli)
-- [License](https://moonpeak-ai.com/docs/#license)
+- [Overview](https://moonpeak-ai.com/docs/index.md): Server-agnostic MCP testing framework and full-stack MCP App framework.
+- [Quickstart](https://moonpeak-ai.com/docs/quickstart/index.md): From npx moonpeak new to a View rendering in Claude.
+- [Project scaffold](https://moonpeak-ai.com/docs/project-scaffold/index.md): What npx moonpeak new creates, and how moonpeak discovers tools, Views and tests.
+- [Configuration](https://moonpeak-ai.com/docs/configuration/index.md): moonpeak works without a config file. moonpeak.config.js is there when you need it.
 
-## Pages
+## App Framework
+
+- [Tools](https://moonpeak-ai.com/docs/app-framework/tools/index.md): One file in src/tools is one MCP tool: metadata, a zod schema and a handler.
+- [Views](https://moonpeak-ai.com/docs/app-framework/views/index.md): One folder in src/resources is one View: a React component the host renders next to the chat.
+- [Runtime APIs](https://moonpeak-ai.com/docs/app-framework/runtime-apis/index.md): Every hook a View can use, from moonpeak, moonpeak/chatgpt and moonpeak/claude.
+- [ChatGPT Apps](https://moonpeak-ai.com/docs/app-framework/chatgpt/index.md): A moonpeak project is a ChatGPT App. What moonpeak adds for ChatGPT, and how to try it.
+- [Claude connectors](https://moonpeak-ai.com/docs/app-framework/claude/index.md): A moonpeak project is a Claude connector with interactive UI.
+- [MCP server](https://moonpeak-ai.com/docs/app-framework/mcp-server/index.md): The server moonpeak builds from your tools and Views, and how to use it directly.
+- [Production server](https://moonpeak-ai.com/docs/app-framework/production-server/index.md): moonpeak build and moonpeak start, and how to mount the build on another runtime.
+
+## Hooks
+
+- [useToolData](https://moonpeak-ai.com/docs/hooks/use-tool-data/index.md): Tool data hook from moonpeak.
+- [useToolInput](https://moonpeak-ai.com/docs/hooks/use-tool-input/index.md): Tool data hook from moonpeak.
+- [useToolOutput](https://moonpeak-ai.com/docs/hooks/use-tool-output/index.md): Tool data hook from moonpeak.
+- [useToolResult](https://moonpeak-ai.com/docs/hooks/use-tool-result/index.md): Tool data hook from moonpeak.
+- [useTheme](https://moonpeak-ai.com/docs/hooks/use-theme/index.md): Host context hook from moonpeak.
+- [useDisplayMode](https://moonpeak-ai.com/docs/hooks/use-display-mode/index.md): Host context hook from moonpeak.
+- [useRequestDisplayMode](https://moonpeak-ai.com/docs/hooks/use-request-display-mode/index.md): Host context hook from moonpeak.
+- [useHostContext](https://moonpeak-ai.com/docs/hooks/use-host-context/index.md): Host context hook from moonpeak.
+- [useLocale](https://moonpeak-ai.com/docs/hooks/use-locale/index.md): Host context hook from moonpeak.
+- [useTimeZone](https://moonpeak-ai.com/docs/hooks/use-time-zone/index.md): Host context hook from moonpeak.
+- [usePlatform](https://moonpeak-ai.com/docs/hooks/use-platform/index.md): Host context hook from moonpeak.
+- [useDeviceCapabilities](https://moonpeak-ai.com/docs/hooks/use-device-capabilities/index.md): Host context hook from moonpeak.
+- [useSafeArea](https://moonpeak-ai.com/docs/hooks/use-safe-area/index.md): Host context hook from moonpeak.
+- [useContainerSize](https://moonpeak-ai.com/docs/hooks/use-container-size/index.md): Host context hook from moonpeak.
+- [useMaxHeight](https://moonpeak-ai.com/docs/hooks/use-max-height/index.md): Host context hook from moonpeak.
+- [useHost](https://moonpeak-ai.com/docs/hooks/use-host/index.md): Host hook from moonpeak.
+- [useHostCapabilities](https://moonpeak-ai.com/docs/hooks/use-host-capabilities/index.md): Host hook from moonpeak.
+- [useConnection](https://moonpeak-ai.com/docs/hooks/use-connection/index.md): Host hook from moonpeak.
+- [useApp](https://moonpeak-ai.com/docs/hooks/use-app/index.md): Host hook from moonpeak.
+- [useCallTool](https://moonpeak-ai.com/docs/hooks/use-call-tool/index.md): Actions hook from moonpeak.
+- [useSendMessage](https://moonpeak-ai.com/docs/hooks/use-send-message/index.md): Actions hook from moonpeak.
+- [useUpdateModelContext](https://moonpeak-ai.com/docs/hooks/use-update-model-context/index.md): Actions hook from moonpeak.
+- [useOpenLink](https://moonpeak-ai.com/docs/hooks/use-open-link/index.md): Actions hook from moonpeak.
+- [useDownloadFile](https://moonpeak-ai.com/docs/hooks/use-download-file/index.md): Actions hook from moonpeak.
+- [useLog](https://moonpeak-ai.com/docs/hooks/use-log/index.md): Actions hook from moonpeak.
+- [useAppState](https://moonpeak-ai.com/docs/hooks/use-app-state/index.md): State hook from moonpeak.
+- [useResultState](https://moonpeak-ai.com/docs/hooks/use-result-state/index.md): State hook from moonpeak.
+- [useIsChatGPT](https://moonpeak-ai.com/docs/hooks/use-is-chat-gpt/index.md): ChatGPT hook from moonpeak/chatgpt.
+- [useWidgetState](https://moonpeak-ai.com/docs/hooks/use-widget-state/index.md): ChatGPT hook from moonpeak/chatgpt.
+- [useOpenAiGlobal](https://moonpeak-ai.com/docs/hooks/use-open-ai-global/index.md): ChatGPT hook from moonpeak/chatgpt.
+- [useUploadFile](https://moonpeak-ai.com/docs/hooks/use-upload-file/index.md): ChatGPT hook from moonpeak/chatgpt.
+- [useRequestModal](https://moonpeak-ai.com/docs/hooks/use-request-modal/index.md): ChatGPT hook from moonpeak/chatgpt.
+- [useUserAgent](https://moonpeak-ai.com/docs/hooks/use-user-agent/index.md): ChatGPT hook from moonpeak/chatgpt.
+- [useIsClaude](https://moonpeak-ai.com/docs/hooks/use-is-claude/index.md): Claude hook from moonpeak/claude.
+- [useClaudeStyles](https://moonpeak-ai.com/docs/hooks/use-claude-styles/index.md): Claude hook from moonpeak/claude.
+
+## Starter resources
+
+- [moon](https://moonpeak-ai.com/docs/resources/moon/index.md): Detail card: a date's moon phase, a 7-day strip, and buttons that call the tool again through the host.
+- [calendar](https://moonpeak-ai.com/docs/resources/calendar/index.md): Carousel: swipeable cards of the upcoming moon phases, loading more through the host.
+- [review](https://moonpeak-ai.com/docs/resources/review/index.md): Review and confirm: the model proposes a stargazing night, the user confirms it in the UI through an app-only tool.
+
+## CLI
+
+- [moonpeak new](https://moonpeak-ai.com/docs/cli/new/index.md): Scaffold a project, picking which starter resources to include.
+- [moonpeak dev](https://moonpeak-ai.com/docs/cli/dev/index.md): MCP server and inspector with hot reload, on one port.
+- [moonpeak build](https://moonpeak-ai.com/docs/cli/build/index.md): Bundle every View into one HTML file and your tools into dist/server.mjs.
+- [moonpeak start](https://moonpeak-ai.com/docs/cli/start/index.md): Serve a build at /mcp.
+- [moonpeak inspect](https://moonpeak-ai.com/docs/cli/inspect/index.md): Open the inspector against any MCP server.
+- [moonpeak test](https://moonpeak-ai.com/docs/cli/test/index.md): Every testing mode in one command.
+- [moonpeak upgrade](https://moonpeak-ai.com/docs/cli/upgrade/index.md): Update moonpeak in the current project.
+
+## Testing Framework
+
+- [Testing Framework](https://moonpeak-ai.com/docs/testing/index.md): Test MCP Apps and any MCP server in CI, without host accounts, tunnels or AI credits.
+- [Simulations](https://moonpeak-ai.com/docs/testing/simulations/index.md): JSON fixtures for a tool: input, optional mocked output, expectations and host settings.
+- [In-process checks](https://moonpeak-ai.com/docs/testing/unit/index.md): What moonpeak test checks, in about a second, with no browser.
+- [E2E testing](https://moonpeak-ai.com/docs/testing/e2e/index.md): Playwright tests against the inspector, in ChatGPT and Claude style hosts.
+- [Visual regression](https://moonpeak-ai.com/docs/testing/visual/index.md): Screenshot tests tagged @visual.
+- [Evals](https://moonpeak-ai.com/docs/testing/evals/index.md): Check that real models pick the right tool with the right arguments.
+- [Any MCP server](https://moonpeak-ai.com/docs/testing/any-server/index.md): Test and inspect MCP servers written in Python, Go, Rust, Java or anything else.
+- [CI](https://moonpeak-ai.com/docs/testing/ci/index.md): Run moonpeak tests in GitHub Actions.
+
+## Inspector
+
+- [Inspector](https://moonpeak-ai.com/docs/inspector/index.md): ChatGPT-style and Claude-style hosts on localhost.
+- [URL parameters](https://moonpeak-ai.com/docs/inspector/url-parameters/index.md): Every inspector setting is in the URL, so a bug report is a link.
+- [Remote servers](https://moonpeak-ai.com/docs/inspector/remote/index.md): Inspect an MCP server you didn't build with moonpeak.
+
+## MCP Apps
+
+- [MCP Apps](https://moonpeak-ai.com/docs/mcp-apps/index.md): What MCP Apps are and how a host renders one.
+- [Lifecycle](https://moonpeak-ai.com/docs/mcp-apps/lifecycle/index.md): The order in which a View receives data, and what each state means.
+- [Display modes & layout](https://moonpeak-ai.com/docs/mcp-apps/display-modes/index.md): Inline, picture-in-picture and fullscreen, and how to size a View.
+- [State persistence](https://moonpeak-ai.com/docs/mcp-apps/state/index.md): Keeping what the user did in a View across reloads, and sharing it with the model.
+- [Tool visibility](https://moonpeak-ai.com/docs/mcp-apps/visibility/index.md): Tools only the model can call, only the View can call, or both.
+- [Security & CSP](https://moonpeak-ai.com/docs/mcp-apps/security/index.md): What a View can and cannot do, and how to allow more.
+- [Tool results](https://moonpeak-ai.com/docs/mcp-apps/tool-results/index.md): content, structuredContent and _meta: who reads what.
+
+## Guides
+
+- [Deployment](https://moonpeak-ai.com/docs/guides/deployment/index.md): Put a moonpeak server on the internet over HTTPS.
+- [Authorization](https://moonpeak-ai.com/docs/guides/authorization/index.md): Protecting a moonpeak server and testing protected servers.
+- [Patterns](https://moonpeak-ai.com/docs/guides/patterns/index.md): Shapes that work well for MCP Apps.
+- [Troubleshooting](https://moonpeak-ai.com/docs/guides/troubleshooting/index.md): Common problems and their fixes.
+
+## Site
 
 - [MCP App framework](https://moonpeak-ai.com/mcp-app-framework/)
 - [MCP testing framework](https://moonpeak-ai.com/testing-framework/)
 - [MCP App inspector](https://moonpeak-ai.com/mcp-app-inspector/)
 - [FAQs](https://moonpeak-ai.com/faqs/)
 - [Source on GitHub](https://github.com/ghiansalman30-crypto/moonpeak)
-- [Agent skill](https://github.com/ghiansalman30-crypto/moonpeak/blob/main/skills/moonpeak/SKILL.md)

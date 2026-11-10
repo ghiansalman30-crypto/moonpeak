@@ -112,9 +112,11 @@ function applySim() {
   S.input = sim ? structuredClone(sim.input || {}) : exampleInput(currentTool());
   S.result = sim?.result ? structuredClone(sim.result) : sim?.output !== undefined ? { structuredContent: structuredClone(sim.output), content: [{ type: "text", text: JSON.stringify(sim.output) }] } : undefined;
   if (sim?.host) {
-    if (sim.host.name === "claude" || sim.host.name === "chatgpt") S.host = sim.host.name;
+    const hostName = sim.host.name ?? sim.host.host; // "host" is accepted as an alias
+    if (hostName === "claude" || hostName === "chatgpt") S.host = hostName;
     if (sim.host.theme) S.theme = sim.host.theme;
-    if (sim.host.displayMode) S.mode = sim.host.displayMode;
+    const mode = sim.host.displayMode ?? sim.host.mode;
+    if (["inline", "pip", "fullscreen"].includes(mode)) S.mode = mode;
     if (sim.host.locale) S.locale = sim.host.locale;
     if (sim.host.device) S.device = sim.host.device;
   }

@@ -1,0 +1,2505 @@
+# Overview
+
+Source: https://moonpeak-ai.com/docs/
+
+moonpeak is one npm package with three jobs:
+
+- **An MCP App framework.** One file per tool, one folder per View. React hooks for tool data, theme, display modes, state and host actions. The same project runs as a ChatGPT App, a Claude connector and in every other MCP Apps host.
+- **An MCP testing framework.** Simulations, schema and View checks, Playwright e2e against ChatGPT and Claude style hosts, visual regression and real-model evals. It also tests MCP servers written in any language.
+- **An MCP App inspector.** ChatGPT-style and Claude-style hosts on localhost, with every host setting in the URL.
+
+```bash
+npx moonpeak new
+```
+
+It is built on the official [MCP Apps SDK](https://github.com/modelcontextprotocol/ext-apps) and the MCP TypeScript SDK v2, so what works in the inspector works in real hosts.
+
+## Where to start
+
+| If you want to | Read |
+|---|---|
+| Build your first app | [Quickstart](/docs/quickstart) |
+| Understand the folders | [Project scaffold](/docs/project-scaffold) |
+| Write a tool or a View | [Tools](/docs/app-framework/tools) · [Views](/docs/app-framework/views) |
+| Look up a hook | [Runtime APIs](/docs/app-framework/runtime-apis) |
+| Test an existing MCP server | [Any MCP server](/docs/testing/any-server) |
+| Ship it | [Deployment](/docs/guides/deployment) |
+| Learn the protocol | [MCP Apps introduction](/docs/mcp-apps) |
+
+## Try the live demo
+
+The starter app runs at `https://moonpeak-ai.com/mcp`. Add it as a custom connector in Claude, as an app in ChatGPT developer mode, or open it in the inspector:
+
+```bash
+npx moonpeak inspect --server https://moonpeak-ai.com/mcp
+```
+
+## For agents
+
+Every docs page has a Markdown version (add `index.md` to its URL). [llms.txt](/docs/llms.txt) lists them all and [llms-full.txt](/docs/llms-full.txt) has every page in one file. The repository also ships an [agent skill](https://github.com/ghiansalman30-crypto/moonpeak/blob/main/skills/moonpeak/SKILL.md) for Claude Code and other coding agents.
+
+
+---
+
+# Quickstart
+
+Source: https://moonpeak-ai.com/docs/quickstart/
+
+## 1. Create a project
+
+```bash
+npx moonpeak new
+```
+
+`new` asks three things:
+
+1. **Project name**, for example `moon-app`.
+2. **Resources**: which starter Views to include. Pick any of `moon`, `calendar` and `review`, or press Enter for all of them.
+3. **Install dependencies?** Press Enter to install with the package manager you ran it with (npm, pnpm, yarn or bun).
+
+You can skip the questions:
+
+```bash
+npx moonpeak new moon-app calendar,review --install
+```
+
+## 2. Start the inspector
+
+```bash
+cd moon-app
+npm run dev
+```
+
+Open http://localhost:3000. The inspector lists your tools, runs the selected one and renders its View in a ChatGPT-style host. Switch to the Claude host, dark theme, a phone width or fullscreen from the sidebar. Your MCP server is live at http://localhost:3000/mcp.
+
+## 3. Change something
+
+Edit `src/resources/moon/moon.tsx` and save: the View updates in place and keeps its state. Edit `src/tools/show-moon.ts` and the next call uses the new code. No restart.
+
+## 4. Test it
+
+```bash
+npm test                      # schemas, Views and simulations, ~1 s
+npx playwright install chromium
+npx moonpeak test --e2e       # Playwright against the inspector
+```
+
+## 5. Run it in Claude or ChatGPT
+
+```bash
+npm run build && npm start    # http://localhost:8000/mcp
+```
+
+Put that behind HTTPS (see [Deployment](/docs/guides/deployment)), then:
+
+- **Claude**: Settings → Connectors → Add custom connector → `https://your-domain/mcp`
+- **ChatGPT**: Settings → Apps → enable Developer mode → Create app → `https://your-domain/mcp`
+
+Ask *"what does the moon look like on Nov 24?"* and the moon View renders in the chat.
+
+## Next
+
+- [Project scaffold](/docs/project-scaffold): what every folder does
+- [Tools](/docs/app-framework/tools) and [Views](/docs/app-framework/views)
+- [Simulations](/docs/testing/simulations)
+
+
+---
+
+# Project scaffold
+
+Source: https://moonpeak-ai.com/docs/project-scaffold/
+
+```
+moon-app/
+  package.json
+  tsconfig.json
+  playwright.config.ts
+  moonpeak.config.js        optional
+  src/
+    tools/                  one MCP tool per file
+      show-moon.ts
+      moon-facts.ts
+    resources/              one View per folder
+      moon/
+        moon.tsx
+        moon.css
+    lib/                    shared code
+  tests/
+    simulations/            fixtures for the inspector and moonpeak test
+      show-moon.json
+    e2e/                    Playwright tests
+      moon.spec.ts
+    evals/                  model evals
+      moon.eval.json
+```
+
+## Discovery rules
+
+| Folder | Rule |
+|---|---|
+| `src/tools/*.ts` (also `.tsx`, `.js`, `.jsx`, `.mts`, `.mjs`) | Every file is one tool. The file name is the tool name. `*.test.*`, `*.spec.*` and `*.d.ts` are ignored. |
+| `src/resources/<name>/<name>.tsx` | Every folder is one View, served as `ui://<app>/<name>.html`. A `<name>.css`, `style.css` or `styles.css` next to it is included. |
+| `tests/simulations/*.json` | One file per tool, holding one simulation or an array of them. |
+| `tests/e2e/*.spec.ts` | Run by `moonpeak test --e2e`. |
+| `tests/evals/*.eval.json` | Run by `moonpeak test --eval`. |
+
+The app name (used in resource URIs) is `name` from `moonpeak.config.js`, else `name` from `package.json`.
+
+## Scripts
+
+| Script | Runs |
+|---|---|
+| `npm run dev` | `moonpeak dev`: inspector + MCP server with hot reload |
+| `npm test` | `moonpeak test` |
+| `npm run test:e2e` | `moonpeak test --e2e` |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run build` | `moonpeak build` |
+| `npm start` | `moonpeak start` |
+
+## Starter resources
+
+`new` can include any of three example Views. Each comes with its tools, simulations, e2e tests and evals, so you can delete the ones you don't need without breaking the others.
+
+- [moon](/docs/resources/moon): a detail card
+- [calendar](/docs/resources/calendar): a carousel
+- [review](/docs/resources/review): a review and confirm flow
+
+
+---
+
+# Configuration
+
+Source: https://moonpeak-ai.com/docs/configuration/
+
+Create `moonpeak.config.js` (or `.mjs`) in the project root and export an object:
+
+```js
+// moonpeak.config.js
+export default {
+  name: "moon-app",              // app name in ui:// URIs; defaults to package.json name
+  version: "1.2.0",              // server version; defaults to package.json version
+  instructions: "Use show-moon for anything about the moon on a date.",
+  port: 3000,                    // dev server port
+  vite: {
+    plugins: [],                 // extra Vite plugins for your Views (e.g. Tailwind)
+    resolve: { alias: {} },
+    define: {},
+    css: {},
+  },
+};
+```
+
+| Key | Used by | Default |
+|---|---|---|
+| `name` | resource URIs, server info | `package.json` name, then the folder name |
+| `version` | server info | `package.json` version, then `0.0.0` |
+| `instructions` | MCP `initialize` instructions sent to the host | none |
+| `port` | `moonpeak dev` | 3000, or the next free port |
+| `vite` | building Views in dev and `moonpeak build` | moonpeak's own React setup |
+
+## Tailwind or other Vite plugins
+
+```js
+import tailwindcss from "@tailwindcss/vite";
+export default { vite: { plugins: [tailwindcss()] } };
+```
+
+Then `@import "tailwindcss";` in your View's CSS file.
+
+## Per-View settings
+
+Settings for one View live next to it, as `export const resource = {...}` in the View file. See [Views](/docs/app-framework/views#resource-config).
+
+
+---
+
+# Tools
+
+Source: https://moonpeak-ai.com/docs/app-framework/tools/
+
+```ts
+// src/tools/show-moon.ts
+import { z } from "zod";
+import { moonOn, parseDate } from "../lib/moon";
+
+export const tool = {
+  title: "Show moon phase",
+  description: "Show the moon phase for a date. Use when the user asks about the moon on a date.",
+  resource: "moon",                     // render src/resources/moon as the UI
+  annotations: { readOnlyHint: true },
+  invoking: "Looking up",               // ChatGPT status while running
+  invoked: "Here's the moon",           // ...and after
+};
+
+export const schema = {
+  date: z.string().optional().describe("Date as YYYY-MM-DD. Defaults to today."),
+};
+
+export default async function showMoon({ date }: { date?: string }) {
+  return moonOn(parseDate(date));       // a plain object becomes structuredContent
+}
+```
+
+## Exports
+
+| Export | Required | What it is |
+|---|---|---|
+| `default` | yes | The handler: `(input, ctx) => result`. May be async. |
+| `tool` | yes | Metadata (below). |
+| `schema` | no | Input schema: a zod raw shape (`{ date: z.string() }`) or a zod object (any Standard Schema). |
+| `outputSchema` | no | Output schema, same forms. Hosts can validate `structuredContent` against it. |
+
+## `tool` fields
+
+| Field | Meaning |
+|---|---|
+| `description` | Written for the model: say what the tool does and when to use it. This is what evals test. |
+| `title` | Human name shown by hosts. |
+| `resource` | Name of a folder in `src/resources`. Makes this an MCP App tool with a View. Leave it out for a text-only tool. |
+| `visibility` | `["model", "app"]` (default), `["model"]`, or `["app"]` for a helper only your View may call. See [Tool visibility](/docs/mcp-apps/visibility). |
+| `annotations` | MCP hints: `readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`. |
+| `invoking`, `invoked` | Short status texts ChatGPT shows while the tool runs and after. |
+| `_meta` | Extra `_meta` keys merged into the tool definition. |
+
+## What a handler can return
+
+| Return | Becomes |
+|---|---|
+| A plain object | `structuredContent`, plus a JSON text copy in `content` for the model |
+| A string | One text content block |
+| A full `CallToolResult` (`{ content, structuredContent, isError, _meta }`) | Passed through as is |
+| `throw new Error("...")` | `isError: true` with your message as text |
+
+See [Tool results](/docs/mcp-apps/tool-results) for how hosts use each part.
+
+## A text-only tool
+
+```ts
+// src/tools/moon-facts.ts
+export const tool = { title: "Moon facts", description: "Answer a quick moon question in text." };
+export default async function () {
+  return "The Moon is 384,400 km away on average.";
+}
+```
+
+## Validation errors
+
+Input is validated against `schema` before your handler runs. A bad call returns a tool error naming the field, which `moonpeak test` and the inspector both show.
+
+
+---
+
+# Views
+
+Source: https://moonpeak-ai.com/docs/app-framework/views/
+
+```tsx
+// src/resources/moon/moon.tsx
+import { useToolData, useTheme, useCallTool } from "moonpeak";
+
+export const resource = {
+  title: "Moon phase",
+  description: "Moon phase for a date with a 7-day strip",
+  prefersBorder: true,
+};
+
+export default function Moon() {
+  const { output, isPending, isError } = useToolData<{ date?: string }, { phase: string }>();
+  const theme = useTheme();
+  if (isError) return <p className="error">Something went wrong.</p>;
+  if (isPending) return <p>Reading the sky…</p>;
+  return <h1 className={theme}>{output?.phase}</h1>;
+}
+```
+
+The default export is the View. moonpeak connects it to the host, mounts it and wraps it in an error boundary; you never touch `postMessage`.
+
+## Styles
+
+A CSS file in the folder named `<name>.css`, `style.css` or `styles.css` is imported automatically. Each View is built into one HTML file with its CSS and JS inlined, so it works under strict host CSPs. Style both themes: hosts can switch between light and dark at any time.
+
+## Resource config
+
+`export const resource = {...}` sets per-View options:
+
+| Field | Meaning |
+|---|---|
+| `title`, `description` | Shown by hosts and used as ChatGPT's widget description. |
+| `prefersBorder` | Ask the host to draw a border around the View. |
+| `csp.connectDomains` | Origins the View may `fetch` from. |
+| `csp.resourceDomains` | Origins for images, fonts and scripts. |
+| `csp.frameDomains`, `csp.baseUriDomains` | Origins for nested frames and `<base>`. |
+| `permissions` | Ask for `camera`, `microphone`, `geolocation` or `clipboardWrite`. |
+| `domain` | A dedicated origin for the View, when the host supports it. |
+
+See [Security & CSP](/docs/mcp-apps/security).
+
+## Rules of thumb
+
+- Call every hook before the first early `return`.
+- Use one [`useAppState`](/docs/hooks/use-app-state) per View for state that should survive reloads.
+- Talk to your server with [`useCallTool`](/docs/hooks/use-call-tool), not `fetch`, unless you set `csp.connectDomains`.
+- Keep the View useful in a 320 px wide frame; check it with the inspector's mobile device.
+
+## Hot reload
+
+In `moonpeak dev`, saving a View hot-swaps the component and keeps its state. Saving the `resource` config or a tool takes effect on the next call without a page reload.
+
+
+---
+
+# Runtime APIs
+
+Source: https://moonpeak-ai.com/docs/app-framework/runtime-apis/
+
+Hooks from `moonpeak` work in every MCP Apps host. Hooks from `moonpeak/chatgpt` and `moonpeak/claude` are safe to call anywhere and return empty values outside their host.
+
+## Tool data
+
+| Hook | Returns |
+|---|---|
+| [useToolData](/docs/hooks/use-tool-data) | `{ input, output, content, isPending, isError, isStreaming, isCancelled, tool, result }` |
+| [useToolInput](/docs/hooks/use-tool-input) | the tool input |
+| [useToolOutput](/docs/hooks/use-tool-output) | the structured output |
+| [useToolResult](/docs/hooks/use-tool-result) | the raw `CallToolResult` |
+
+## Host context
+
+| Hook | Returns |
+|---|---|
+| [useTheme](/docs/hooks/use-theme) | `"light" \| "dark"` |
+| [useDisplayMode](/docs/hooks/use-display-mode) | `"inline" \| "pip" \| "fullscreen"` |
+| [useRequestDisplayMode](/docs/hooks/use-request-display-mode) | a function to request a mode, plus `available` |
+| [useHostContext](/docs/hooks/use-host-context) | the whole host context |
+| [useLocale](/docs/hooks/use-locale) · [useTimeZone](/docs/hooks/use-time-zone) | locale and IANA time zone |
+| [usePlatform](/docs/hooks/use-platform) · [useDeviceCapabilities](/docs/hooks/use-device-capabilities) | `web/desktop/mobile`, touch and hover |
+| [useSafeArea](/docs/hooks/use-safe-area) · [useContainerSize](/docs/hooks/use-container-size) · [useMaxHeight](/docs/hooks/use-max-height) | layout limits |
+
+## Host
+
+| Hook | Returns |
+|---|---|
+| [useHost](/docs/hooks/use-host) | `{ name, version }` of the host |
+| [useHostCapabilities](/docs/hooks/use-host-capabilities) | what the host supports |
+| [useConnection](/docs/hooks/use-connection) | `{ status, ready, error }` |
+| [useApp](/docs/hooks/use-app) | the raw MCP Apps SDK `App` |
+
+## Actions
+
+| Hook | Does |
+|---|---|
+| [useCallTool](/docs/hooks/use-call-tool) | call a tool on your server through the host |
+| [useSendMessage](/docs/hooks/use-send-message) | post a message as the user |
+| [useUpdateModelContext](/docs/hooks/use-update-model-context) | tell the model something silently |
+| [useOpenLink](/docs/hooks/use-open-link) · [useDownloadFile](/docs/hooks/use-download-file) · [useLog](/docs/hooks/use-log) | host actions |
+
+## State
+
+| Hook | Does |
+|---|---|
+| [useAppState](/docs/hooks/use-app-state) | one state object per View, persisted in ChatGPT, optionally shared with the model |
+| [useResultState](/docs/hooks/use-result-state) | local state that resets on every new result |
+
+## Host extras
+
+| Hook | From |
+|---|---|
+| [useIsChatGPT](/docs/hooks/use-is-chat-gpt), [useWidgetState](/docs/hooks/use-widget-state), [useOpenAiGlobal](/docs/hooks/use-open-ai-global), [useUploadFile](/docs/hooks/use-upload-file), [useRequestModal](/docs/hooks/use-request-modal), [useUserAgent](/docs/hooks/use-user-agent) | `moonpeak/chatgpt` |
+| [useIsClaude](/docs/hooks/use-is-claude), [useClaudeStyles](/docs/hooks/use-claude-styles) | `moonpeak/claude` |
+
+## Helpers
+
+```ts
+import { isHost, connect } from "moonpeak";
+isHost(useHost(), "claude");   // forgiving host-name check
+```
+
+`connect()` is called for you when a View mounts. Call it yourself only if you render without moonpeak's entry (for example in a test harness).
+
+
+---
+
+# ChatGPT Apps
+
+Source: https://moonpeak-ai.com/docs/app-framework/chatgpt/
+
+ChatGPT Apps are MCP Apps. Every moonpeak resource carries both the MCP Apps metadata and the older ChatGPT Apps SDK keys, so ChatGPT renders your Views without extra work:
+
+| moonpeak | ChatGPT key |
+|---|---|
+| tool `resource` | `openai/outputTemplate` |
+| tool `invoking`, `invoked` | `openai/toolInvocation/invoking`, `.../invoked` |
+| tool `visibility: ["app"]` | `openai/visibility: "private"` and `openai/widgetAccessible: true` |
+| resource `description` | `openai/widgetDescription` |
+| resource `prefersBorder` | `openai/widgetPrefersBorder` |
+| resource `csp` | `openai/widgetCSP` |
+
+## ChatGPT-only hooks
+
+```tsx
+import { useIsChatGPT, useWidgetState, useOpenAiGlobal, useUploadFile, useRequestModal, useUserAgent } from "moonpeak/chatgpt";
+```
+
+They read `window.openai` and do nothing outside ChatGPT. Prefer the portable hooks when one exists: [`useAppState`](/docs/hooks/use-app-state) already saves to ChatGPT's widget state.
+
+## Try it in ChatGPT
+
+1. Deploy over HTTPS (see [Deployment](/docs/guides/deployment)).
+2. In ChatGPT: Settings → Apps → enable **Developer mode** → **Create app**.
+3. Enter `https://your-domain/mcp` and save.
+4. In a new chat, ask for something your tool handles.
+
+The inspector's ChatGPT host replicates `window.openai` (globals, widget state, display modes), so most issues show up locally first.
+
+
+---
+
+# Claude connectors
+
+Source: https://moonpeak-ai.com/docs/app-framework/claude/
+
+Claude renders MCP Apps natively. Deploy your server and add it as a connector:
+
+1. Deploy over HTTPS (see [Deployment](/docs/guides/deployment)).
+2. In Claude: Settings → Connectors → **Add custom connector**.
+3. Enter `https://your-domain/mcp`.
+4. Enable the connector in a chat and ask for something your tool handles.
+
+## Claude-only hooks
+
+```tsx
+import { useIsClaude, useClaudeStyles } from "moonpeak/claude";
+
+const vars = useClaudeStyles();   // fonts and colors Claude sends in host context
+```
+
+moonpeak already applies host style variables to the document, so `var(--font-sans)` and friends work in your CSS in every host that sends them.
+
+## Auth
+
+If your server needs a user's credentials, see [Authorization](/docs/guides/authorization).
+
+
+---
+
+# MCP server
+
+Source: https://moonpeak-ai.com/docs/app-framework/mcp-server/
+
+`moonpeak dev` and `moonpeak start` both build an MCP server from your project. You can also use the pieces yourself from `moonpeak/server`:
+
+```ts
+import { createMcpServer, createHandler, createNodeHandler, resourceUri, RESOURCE_MIME_TYPE } from "moonpeak/server";
+```
+
+| Export | What it does |
+|---|---|
+| `createMcpServer(opts)` | An `McpServer` (MCP TypeScript SDK v2) with every tool and `ui://` resource registered. |
+| `createHandler(opts)` | A Fetch handler `(Request) => Promise<Response>` for Workers, Hono, Deno, Bun, Next.js. Stateless: one server per request. |
+| `createNodeHandler(opts)` | A Node `(req, res)` handler for `http.createServer` and Express. |
+| `resourceUri(app, name)` | `ui://<app>/<name>.html` |
+| `RESOURCE_MIME_TYPE` | `text/html;profile=mcp-app` |
+
+`opts` is `{ name, version?, instructions?, tools, resources }`. The easiest way to get it is from a build:
+
+```ts
+import { loadBuilt } from "moonpeak/server";   // reads dist/server.mjs + dist/resources (Node)
+const opts = await loadBuilt(process.cwd());
+```
+
+or by importing `dist/server.mjs` and reading the HTML files yourself (see [Production server](/docs/app-framework/production-server)).
+
+## Transport
+
+Streamable HTTP at `/mcp`, stateless. `POST` carries JSON-RPC; the optional `GET` stream answers `405` because the server never pushes. That is spec-compliant and every host handles it.
+
+
+---
+
+# Production server
+
+Source: https://moonpeak-ai.com/docs/app-framework/production-server/
+
+```bash
+moonpeak build     # dist/resources/<view>.html, dist/server.mjs, dist/manifest.json
+moonpeak start     # serves /mcp and /health on $PORT or 8000
+```
+
+`dist/server.mjs` bundles your tools (dependencies stay external, so install them in production). Each `dist/resources/*.html` is one self-contained View.
+
+## Endpoints
+
+| Path | |
+|---|---|
+| `/mcp` | the MCP server (Streamable HTTP) |
+| `/health` | `{ ok, name, version, tools }` for load balancers |
+
+## Mount it yourself
+
+```ts
+// Express
+import express from "express";
+import { createNodeHandler, loadBuilt } from "moonpeak/server";
+
+const app = express();
+app.all("/mcp", await createNodeHandler(await loadBuilt(process.cwd())));
+app.listen(8000);
+```
+
+```ts
+// Cloudflare Workers, Hono, Deno, Bun
+import { createHandler } from "moonpeak/server";
+import * as built from "./dist/server.mjs";
+// however your runtime imports text files (Wrangler text rules, Bun, Deno...)
+import moon from "./dist/resources/moon.html";
+import calendar from "./dist/resources/calendar.html";
+const html = { moon, calendar };
+
+const handle = createHandler({
+  ...built.app,
+  tools: built.tools,
+  resources: built.resources.map((r) => ({ ...r, html: () => html[r.name] })),
+});
+export default { fetch: (req) => (new URL(req.url).pathname === "/mcp" ? handle(req) : new Response("ok")) };
+```
+
+Then put it behind HTTPS. See [Deployment](/docs/guides/deployment).
+
+
+---
+
+# useToolData
+
+Source: https://moonpeak-ai.com/docs/hooks/use-tool-data/
+
+```ts
+import { useToolData } from "moonpeak";
+
+useToolData<In, Out>(): ToolData<In, Out>
+```
+
+Everything about the tool call this View was opened for: the input, your handler's structured output, the raw result and its state.
+
+## Returns
+
+| Field | Type | Meaning |
+|---|---|---|
+| `input` | `In | undefined` | Tool arguments. While the model is still writing them, the partial input. |
+| `output` | `Out | undefined` | The `structuredContent` your handler returned. |
+| `content` | `ContentBlock[] | undefined` | The result's content blocks (text the model sees). |
+| `isPending` | `boolean` | No result yet and not cancelled. Show a skeleton. |
+| `isStreaming` | `boolean` | The host is still streaming the input. |
+| `isError` | `boolean` | The tool returned `isError: true` (your handler threw). |
+| `isCancelled` | `boolean` | The user or host cancelled the call. |
+| `tool` | `{ name, title?, description? }` | Which tool this View belongs to. |
+| `result` | `CallToolResult | undefined` | The whole result, including `_meta`. |
+
+## Example
+
+```tsx
+import { useToolData } from "moonpeak";
+
+export default function Moon() {
+  const { output, isPending, isError, content } = useToolData<{ date?: string }, { phase: string }>();
+  if (isError) return <p>{content?.[0]?.text}</p>;
+  if (isPending) return <p>Reading the sky…</p>;
+  return <h1>{output?.phase}</h1>;
+}
+```
+
+## Notes
+
+- Handle `isError` and `isPending` before reading `output`.
+- Call every hook before the first early `return`.
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useToolInput
+
+Source: https://moonpeak-ai.com/docs/hooks/use-tool-input/
+
+```ts
+import { useToolInput } from "moonpeak";
+
+useToolInput<In>(): In | undefined
+```
+
+Just the tool input (or the partial input while it streams).
+
+## Example
+
+```tsx
+const input = useToolInput<{ date?: string }>();
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useToolOutput
+
+Source: https://moonpeak-ai.com/docs/hooks/use-tool-output/
+
+```ts
+import { useToolOutput } from "moonpeak";
+
+useToolOutput<Out>(): Out | undefined
+```
+
+Just the structured content your handler returned.
+
+## Example
+
+```tsx
+const output = useToolOutput<{ phase: string }>();
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useToolResult
+
+Source: https://moonpeak-ai.com/docs/hooks/use-tool-result/
+
+```ts
+import { useToolResult } from "moonpeak";
+
+useToolResult<Out>(): CallToolResult<Out> | undefined
+```
+
+The raw `CallToolResult`: `content`, `structuredContent`, `isError` and `_meta`.
+
+## Example
+
+```tsx
+const result = useToolResult();
+const meta = result?._meta;
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useTheme
+
+Source: https://moonpeak-ai.com/docs/hooks/use-theme/
+
+```ts
+import { useTheme } from "moonpeak";
+
+useTheme(): "light" | "dark"
+```
+
+The host's theme. Defaults to `"light"` before the host reports one. moonpeak also applies the host's CSS variables to the document.
+
+## Example
+
+```tsx
+const theme = useTheme();
+return <div className={`card ${theme}`}>…</div>;
+```
+
+## Notes
+
+- Style both themes: hosts switch at any time without reloading the View.
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useDisplayMode
+
+Source: https://moonpeak-ai.com/docs/hooks/use-display-mode/
+
+```ts
+import { useDisplayMode } from "moonpeak";
+
+useDisplayMode(): "inline" | "pip" | "fullscreen"
+```
+
+How the host is showing the View right now.
+
+## Example
+
+```tsx
+const mode = useDisplayMode();
+return <div className={`app mode-${mode}`}>…</div>;
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useRequestDisplayMode
+
+Source: https://moonpeak-ai.com/docs/hooks/use-request-display-mode/
+
+```ts
+import { useRequestDisplayMode } from "moonpeak";
+
+useRequestDisplayMode(): ((mode) => Promise<DisplayMode>) & { available: DisplayMode[] }
+```
+
+Ask the host to switch display mode. Resolves to the mode the host actually granted; `available` lists what this host allows.
+
+## Example
+
+```tsx
+const requestMode = useRequestDisplayMode();
+
+{requestMode.available.includes("fullscreen") && (
+  <button onClick={() => requestMode("fullscreen")}>Expand</button>
+)}
+```
+
+## Notes
+
+- Hosts may refuse a mode. Render from `useDisplayMode()`, not from what you asked for.
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useHostContext
+
+Source: https://moonpeak-ai.com/docs/hooks/use-host-context/
+
+```ts
+import { useHostContext } from "moonpeak";
+
+useHostContext(): HostContext
+```
+
+The whole host context object: theme, display modes, locale, time zone, platform, device capabilities, safe areas, container dimensions, tool info and style variables.
+
+## Example
+
+```tsx
+const ctx = useHostContext();
+console.log(ctx.platform, ctx.containerDimensions);
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useLocale
+
+Source: https://moonpeak-ai.com/docs/hooks/use-locale/
+
+```ts
+import { useLocale } from "moonpeak";
+
+useLocale(): string
+```
+
+The host's locale (BCP 47), falling back to the browser's. Use it for `Intl` formatting.
+
+## Example
+
+```tsx
+const locale = useLocale();
+const day = new Date(date).toLocaleDateString(locale, { weekday: "long" });
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useTimeZone
+
+Source: https://moonpeak-ai.com/docs/hooks/use-time-zone/
+
+```ts
+import { useTimeZone } from "moonpeak";
+
+useTimeZone(): string
+```
+
+The user's IANA time zone as reported by the host, falling back to the browser's.
+
+## Example
+
+```tsx
+const tz = useTimeZone(); // "Asia/Jakarta"
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# usePlatform
+
+Source: https://moonpeak-ai.com/docs/hooks/use-platform/
+
+```ts
+import { usePlatform } from "moonpeak";
+
+usePlatform(): "web" | "desktop" | "mobile"
+```
+
+Where the host is running. Defaults to `"web"`.
+
+## Example
+
+```tsx
+const compact = usePlatform() === "mobile";
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useDeviceCapabilities
+
+Source: https://moonpeak-ai.com/docs/hooks/use-device-capabilities/
+
+```ts
+import { useDeviceCapabilities } from "moonpeak";
+
+useDeviceCapabilities(): { touch?: boolean; hover?: boolean }
+```
+
+Whether the device has touch input and hover. Use it instead of guessing from screen size.
+
+## Example
+
+```tsx
+const { hover } = useDeviceCapabilities();
+// show tooltips only when hover exists
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useSafeArea
+
+Source: https://moonpeak-ai.com/docs/hooks/use-safe-area/
+
+```ts
+import { useSafeArea } from "moonpeak";
+
+useSafeArea(): { top; right; bottom; left }
+```
+
+Insets (px) the View must keep clear, for notches and host chrome, mostly in fullscreen on mobile.
+
+## Example
+
+```tsx
+const s = useSafeArea();
+return <div style={{ paddingTop: s.top, paddingBottom: s.bottom }}>…</div>;
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useContainerSize
+
+Source: https://moonpeak-ai.com/docs/hooks/use-container-size/
+
+```ts
+import { useContainerSize } from "moonpeak";
+
+useContainerSize(): { width?; height?; maxWidth?; maxHeight? }
+```
+
+The space the host gives the View, as reported in host context.
+
+## Example
+
+```tsx
+const { width } = useContainerSize();
+const columns = (width ?? 600) > 520 ? 7 : 4;
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useMaxHeight
+
+Source: https://moonpeak-ai.com/docs/hooks/use-max-height/
+
+```ts
+import { useMaxHeight } from "moonpeak";
+
+useMaxHeight(): number | undefined
+```
+
+The tallest the View may grow (`maxHeight`, or `height` when the host sets a fixed size).
+
+## Example
+
+```tsx
+const max = useMaxHeight();
+return <div style={{ maxHeight: max, overflowY: "auto" }}>…</div>;
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useHost
+
+Source: https://moonpeak-ai.com/docs/hooks/use-host/
+
+```ts
+import { useHost } from "moonpeak";
+
+useHost(): { name: string; version?: string } | null
+```
+
+Name and version of the host rendering the View. `isHost(host, "claude")` is a forgiving check.
+
+## Example
+
+```tsx
+import { useHost, isHost } from "moonpeak";
+const host = useHost();
+const inClaude = isHost(host, "claude");
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useHostCapabilities
+
+Source: https://moonpeak-ai.com/docs/hooks/use-host-capabilities/
+
+```ts
+import { useHostCapabilities } from "moonpeak";
+
+useHostCapabilities(): Record<string, unknown> | null
+```
+
+What the host supports (for example `updateModelContext`, `openLinks`, `downloadFile`). Feature-detect before showing a control.
+
+## Example
+
+```tsx
+const caps = useHostCapabilities();
+const canDownload = Boolean(caps?.downloadFile);
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useConnection
+
+Source: https://moonpeak-ai.com/docs/hooks/use-connection/
+
+```ts
+import { useConnection } from "moonpeak";
+
+useConnection(): { status: "connecting" | "ready" | "error"; error; ready: boolean }
+```
+
+State of the postMessage connection to the host.
+
+## Example
+
+```tsx
+const { ready, error } = useConnection();
+if (error) return <p>Could not reach the host.</p>;
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useApp
+
+Source: https://moonpeak-ai.com/docs/hooks/use-app/
+
+```ts
+import { useApp } from "moonpeak";
+
+useApp(): App | null
+```
+
+The underlying `App` instance from the official MCP Apps SDK (`@modelcontextprotocol/ext-apps`), for anything the hooks don't cover.
+
+## Example
+
+```tsx
+const app = useApp();
+await app?.readServerResource({ uri: "ui://my-app/data" });
+```
+
+## Notes
+
+- `null` until the View has connected.
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useCallTool
+
+Source: https://moonpeak-ai.com/docs/hooks/use-call-tool/
+
+```ts
+import { useCallTool } from "moonpeak";
+
+useCallTool(): (name: string, args?: object) => Promise<CallToolResult>
+```
+
+Call a tool on your MCP server through the host. Throws an `Error` with the tool's text when the result has `isError: true` (the result is on `err.result`).
+
+## Example
+
+```tsx
+const callTool = useCallTool();
+
+async function nextWeek() {
+  const res = await callTool("show-moon", { date: "2026-12-01" });
+  setState({ view: res.structuredContent, selected: 0 });
+}
+```
+
+## Notes
+
+- Tools marked `visibility: ["app"]` can be called here even though the model never sees them.
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useSendMessage
+
+Source: https://moonpeak-ai.com/docs/hooks/use-send-message/
+
+```ts
+import { useSendMessage } from "moonpeak";
+
+useSendMessage(): (text: string) => Promise<unknown>
+```
+
+Post a message into the conversation as the user, which starts a new model turn.
+
+## Example
+
+```tsx
+const sendMessage = useSendMessage();
+<button onClick={() => sendMessage("What should I photograph tonight?")}>Ask</button>
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useUpdateModelContext
+
+Source: https://moonpeak-ai.com/docs/hooks/use-update-model-context/
+
+```ts
+import { useUpdateModelContext } from "moonpeak";
+
+useUpdateModelContext(): (value: string | object) => Promise<unknown>
+```
+
+Tell the model what happened in the View without posting a message. A string becomes text content; an object becomes structured content. The model sees it on its next turn.
+
+## Example
+
+```tsx
+const updateModelContext = useUpdateModelContext();
+await updateModelContext("The user confirmed the plan for 2026-12-09 (ref MP-1A2B3C).");
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useOpenLink
+
+Source: https://moonpeak-ai.com/docs/hooks/use-open-link/
+
+```ts
+import { useOpenLink } from "moonpeak";
+
+useOpenLink(): (url: string) => Promise<unknown>
+```
+
+Ask the host to open a URL. Views run sandboxed, so plain `<a target="_blank">` may be blocked.
+
+## Example
+
+```tsx
+const openLink = useOpenLink();
+<button onClick={() => openLink("https://moonpeak-ai.com")}>Docs</button>
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useDownloadFile
+
+Source: https://moonpeak-ai.com/docs/hooks/use-download-file/
+
+```ts
+import { useDownloadFile } from "moonpeak";
+
+useDownloadFile(): (file: { contents: unknown[] }) => Promise<unknown>
+```
+
+Ask the host to save a file for the user, using MCP resource contents.
+
+## Example
+
+```tsx
+const download = useDownloadFile();
+await download({ contents: [{ uri: "file:///moon.csv", mimeType: "text/csv", text: csv }] });
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useLog
+
+Source: https://moonpeak-ai.com/docs/hooks/use-log/
+
+```ts
+import { useLog } from "moonpeak";
+
+useLog(): (level, data) => void
+```
+
+Send a log message to the host (levels: debug, info, notice, warning, error). The inspector shows them in its Log tab. Never throws.
+
+## Example
+
+```tsx
+const log = useLog();
+log("info", { loaded: events.length });
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useAppState
+
+Source: https://moonpeak-ai.com/docs/hooks/use-app-state/
+
+```ts
+import { useAppState } from "moonpeak";
+
+useAppState<S>(initial: S, options?: { share?: boolean }): [S, (next: S | (prev: S) => S) => S]
+```
+
+State that belongs to this View instance. In ChatGPT it is saved with the message (widget state), so it survives reloads. With `{ share: true }` the model also sees it on its next turn (debounced 400 ms).
+
+## Example
+
+```tsx
+const [state, setState] = useAppState({ selected: 0, more: [] }, { share: true });
+setState((s) => ({ ...s, selected: 2 }));
+```
+
+## Notes
+
+- It holds ONE object per View. Use it once, put every field in that object and pass pieces down. moonpeak warns in the console if it is used twice.
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useResultState
+
+Source: https://moonpeak-ai.com/docs/hooks/use-result-state/
+
+```ts
+import { useResultState } from "moonpeak";
+
+useResultState<S>(initial: S | (result) => S): [S, (next: S) => void]
+```
+
+Like `useState`, but resets whenever a new tool result arrives. Good for UI state tied to one result, like an open row.
+
+## Example
+
+```tsx
+const [open, setOpen] = useResultState<number | null>(null);
+```
+
+## Works in
+
+Every MCP Apps host: ChatGPT, Claude, VS Code, Goose and the moonpeak inspector.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useIsChatGPT
+
+Source: https://moonpeak-ai.com/docs/hooks/use-is-chat-gpt/
+
+```ts
+import { useIsChatGPT } from "moonpeak/chatgpt";
+
+useIsChatGPT(): boolean  ·  isChatGPT(): boolean
+```
+
+True when the View runs inside ChatGPT (the `window.openai` global is present).
+
+## Example
+
+```tsx
+import { useIsChatGPT } from "moonpeak/chatgpt";
+const chatgpt = useIsChatGPT();
+```
+
+## Works in
+
+ChatGPT. Safe to call anywhere: elsewhere it returns an empty value or does nothing.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useWidgetState
+
+Source: https://moonpeak-ai.com/docs/hooks/use-widget-state/
+
+```ts
+import { useWidgetState } from "moonpeak/chatgpt";
+
+useWidgetState<S>(): [S | undefined, (v: S) => void]
+```
+
+ChatGPT's raw widget state. Prefer `useAppState`, which uses it in ChatGPT and works in every other host too.
+
+## Example
+
+```tsx
+const [saved, save] = useWidgetState<{ tab: number }>();
+```
+
+## Works in
+
+ChatGPT. Safe to call anywhere: elsewhere it returns an empty value or does nothing.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useOpenAiGlobal
+
+Source: https://moonpeak-ai.com/docs/hooks/use-open-ai-global/
+
+```ts
+import { useOpenAiGlobal } from "moonpeak/chatgpt";
+
+useOpenAiGlobal<T>(key: string): T | undefined
+```
+
+Read a `window.openai` global (for example `maxHeight`, `locale`, `userAgent`) and re-render when ChatGPT changes it. `undefined` outside ChatGPT.
+
+## Example
+
+```tsx
+const maxHeight = useOpenAiGlobal<number>("maxHeight");
+```
+
+## Works in
+
+ChatGPT. Safe to call anywhere: elsewhere it returns an empty value or does nothing.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useUploadFile
+
+Source: https://moonpeak-ai.com/docs/hooks/use-upload-file/
+
+```ts
+import { useUploadFile } from "moonpeak/chatgpt";
+
+useUploadFile(): (file: File) => Promise<{ fileId: string } | null>
+```
+
+Upload a file through ChatGPT. Resolves to `null` in hosts without uploads.
+
+## Example
+
+```tsx
+const upload = useUploadFile();
+const res = await upload(input.files[0]);
+```
+
+## Works in
+
+ChatGPT. Safe to call anywhere: elsewhere it returns an empty value or does nothing.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useRequestModal
+
+Source: https://moonpeak-ai.com/docs/hooks/use-request-modal/
+
+```ts
+import { useRequestModal } from "moonpeak/chatgpt";
+
+useRequestModal(): (opts: object) => Promise<unknown>
+```
+
+Ask ChatGPT to open a modal. A no-op elsewhere.
+
+## Example
+
+```tsx
+const requestModal = useRequestModal();
+```
+
+## Works in
+
+ChatGPT. Safe to call anywhere: elsewhere it returns an empty value or does nothing.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useUserAgent
+
+Source: https://moonpeak-ai.com/docs/hooks/use-user-agent/
+
+```ts
+import { useUserAgent } from "moonpeak/chatgpt";
+
+useUserAgent(): unknown
+```
+
+ChatGPT's user agent info (device type, capabilities). `undefined` outside ChatGPT.
+
+## Example
+
+```tsx
+const ua = useUserAgent();
+```
+
+## Works in
+
+ChatGPT. Safe to call anywhere: elsewhere it returns an empty value or does nothing.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useIsClaude
+
+Source: https://moonpeak-ai.com/docs/hooks/use-is-claude/
+
+```ts
+import { useIsClaude } from "moonpeak/claude";
+
+useIsClaude(): boolean
+```
+
+True when the host reports itself as Claude.
+
+## Example
+
+```tsx
+import { useIsClaude } from "moonpeak/claude";
+const claude = useIsClaude();
+```
+
+## Works in
+
+Claude. Safe to call anywhere: elsewhere it returns an empty value.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# useClaudeStyles
+
+Source: https://moonpeak-ai.com/docs/hooks/use-claude-styles/
+
+```ts
+import { useClaudeStyles } from "moonpeak/claude";
+
+useClaudeStyles(): Record<string, string | undefined>
+```
+
+The style variables Claude sends in host context (fonts, colors), so a View can match the chat around it.
+
+## Example
+
+```tsx
+const vars = useClaudeStyles();
+<div style={{ fontFamily: vars["--font-sans"] }}>…</div>
+```
+
+## Works in
+
+Claude. Safe to call anywhere: elsewhere it returns an empty value.
+
+See all hooks in [Runtime APIs](/docs/app-framework/runtime-apis).
+
+---
+
+# moon
+
+Source: https://moonpeak-ai.com/docs/resources/moon/
+
+```bash
+npx moonpeak new my-app moon
+```
+
+| Part | File |
+|---|---|
+| View | `src/resources/moon/moon.tsx`, `moon.css` |
+| Tools | `src/tools/show-moon.ts` (with View), `src/tools/moon-facts.ts` (text only) |
+| Tests | `tests/simulations/show-moon.json`, `moon-facts.json`, `tests/e2e/moon.spec.ts`, `tests/evals/moon.eval.json` |
+
+## What it shows
+
+- Reading tool data with [`useToolData`](/docs/hooks/use-tool-data) and handling pending and error states.
+- Calling the same tool again from the View ("Week →") with [`useCallTool`](/docs/hooks/use-call-tool), keeping the new result in [`useAppState`](/docs/hooks/use-app-state).
+- Posting a follow-up question with [`useSendMessage`](/docs/hooks/use-send-message).
+- Asking for fullscreen with [`useRequestDisplayMode`](/docs/hooks/use-request-display-mode) and styling per display mode.
+- A text-only sibling tool (`moon-facts`), so evals can check the model picks the right one.
+
+The moon math in `src/lib/moon.ts` is real (synodic month from a known new moon), so no API is needed.
+
+
+---
+
+# calendar
+
+Source: https://moonpeak-ai.com/docs/resources/calendar/
+
+```bash
+npx moonpeak new my-app calendar
+```
+
+| Part | File |
+|---|---|
+| View | `src/resources/calendar/calendar.tsx`, `calendar.css` |
+| Tool | `src/tools/moon-calendar.ts` (`from?`, `count` 1-12) |
+| Tests | `tests/simulations/moon-calendar.json`, `tests/e2e/calendar.spec.ts`, `tests/evals/calendar.eval.json` |
+
+## What it shows
+
+- A horizontal scroll-snap carousel with previous and next buttons that works with touch, mouse and keyboard.
+- **Pagination through the host**: "Load 4 more" calls `moon-calendar` again from the View and appends the result.
+- **Shared state**: the selected card and loaded pages live in `useAppState(..., { share: true })`, so the model knows which phase the user picked.
+- A schema limit (`count` max 12) with a simulation proving out-of-range input is a tool error.
+
+
+---
+
+# review
+
+Source: https://moonpeak-ai.com/docs/resources/review/
+
+```bash
+npx moonpeak new my-app review
+```
+
+| Part | File |
+|---|---|
+| View | `src/resources/review/review.tsx`, `review.css` |
+| Tools | `src/tools/plan-night.ts` (model-visible, with View), `src/tools/confirm-plan.ts` (app-only) |
+| Tests | `tests/simulations/plan-night.json`, `confirm-plan.json`, `tests/e2e/review.spec.ts`, `tests/evals/review.eval.json` |
+
+## The pattern
+
+1. The model calls `plan-night` with a date and place. It returns a **proposal** (`status: "proposed"`) with sky darkness and targets, and suggests a darker night when the moon is bright.
+2. The View shows the proposal with **Confirm plan** and **Pick another night**.
+3. **Confirm** calls `confirm-plan` with [`useCallTool`](/docs/hooks/use-call-tool). That tool has `visibility: ["app"]`, so hosts never offer it to the model: only the user's click can confirm. The View then tells the model with [`useUpdateModelContext`](/docs/hooks/use-update-model-context).
+4. **Decline** posts a follow-up with [`useSendMessage`](/docs/hooks/use-send-message), asking for the darker night.
+
+The decision is kept in `useAppState`, so a confirmed plan stays confirmed after a reload. Use the same shape for anything the model should propose but the user must approve: bookings, payments, sending email.
+
+
+---
+
+# moonpeak new
+
+Source: https://moonpeak-ai.com/docs/cli/new/
+
+```bash
+npx moonpeak new [name] [resources] [--install | --no-install] [-y]
+```
+
+| Argument | |
+|---|---|
+| `name` | Folder and package name. Asked for when missing (default `moonpeak-app`). |
+| `resources` | Comma-separated: `moon`, `calendar`, `review`, or `all`. Asked for when missing. |
+| `--install` / `--no-install` | Install dependencies, or don't, without asking. |
+| `-y`, `--yes` | Accept every default. |
+
+Outside a terminal (CI, scripts) `new` never prompts: it uses the defaults and does not install.
+
+```bash
+npx moonpeak new moon-app calendar,review --install
+pnpm dlx moonpeak new moon-app          # uses pnpm for the install and next steps
+```
+
+The target folder must be empty or missing.
+
+
+---
+
+# moonpeak dev
+
+Source: https://moonpeak-ai.com/docs/cli/dev/
+
+```bash
+moonpeak dev [--port 3000] [--open]
+```
+
+Starts one HTTP server with:
+
+| Path | |
+|---|---|
+| `/` | the inspector |
+| `/mcp` | your MCP server (Streamable HTTP) |
+| `/__moonpeak/view/<name>` | a View with Vite HMR |
+
+Saving a View hot-swaps it and keeps its state; saving a tool takes effect on the next call. If the port is busy, the next free one is used. The server only answers on `localhost` (requests with another `Host` header get `403`), which blocks DNS-rebinding attacks from web pages.
+
+`--open` opens the inspector in your browser. The port can also come from `moonpeak.config.js`.
+
+
+---
+
+# moonpeak build
+
+Source: https://moonpeak-ai.com/docs/cli/build/
+
+```bash
+moonpeak build [--out dist]
+```
+
+Writes (into `--out`, default `dist`):
+
+| File | |
+|---|---|
+| `dist/resources/<name>.html` | each View with its JS and CSS inlined |
+| `dist/server.mjs` | your tools and resource configs, bundled (dependencies external) |
+| `dist/manifest.json` | app name, version, tools and resources |
+
+Serve it with [`moonpeak start`](/docs/cli/start) or mount it yourself ([Production server](/docs/app-framework/production-server)).
+
+
+---
+
+# moonpeak start
+
+Source: https://moonpeak-ai.com/docs/cli/start/
+
+```bash
+moonpeak start [--port 8000] [--out dist]
+```
+
+Serves the build in `--out` (default `dist/`) on `0.0.0.0`: `/mcp` and `/health`. The port is `--port`, else `$PORT`, else `8000`. Run `moonpeak build` first.
+
+
+---
+
+# moonpeak inspect
+
+Source: https://moonpeak-ai.com/docs/cli/inspect/
+
+```bash
+moonpeak inspect --server <url> [--header k:v]... [--port 3000]
+```
+
+```bash
+moonpeak inspect --server http://localhost:8000/mcp
+moonpeak inspect --server https://api.example.com/mcp --header "authorization:Bearer $TOKEN"
+moonpeak inspect --server https://moonpeak-ai.com/mcp
+```
+
+The inspector proxies `/mcp` to the server (adding your headers), lists its tools, reads `ui://` resources with `resources/read` and renders them exactly like a host. Simulations come from `tests/simulations/` in the current folder, so you can keep fixtures for a server that moonpeak didn't build (`moonpeak test init --server` writes them). See [Remote servers](/docs/inspector/remote).
+
+
+---
+
+# moonpeak test
+
+Source: https://moonpeak-ai.com/docs/cli/test/
+
+```bash
+moonpeak test [--filter text]          # schemas, Views, simulations (in-process)
+moonpeak test --e2e                    # Playwright against the inspector
+moonpeak test --visual [--update]      # @visual screenshot tests
+moonpeak test --eval                   # model evals
+moonpeak test --server <url> [--header k:v]   # all of the above against another server
+moonpeak test init [--server <url>]    # write a simulation per tool
+```
+
+| Option | |
+|---|---|
+| `--filter <text>` | only tools or simulations whose name contains the text |
+| `--e2e` | runs your Playwright config; excludes `@visual` tests |
+| `--visual` | runs only `@visual` tests; records missing baselines |
+| `--update` | with `--visual`: re-record every baseline |
+| `--eval` | runs `tests/evals/*.eval.json`; needs provider keys |
+| `--server <url>` | test a remote server instead of this project |
+| `--header k:v` | extra request header, repeatable |
+
+In a folder without `src/tools` that has a `moonpeak.test.json` (`{ "server": "https://..." }`, written by `test init --server`), `moonpeak test` tests that server automatically.
+
+Exit code is `0` when everything passed, `1` otherwise, so it drops into CI. See [Testing Framework](/docs/testing).
+
+
+---
+
+# moonpeak upgrade
+
+Source: https://moonpeak-ai.com/docs/cli/upgrade/
+
+```bash
+moonpeak upgrade
+```
+
+Installs `moonpeak@latest` with the package manager that ran the command. `moonpeak --version` prints the installed version.
+
+
+---
+
+# Testing Framework
+
+Source: https://moonpeak-ai.com/docs/testing/
+
+moonpeak tests at five levels. Start with the first and add the others when you need them.
+
+| Level | Command | Needs | Speed |
+|---|---|---|---|
+| [In-process checks](/docs/testing/unit) | `moonpeak test` | nothing | ~1 s |
+| [E2E](/docs/testing/e2e) | `moonpeak test --e2e` | Chromium (Playwright) | seconds |
+| [Visual regression](/docs/testing/visual) | `moonpeak test --visual` | Chromium | seconds |
+| [Evals](/docs/testing/evals) | `moonpeak test --eval` | provider API keys | depends on the model |
+| [Any MCP server](/docs/testing/any-server) | `--server <url>` | a running server | same as above |
+
+All of them read the same [simulations](/docs/testing/simulations): JSON fixtures that also drive the inspector, so the scenario you look at is the scenario you test.
+
+```text
+  moonpeak test my-app
+
+  ✓ schema     plan-night
+  ✓ view       ui://my-app/review.html
+  ✓ sim        plan-night#dark-new-moon-night
+  ✗ sim        plan-night#bad-date
+      expected isError true, got false
+
+  1 failed · 21 checks · 1.1s
+```
+
+Ready-made CI setup: [CI](/docs/testing/ci).
+
+
+---
+
+# Simulations
+
+Source: https://moonpeak-ai.com/docs/testing/simulations/
+
+One file per tool in `tests/simulations/<tool>.json`, holding one simulation or an array:
+
+```json
+[
+  {
+    "name": "full moon",
+    "prompt": "What does the moon look like on Nov 24, 2026?",
+    "input": { "date": "2026-11-24" },
+    "expect": { "output": { "phase": "Full Moon", "week": { "$length": 7 } } }
+  },
+  {
+    "name": "mocked crescent",
+    "input": {},
+    "output": { "phase": "Waxing Crescent", "illumination": 0.11 },
+    "host": { "name": "claude", "theme": "dark", "device": "mobile" }
+  },
+  {
+    "name": "bad date",
+    "input": { "date": "soon" },
+    "expect": { "isError": true, "text": "not a date" }
+  }
+]
+```
+
+## Fields
+
+| Field | |
+|---|---|
+| `name` | Shown in the inspector and test output. In a file with several simulations the id is `<tool>#<slug of name>` (e.g. `show-moon#full-moon`); a file with one simulation uses the tool name as its id. |
+| `tool` | Which tool; defaults to the file name. |
+| `prompt` | What a user might ask. Shown in the inspector's chat. |
+| `input` | Tool arguments. |
+| `output` / `result` | **Mock** the tool result (`output` = structuredContent, `result` = a whole CallToolResult). The handler is not called, so you can design a View before the backend exists. |
+| `expect` | What `moonpeak test` checks (below). |
+| `host` | Inspector settings for this scenario: `name` (`chatgpt` or `claude`), `theme`, `displayMode` (`inline`, `pip`, `fullscreen`), `device` (`desktop`, `tablet`, `mobile`), `locale`. |
+
+## Expectations
+
+| Key | Passes when |
+|---|---|
+| `isError` | the result's `isError` matches |
+| `text` | the result's text contains the string (or every string in an array) |
+| `output` | **partial match** against `structuredContent` |
+
+Inside `output`:
+
+| Matcher | Example | Matches |
+|---|---|---|
+| literal | `"phase": "Full Moon"` | equal value |
+| object | `{ "week": {...} }` | listed keys only, extra keys ignored |
+| array | `[{ "phase": "Full Moon" }]` | element by element, partial |
+| `"re:..."` | `"re:^MP-[0-9A-Z]{6}$"` | regular expression |
+| `"*"` | `"ref": "*"` | any value, as long as the key exists |
+| `$length` | `{ "$length": 7 }` | array length |
+| `$minLength` | `{ "$minLength": 1 }` | at least that many |
+
+## Writing them for an existing server
+
+```bash
+moonpeak test init --server http://localhost:8000/mcp
+```
+
+writes a starter simulation per tool (with example input built from its schema) plus `moonpeak.test.json`. Running it again only adds files for new tools.
+
+
+---
+
+# In-process checks
+
+Source: https://moonpeak-ai.com/docs/testing/unit/
+
+```bash
+moonpeak test [--filter plan-night]
+```
+
+Runs your real handlers in-process over an in-memory MCP transport:
+
+1. **Setup**: the project has tools. An empty project fails loudly instead of passing.
+2. **Schema**: every tool lists with a valid input schema (and output schema if you set one).
+3. **View**: every `ui://` resource builds and returns HTML with the MCP Apps MIME type.
+4. **Simulations**: every simulation with `expect` runs against the handler (or its mocked output) and is checked.
+
+Nothing leaves your machine. Use `--filter` to run one tool or simulation.
+
+
+---
+
+# E2E testing
+
+Source: https://moonpeak-ai.com/docs/testing/e2e/
+
+```bash
+npx playwright install chromium   # once
+moonpeak test --e2e
+```
+
+moonpeak starts the inspector for your project and runs your Playwright config. Tests import from `moonpeak/test`:
+
+```ts
+import { test, expect } from "moonpeak/test";
+
+test("renders in Claude dark mode", async ({ inspector }) => {
+  const view = await inspector.open({ tool: "show-moon", sim: "show-moon#full-moon", host: "claude", theme: "dark" });
+  await expect(view.getByRole("heading", { name: "Full Moon" })).toBeVisible();
+});
+
+test("asking posts a message", async ({ inspector }) => {
+  const view = await inspector.open({ tool: "show-moon", sim: "show-moon#full-moon" });
+  await view.getByRole("button", { name: "Ask about this night" }).click();
+  await expect(inspector.sentMessages()).toContainText("full moon");
+});
+
+test("tool output", async ({ mcp }) => {
+  expect(await mcp.call("show-moon", { date: "2026-11-24" })).toHaveStructuredContent({ phase: "Full Moon" });
+});
+```
+
+## `inspector` fixture
+
+| Member | |
+|---|---|
+| `open({ tool, sim, host, theme, device, mode })` | opens the inspector with those settings and returns a frame locator for the View once it has rendered |
+| `view()` | the current View's frame locator |
+| `sentMessages()` | locator for messages the View posted |
+| `modelContext()` | locator for what the View told the model |
+| `setTheme(t)`, `setDisplayMode(m)` | change host settings without reloading the View |
+| `page` | the Playwright page |
+
+## `mcp` fixture
+
+| Member | |
+|---|---|
+| `call(name, args)` | call a tool, returns the `CallToolResult` |
+| `listTools()` | the server's tools, with `_meta` |
+| `client` | the raw MCP client |
+
+## Matchers
+
+`toHaveStructuredContent(partial)`, `toBeError()` and `toHaveTextContent(text)`, using the same partial matching as simulations.
+
+
+---
+
+# Visual regression
+
+Source: https://moonpeak-ai.com/docs/testing/visual/
+
+```ts
+test("@visual crescent in both hosts", async ({ inspector }) => {
+  for (const host of ["chatgpt", "claude"] as const) {
+    const view = await inspector.open({ tool: "show-moon", sim: "show-moon#mocked-crescent", host });
+    await expect(view.locator(".moon-app")).toHaveScreenshot(`crescent-${host}.png`, { maxDiffPixelRatio: 0.01 });
+  }
+});
+```
+
+```bash
+moonpeak test --visual            # runs @visual tests; records missing baselines
+moonpeak test --visual --update   # re-record after an intended change
+```
+
+`--e2e` skips `@visual` tests, so functional runs stay fast. Use a **mocked** simulation for screenshots so data never changes between runs.
+
+Baselines are platform specific (fonts render differently on Windows, macOS and Linux). Record them on the platform that checks them, usually CI, and keep `__screenshots__` out of git otherwise.
+
+
+---
+
+# Evals
+
+Source: https://moonpeak-ai.com/docs/testing/evals/
+
+```json
+// tests/evals/moon.eval.json
+{
+  "models": ["claude-opus-5-5", "gpt-5"],
+  "runs": 3,
+  "passRate": 1,
+  "system": "You are a helpful astronomy assistant.",
+  "cases": [
+    { "prompt": "what does the moon look like on 2026-11-24?", "expect": { "tool": "show-moon", "args": { "date": "2026-11-24" } } },
+    { "prompt": "quick: moon phase on 2026-12-09, just text", "expect": { "tool": "moon-facts" } },
+    { "prompt": "write me a haiku about autumn", "expect": { "tool": null } }
+  ]
+}
+```
+
+```bash
+ANTHROPIC_API_KEY=... OPENAI_API_KEY=... moonpeak test --eval
+```
+
+For every case and model, moonpeak sends your tool list (names, descriptions, input schemas) and the prompt, `runs` times, and checks which tool the model called:
+
+| `expect` | Passes when |
+|---|---|
+| `"tool": "name"` | the model called that tool |
+| `"tool": null` | the model called no tool |
+| `"args": {...}` | the arguments partially match |
+
+A case passes when at least `passRate` of its runs pass (default: all of them). Tools with `visibility: ["app"]` are never sent, because hosts never show them to the model.
+
+## Providers
+
+| Model names | Needs |
+|---|---|
+| `claude-*` | `ANTHROPIC_API_KEY` and `@anthropic-ai/sdk` in your project |
+| `gpt-*`, `o1`/`o3`/`o4-*`, `chatgpt-*` | `OPENAI_API_KEY` and `openai` in your project |
+
+`ANTHROPIC_BASE_URL` and `OPENAI_BASE_URL` are respected, so evals can run against a proxy or a gateway. Evals are the one mode that costs money; keep `runs` small and run them on demand rather than on every push.
+
+
+---
+
+# Any MCP server
+
+Source: https://moonpeak-ai.com/docs/testing/any-server/
+
+Everything in the testing framework works against a server moonpeak didn't build, over Streamable HTTP:
+
+```bash
+# write fixtures for each tool, plus moonpeak.test.json
+moonpeak test init --server http://localhost:8000/mcp
+
+# edit tests/simulations/*.json, then
+moonpeak test                       # picks the server up from moonpeak.test.json
+moonpeak test --server http://localhost:8000/mcp --header "authorization:Bearer $TOKEN"
+
+# look at its Views
+moonpeak inspect --server http://localhost:8000/mcp
+```
+
+The folder only needs `tests/simulations/` (and optionally `tests/e2e/`, `tests/evals/`). No `src/`, no build.
+
+If the server can't be reached, moonpeak says so with the URL instead of a stack trace, and exits `1`.
+
+
+---
+
+# CI
+
+Source: https://moonpeak-ai.com/docs/testing/ci/
+
+```yaml
+# .github/workflows/test.yml
+name: test
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npx moonpeak test
+      - run: npx playwright install --with-deps chromium
+      - run: npx moonpeak test --e2e
+```
+
+For a server in another language, start it in the background first, then point `--server` at it.
+
+Pin `ubuntu-24.04`: Playwright's `--with-deps` installs system packages and only supports the Ubuntu versions it knows. Run `--eval` in a separate, manually triggered workflow with your provider keys as secrets.
+
+
+---
+
+# Inspector
+
+Source: https://moonpeak-ai.com/docs/inspector/
+
+```bash
+moonpeak dev                                         # your project
+moonpeak inspect --server https://moonpeak-ai.com/mcp  # any server
+```
+
+The inspector is a real MCP Apps host: it connects to your server with the MCP client, reads `ui://` resources and renders them in a sandboxed iframe through the official `AppBridge`, exactly like ChatGPT and Claude do.
+
+## Sidebar
+
+| Control | |
+|---|---|
+| Tool | every tool on the server; tools with a View first |
+| Simulation | fixtures for that tool; picking one runs it |
+| Host | ChatGPT-style or Claude-style chrome, host info and capabilities |
+| Theme | light or dark, sent live to the View |
+| Device | desktop, tablet or mobile width (mobile also reports a touch platform) |
+| Display mode | inline, picture-in-picture or fullscreen |
+| Input | edit the arguments and **Run** the real handler |
+| Output | edit the structured content and **Apply** to re-render without a backend |
+| Log | every bridge message and `useLog` call |
+
+## What the View can do
+
+Calls to `callTool`, `sendMessage`, `updateModelContext`, `openLink`, `downloadFile` and display mode requests are handled like a host would: tools run against your server, messages appear in the chat, model context appears in a panel, links open in a new tab and downloads save. In the ChatGPT host, `window.openai` is there too (globals, widget state).
+
+Everything you set lives in the URL. See [URL parameters](/docs/inspector/url-parameters).
+
+
+---
+
+# URL parameters
+
+Source: https://moonpeak-ai.com/docs/inspector/url-parameters/
+
+```text
+http://localhost:3000/?tool=show-moon&sim=show-moon%23full-moon&host=claude&theme=dark&device=mobile&mode=fullscreen
+```
+
+| Parameter | Values | Default |
+|---|---|---|
+| `tool` | a tool name | first tool with a View |
+| `sim` | a simulation id (`tool#name`, URL-encode the `#` as `%23`) | first simulation of the tool |
+| `host` | `chatgpt`, `claude` | `chatgpt` |
+| `theme` | `light`, `dark` | `light` |
+| `device` | `desktop`, `tablet`, `mobile` | `desktop` |
+| `mode` | `inline`, `pip`, `fullscreen` | `inline` |
+| `locale` | BCP 47 tag | the browser's |
+| `panel` | `input`, `output`, `log` | `input` |
+
+E2E tests open the inspector through the same parameters (`inspector.open({...})`).
+
+
+---
+
+# Remote servers
+
+Source: https://moonpeak-ai.com/docs/inspector/remote/
+
+```bash
+moonpeak inspect --server https://api.example.com/mcp --header "authorization:Bearer $TOKEN"
+```
+
+- The inspector runs on localhost and proxies `/mcp` to the server, adding the headers server-side, so tokens never reach the page.
+- Views are loaded with `resources/read`, like a host does, and rendered in the same sandbox.
+- Simulations come from `tests/simulations/` in the folder you ran the command in.
+- Servers that don't offer the optional `GET` stream (they answer `405`) are handled quietly.
+
+Try it on the live demo: `npx moonpeak inspect --server https://moonpeak-ai.com/mcp`.
+
+
+---
+
+# MCP Apps
+
+Source: https://moonpeak-ai.com/docs/mcp-apps/
+
+An **MCP App** is an MCP tool that comes with a UI. The protocol is the [MCP Apps extension](https://github.com/modelcontextprotocol/ext-apps) to the Model Context Protocol, supported by ChatGPT (where they are called ChatGPT Apps), Claude, VS Code, Goose and others.
+
+## The pieces
+
+| Piece | What it is |
+|---|---|
+| **Tool** | A normal MCP tool whose definition carries `_meta.ui.resourceUri`. |
+| **UI resource** | An HTML document at a `ui://` URI with MIME type `text/html;profile=mcp-app`. |
+| **View** | That HTML running in a sandboxed iframe in the host. |
+| **Bridge** | A small JSON-RPC protocol over `postMessage` between the View and the host. |
+
+## What happens on a tool call
+
+1. The model calls your tool. The host sees `_meta.ui.resourceUri` and reads the resource with `resources/read`.
+2. The host renders the HTML in a sandboxed iframe and connects the bridge.
+3. The host sends the View its **host context** (theme, display mode, locale, size...) and the **tool input**, then the **tool result** when your handler returns.
+4. The View can call tools, post messages, update model context, open links or ask for another display mode. The host decides whether to allow each request.
+
+In moonpeak, steps 1 to 3 are the framework's job. Your View reads the result with [`useToolData`](/docs/hooks/use-tool-data) and acts with the [action hooks](/docs/app-framework/runtime-apis#actions).
+
+## Why it matters
+
+The same server works in every host that supports MCP Apps. You don't build a ChatGPT version and a Claude version: you build one MCP App and test it in both host styles with the [inspector](/docs/inspector).
+
+
+---
+
+# Lifecycle
+
+Source: https://moonpeak-ai.com/docs/mcp-apps/lifecycle/
+
+| Stage | `useConnection().status` | `useToolData()` |
+|---|---|---|
+| Mounted, bridge connecting | `connecting` | `isPending: true` |
+| Connected, model still writing arguments | `ready` | `isStreaming: true`, partial `input` |
+| Arguments final, tool running | `ready` | `input` set, `isPending: true` |
+| Result arrived | `ready` | `output`, `content`, `isPending: false` |
+| Tool threw | `ready` | `isError: true`, message in `content` |
+| User cancelled | `ready` | `isCancelled: true` |
+
+A View may also be shown again later for an old message (for example after a page reload in ChatGPT). Keep anything the user changed in [`useAppState`](/docs/hooks/use-app-state) so it comes back.
+
+When a View calls a tool itself with [`useCallTool`](/docs/hooks/use-call-tool), that result comes back as the promise's value. It does not replace the result the View was opened with; store it in state if you render from it.
+
+
+---
+
+# Display modes & layout
+
+Source: https://moonpeak-ai.com/docs/mcp-apps/display-modes/
+
+| Mode | Where | Typical use |
+|---|---|---|
+| `inline` | in the message list, as wide as the chat | cards, small tables, carousels |
+| `pip` | a floating window that stays while the user scrolls | timers, players, live status |
+| `fullscreen` | covers the chat | maps, editors, long lists |
+
+Read the current mode with [`useDisplayMode`](/docs/hooks/use-display-mode) and request a change with [`useRequestDisplayMode`](/docs/hooks/use-request-display-mode). The host may refuse; `available` lists the modes it allows.
+
+## Sizing
+
+- **Height**: inline Views grow to their content; moonpeak reports size changes to the host automatically. Respect [`useMaxHeight`](/docs/hooks/use-max-height) and scroll inside the View beyond it.
+- **Width**: assume anything from 320 px (phones) to about 760 px. Test with the inspector's `mobile` device.
+- **Safe areas**: in fullscreen on phones, pad by [`useSafeArea`](/docs/hooks/use-safe-area).
+
+
+---
+
+# State persistence
+
+Source: https://moonpeak-ai.com/docs/mcp-apps/state/
+
+[`useAppState`](/docs/hooks/use-app-state) holds one object per View instance:
+
+```tsx
+const [state, setState] = useAppState({ selected: 0, more: [] }, { share: true });
+```
+
+| Where | What happens |
+|---|---|
+| ChatGPT | saved as the message's widget state, restored when the View is shown again |
+| Other hosts | kept for as long as the View lives |
+| `{ share: true }` | also sent to the model as context (debounced 400 ms), so "the one I picked" makes sense to it |
+
+Use [`useResultState`](/docs/hooks/use-result-state) for throwaway UI state that should reset when a new result arrives.
+
+Anything that must outlive the conversation (orders, saved plans) belongs on your server: call a tool to save it.
+
+
+---
+
+# Tool visibility
+
+Source: https://moonpeak-ai.com/docs/mcp-apps/visibility/
+
+```ts
+export const tool = {
+  title: "Confirm stargazing plan",
+  description: "Confirm a proposed plan. Called from the review View only.",
+  visibility: ["app"],
+};
+```
+
+| `visibility` | Model can call | View can call |
+|---|---|---|
+| `["model", "app"]` (default) | yes | yes |
+| `["model"]` | yes | no |
+| `["app"]` | no | yes |
+
+moonpeak writes `_meta.ui.visibility` on the tool, plus `openai/visibility: "private"` and `openai/widgetAccessible: true` for ChatGPT, whether or not the tool has a View of its own. Hosts leave app-only tools out of the model's tool list, and `moonpeak test --eval` does too.
+
+Use app-only tools for anything that needs the user's explicit action: confirming, paying, deleting. The [review](/docs/resources/review) resource is a full example.
+
+App-only tools are still reachable by anyone who can call your server directly, so check permissions in the handler as you would for any endpoint.
+
+
+---
+
+# Security & CSP
+
+Source: https://moonpeak-ai.com/docs/mcp-apps/security/
+
+Hosts render Views in a sandboxed iframe with a strict Content Security Policy. By default a View can run its own inlined JS and CSS (which is how `moonpeak build` ships it) and talk to the host over the bridge. It cannot fetch other origins, load remote scripts or open popups on its own.
+
+## Allowing more
+
+```tsx
+export const resource = {
+  title: "Map",
+  csp: {
+    connectDomains: ["https://api.example.com"],     // fetch / WebSocket
+    resourceDomains: ["https://tiles.example.com"],  // images, fonts, scripts
+  },
+  permissions: { geolocation: {} },
+};
+```
+
+moonpeak sends these as MCP Apps `_meta.ui.csp` / `permissions` and as ChatGPT's `openai/widgetCSP`. Ask only for what you use; hosts may review apps that ask for more.
+
+## Good practice
+
+- Prefer [`useCallTool`](/docs/hooks/use-call-tool) over `fetch`: the call goes through the host to your server, with no CSP entry and no secrets in the View.
+- Never put API keys in a View. Everything in it is visible to the user.
+- Treat tool input as untrusted: validate with `schema`, and check permissions in handlers, including app-only ones.
+- Use [`useOpenLink`](/docs/hooks/use-open-link) for links so the host can show its own confirmation.
+
+
+---
+
+# Tool results
+
+Source: https://moonpeak-ai.com/docs/mcp-apps/tool-results/
+
+A `CallToolResult` has three parts, read by different consumers:
+
+| Part | Read by | Put here |
+|---|---|---|
+| `content` | the **model** | a short text summary the model can talk about |
+| `structuredContent` | the **View** (and the model, in hosts that pass it) | the data the View renders |
+| `_meta` | the **View** only | data the model should not see (ids, large payloads, signed URLs) |
+
+When your handler returns a plain object, moonpeak puts it in `structuredContent` and a JSON copy in `content`. For large data, return the shape yourself so the model gets a summary:
+
+```ts
+export default async function ({ from }) {
+  const events = upcomingPhases(parseDate(from), 8);
+  return {
+    content: [{ type: "text", text: `Next: ${events[0].phase} on ${events[0].date}.` }],
+    structuredContent: { from, events },
+  };
+}
+```
+
+Throwing returns `isError: true` with your message as text. The View sees `isError` in [`useToolData`](/docs/hooks/use-tool-data); [`useCallTool`](/docs/hooks/use-call-tool) throws it as an `Error`.
+
+
+---
+
+# Deployment
+
+Source: https://moonpeak-ai.com/docs/guides/deployment/
+
+Hosts need a public HTTPS URL. The simplest setup is a VPS with Node and a reverse proxy.
+
+## Node on a server
+
+```bash
+npm ci
+npm run build
+PORT=8000 npm start          # /mcp and /health
+```
+
+Keep it running with systemd, pm2 or a container. A minimal systemd unit:
+
+```ini
+[Service]
+WorkingDirectory=/opt/my-app
+ExecStart=/usr/bin/node node_modules/moonpeak/bin/moonpeak.mjs start --port 8000
+Environment=NODE_ENV=production
+Restart=always
+```
+
+## HTTPS with nginx
+
+```nginx
+location = /mcp {
+    proxy_pass http://127.0.0.1:8000;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header Connection "";
+    proxy_buffering off;          # responses are streamed (SSE)
+    proxy_read_timeout 120s;
+}
+```
+
+Get a certificate with `certbot --nginx -d your-domain`. Add `limit_req` on `/mcp` if the server is public.
+
+## Serverless and edge
+
+Mount `createHandler` from `moonpeak/server` (Fetch API) on Workers, Deno Deploy, Bun or a Next.js route; see [Production server](/docs/app-framework/production-server). The handler is stateless, so it scales horizontally without sticky sessions.
+
+## After deploying
+
+```bash
+npx moonpeak test --server https://your-domain/mcp    # same checks, against production
+```
+
+Then add `https://your-domain/mcp` in Claude (Connectors) or ChatGPT (Developer mode → Create app). The moonpeak demo at `https://moonpeak-ai.com/mcp` is deployed exactly this way.
+
+
+---
+
+# Authorization
+
+Source: https://moonpeak-ai.com/docs/guides/authorization/
+
+moonpeak's server has no built-in auth: put it behind the auth your platform already uses.
+
+## Protecting your server
+
+Mount the handler behind a middleware that checks the request before it reaches `/mcp`:
+
+```ts
+import express from "express";
+import { createNodeHandler, loadBuilt } from "moonpeak/server";
+
+const mcp = await createNodeHandler(await loadBuilt(process.cwd()));
+const app = express();
+app.all("/mcp", (req, res, next) => {
+  if (req.headers.authorization !== `Bearer ${process.env.MCP_TOKEN}`) return res.status(401).end();
+  next();
+}, mcp);
+app.listen(8000);
+```
+
+For per-user access in Claude and ChatGPT, implement OAuth 2.1 as described in the MCP authorization spec (protected resource metadata plus an authorization server); hosts run the user through the login flow when they add your connector. Handlers can then read the verified user from the request in your middleware.
+
+## Testing protected servers
+
+```bash
+moonpeak test --server https://api.example.com/mcp --header "authorization:Bearer $TOKEN"
+moonpeak inspect --server https://api.example.com/mcp --header "authorization:Bearer $TOKEN"
+```
+
+The inspector adds headers server-side in its proxy, so the token is never exposed to the page.
+
+
+---
+
+# Patterns
+
+Source: https://moonpeak-ai.com/docs/guides/patterns/
+
+## Detail card
+
+One result, rendered richly, with buttons that call the same tool again with new arguments. Example: [moon](/docs/resources/moon).
+
+## Carousel
+
+A horizontal list of cards for browsing. Load more pages with `useCallTool` and keep them in `useAppState` with `share: true`, so the model knows which card the user picked. Example: [calendar](/docs/resources/calendar).
+
+## Review and confirm
+
+The model proposes an action, the user approves it in the View, and an app-only tool performs it. The model cannot skip the click. Example: [review](/docs/resources/review).
+
+## Text tool next to a UI tool
+
+Offer a text-only tool for quick answers and a UI tool for exploring. Describe both clearly and add eval cases that check the model picks the right one.
+
+## Summary for the model, data for the View
+
+Return a short `content` summary and the full data in `structuredContent` (see [Tool results](/docs/mcp-apps/tool-results)), so long lists don't fill the model's context.
+
+## Keep the chat moving
+
+After an important action, either post a message ([`useSendMessage`](/docs/hooks/use-send-message)) when the model should respond, or update model context ([`useUpdateModelContext`](/docs/hooks/use-update-model-context)) when it only needs to know.
+
+
+---
+
+# Troubleshooting
+
+Source: https://moonpeak-ai.com/docs/guides/troubleshooting/
+
+## The View stays on its loading state
+
+- The handler threw before returning: check the inspector's Log tab and the dev server output.
+- `useAppState` is used in more than one component: it holds one object per View, so the calls overwrite each other. Use it once and pass values down (moonpeak warns in the console).
+- You read `output` before checking `isPending`.
+
+## "the View is not connected to a host yet"
+
+An action hook was called during the first render. Call actions from event handlers or effects, not while rendering.
+
+## A tool doesn't appear in ChatGPT or Claude
+
+- The server isn't reachable over HTTPS from the internet: run `npx moonpeak test --server https://your-domain/mcp` from another machine.
+- The tool is `visibility: ["app"]`: by design, the model never sees it.
+- The host cached the old tool list: remove and re-add the connector or app.
+
+## The model picks the wrong tool
+
+Rewrite the `description` to say when to use the tool (and when not to), then measure with [evals](/docs/testing/evals).
+
+## `moonpeak test --e2e` can't find a browser
+
+Run `npx playwright install chromium` once (in CI, `npx playwright install --with-deps chromium` on `ubuntu-24.04`).
+
+## Visual tests fail on another machine
+
+Baselines are platform specific. Record them where they are checked: `moonpeak test --visual --update` on that platform.
+
+## 403 from the dev server
+
+`moonpeak dev` only answers to `localhost`. Open it as `http://localhost:3000`, not by IP or another host name.
+
+## Something else
+
+Open an issue on [GitHub](https://github.com/ghiansalman30-crypto/moonpeak/issues) with the inspector URL (it contains every setting).

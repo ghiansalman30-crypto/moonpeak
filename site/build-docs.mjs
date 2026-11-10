@@ -1,142 +1,185 @@
-// Builds site/docs/index.html from packages/moonpeak/README.md so the docs never drift.
+// Builds the multi-page docs at site/docs/** from site/docs-src/*.md.
+// Each source file holds several pages, separated by lines like:
+//   @@page slug="testing/evals" title="Evals" description="..."
+// _nav.json sets the sidebar order. Hook pages come from site/docs-src/hooks.mjs.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { marked } from "marked";
-import { NAV } from "./build-pages.mjs";
+import { NAV, FOOTER } from "./build-pages.mjs";
+import { hookPages } from "./docs-src/hooks.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const md = fs.readFileSync(path.join(here, "..", "packages", "moonpeak", "README.md"), "utf8")
-  .replace(/^# moonpeak\n+/, "")
-  .replace(/^## What you get/m, "## Quickstart\n\n```bash\nnpx moonpeak new my-app   # pick resources: moon, calendar, review\ncd my-app\nnpm run dev\n```\n\nOpen http://localhost:3000. Edit `src/resources/moon/moon.tsx` and the View reloads. Edit `src/tools/show-moon.ts` and the next call uses the new code.\n\nTo try it in Claude or ChatGPT, run `moonpeak build && moonpeak start`, expose port 8000 over HTTPS, and add `https://your-host/mcp` as a custom connector (Claude) or app (ChatGPT developer mode).\n\n## What you get");
+const SRC = path.join(here, "docs-src");
+const OUT = path.join(here, "docs");
+const SITE = "https://moonpeak-ai.com";
+const REPO = "https://github.com/ghiansalman30-crypto/moonpeak";
+const index = fs.readFileSync(path.join(here, "index.html"), "utf8");
+const ICON = index.match(/<link rel="icon"[^>]*>/)[0];
 
-const slug = (s) => s.toLowerCase().replace(/<[^>]+>/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const toc = [];
-const renderer = new marked.Renderer();
-renderer.heading = ({ tokens, depth }) => {
-  const text = marked.Parser.parseInline(tokens);
-  const id = slug(text);
-  if (depth === 2) toc.push({ id, text });
-  return `<h${depth} id="${id}"><a href="#${id}">${text}</a></h${depth}>`;
+// ------------------------------------------------------------------ collect pages
+const pages = new Map();
+for (const file of fs.readdirSync(SRC).filter((f) => f.endsWith(".md"))) {
+  const text = fs.readFileSync(path.join(SRC, file), "utf8").replace(/\r\n/g, "\n");
+  for (const chunk of text.split(/^@@page /m).slice(1)) {
+    const nl = chunk.indexOf("\n");
+    const attrs = Object.fromEntries([...chunk.slice(0, nl).matchAll(/(\w+)="([^"]*)"/g)].map((m) => [m[1], m[2]]));
+    if (attrs.slug === undefined || !attrs.title) throw new Error(`${file}: page without slug/title`);
+    if (pages.has(attrs.slug)) throw new Error(`duplicate page ${attrs.slug}`);
+    pages.set(attrs.slug, { ...attrs, md: chunk.slice(nl + 1).trim() + "\n", source: `site/docs-src/${file}` });
+  }
+}
+for (const p of hookPages()) pages.set(p.slug, { ...p, source: "site/docs-src/hooks.mjs" });
+
+const nav = JSON.parse(fs.readFileSync(path.join(SRC, "_nav.json"), "utf8"));
+const order = [];
+for (const g of nav) {
+  g.items = g.items.flatMap((s) => (s === "@hooks" ? hookPages().map((h) => h.slug) : [s]));
+  for (const s of g.items) {
+    if (!pages.has(s)) throw new Error(`_nav.json lists missing page "${s}"`);
+    order.push(s);
+  }
+}
+for (const s of pages.keys()) if (!order.includes(s)) throw new Error(`page "${s}" is not in _nav.json`);
+
+// ------------------------------------------------------------------ render
+const slugify = (s) => s.toLowerCase().replace(/<[^>]+>/g, "").replace(/&[a-z]+;/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+/** relative URL from docs page `from` to docs page `to` ("" is the docs home) */
+const href = (from, to) => {
+  const up = from === "" ? "" : "../".repeat(from.split("/").length);
+  const r = `${up}${to === "" ? "" : /.[a-z0-9]+$/i.test(to) ? to : to + "/"}`;
+  return r || "./";
 };
-const body = marked.parse(md, { renderer });
+// links written as (/docs/x) or (/x) in sources become relative, so the site works anywhere
+const relLinks = (html, from) => {
+  const depth = from === "" ? 0 : from.split("/").length;
+  return html
+    .replace(/href="\/docs\/?([^"#]*?)\/?(#[^"]*)?"/g, (_, to, hash = "") => `href="${href(from, to)}${hash}"`)
+    .replace(/href="\/(?!\/)([^"]*)"/g, (_, rest) => `href="${"../".repeat(depth + 1)}${rest}"`);
+};
 
-const html = `<!doctype html>
+const searchIndex = [];
+const rendered = new Map();
+for (const slug of order) {
+  const p = pages.get(slug);
+  const toc = [];
+  const r = new marked.Renderer();
+  r.heading = ({ tokens, depth }) => {
+    const text = marked.Parser.parseInline(tokens);
+    const id = slugify(text);
+    if (depth === 2 || depth === 3) toc.push({ id, text: text.replace(/<[^>]+>/g, ""), depth });
+    return `<h${depth} id="${id}"><a href="#${id}">${text}</a></h${depth}>`;
+  };
+  r.code = ({ text, lang }) =>
+    `<div class="codeblock"><button class="copy-code" type="button" aria-label="Copy code">copy</button><pre><code${lang ? ` class="lang-${lang}"` : ""}>${text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre></div>`;
+  const body = relLinks(marked.parse(p.md, { renderer: r }), slug);
+  rendered.set(slug, { body, toc });
+  searchIndex.push({
+    s: slug, t: p.title, d: p.description || "", h: toc.map((t) => t.text),
+    x: p.md.replace(/```[\s\S]*?```/g, " ").replace(/\]\([^)]*\)/g, "]").replace(/[#*`>|\-\[\]()]/g, " ").replace(/\s+/g, " ").slice(0, 1600),
+  });
+}
+
+const group = (slug) => nav.find((g) => g.items.includes(slug))?.title;
+const sidebar = (current) =>
+  nav.map((g) => `<div class="sb-group"><b>${g.title}</b>${g.items.map((s) => `<a href="${href(current, s)}"${s === current ? ' class="on" aria-current="page"' : ""}>${pages.get(s).nav || pages.get(s).title}</a>`).join("")}</div>`).join("");
+
+for (const [i, slug] of order.entries()) {
+  const p = pages.get(slug);
+  const { body, toc } = rendered.get(slug);
+  const prev = order[i - 1], next = order[i + 1];
+  const depth = slug === "" ? 0 : slug.split("/").length;
+  const root = "../".repeat(depth + 1); // site root
+  const docsRoot = depth ? "../".repeat(depth) : "./";
+  const title = `${p.title} - moonpeak docs`;
+  const html = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>moonpeak docs</title>
-<meta name="description" content="moonpeak documentation: MCP App framework, hooks, simulations, testing, inspector and deployment." />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='38%25' cy='34%25'%3E%3Cstop offset='0' stop-color='%23fffdf5'/%3E%3Cstop offset='1' stop-color='%23aaa79a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='12' cy='12' r='3.5' fill='%238c897f' fill-opacity='.45'/%3E%3Ccircle cx='20' cy='13' r='2.5' fill='%238c897f' fill-opacity='.4'/%3E%3C/svg%3E" />
+<title>${title}</title>
+<meta name="description" content="${(p.description || p.title).replace(/"/g, "&quot;")}" />
+<meta property="og:title" content="${title}" />
+<link rel="canonical" href="${SITE}/docs/${slug ? slug + "/" : ""}" />
+<link rel="alternate" type="text/markdown" href="index.md" />
+${ICON}
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="../style.css" />
-<link rel="stylesheet" href="../pages.css" />
-<style>
-  .docs-wrap { display: grid; grid-template-columns: 220px 1fr; gap: 48px; max-width: 1180px; margin: 0 auto; padding: 48px clamp(16px, 5vw, 64px) 96px; }
-  .toc { position: sticky; top: 84px; align-self: start; display: flex; flex-direction: column; gap: 4px; font-size: 14.5px; }
-  .toc b { font: 500 12px var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: 8px; }
-  .toc a { color: var(--mute); text-decoration: none; padding: 4px 0; }
-  .toc a:hover { color: var(--text); }
-  article { min-width: 0; }
-  article h2 { font-size: 32px; margin: 56px 0 14px; scroll-margin-top: 84px; }
-  article h2:first-child { margin-top: 0; }
-  article h3 { font-size: 20px; margin: 30px 0 10px; scroll-margin-top: 84px; }
-  article h2 a, article h3 a { text-decoration: none; }
-  article p, article li { color: #c3c8dc; }
-  article pre { font: 13.5px/1.6 var(--mono); background: #0a0d1a; border: 1px solid var(--line); border-radius: 14px; padding: 18px; overflow-x: auto; }
-  article pre code { background: none; border: 0; padding: 0; font-size: inherit; }
-  article table { width: 100%; border-collapse: collapse; font-size: 14.5px; margin: 14px 0; display: block; overflow-x: auto; }
-  article th, article td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  article th { color: var(--mute); font-weight: 500; }
-  article ul { padding-left: 20px; }
-  article a { color: var(--accent); }
-  article hr { border: 0; border-top: 1px solid var(--line); margin: 36px 0; }
-  .lead { font-size: 19px; }
-  .search { width: 100%; margin: 0 0 10px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font: 14px var(--sans); }
-  .search:focus { outline: none; border-color: #3a4775; }
-  .nohits { color: var(--mute); font-size: 13.5px; margin: 6px 0; }
-  .doc-tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; font-size: 13px; }
-  .doc-tools a, .doc-tools button { color: var(--mute); text-decoration: none; border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px; background: transparent; font: 13px var(--sans); cursor: pointer; }
-  .doc-tools a:hover, .doc-tools button:hover { color: var(--text); border-color: #33406b; }
-  article section.hidden-by-search { display: none; }
-  @media (max-width: 820px) { .docs-wrap { grid-template-columns: 1fr; } .toc { position: static; flex-direction: row; flex-wrap: wrap; gap: 4px 14px; } .toc b { width: 100%; } }
-</style>
+<link rel="stylesheet" href="${root}style.css" />
+<link rel="stylesheet" href="${root}pages.css" />
+<link rel="stylesheet" href="${root}docs.css" />
 </head>
-<body>
+<body class="docs-page" data-docs-root="${docsRoot}">
 <div class="sky" aria-hidden="true"></div>
-${NAV("../")}
-<div class="docs-wrap">
-  <aside class="toc"><b>Docs</b><input class="search" type="search" placeholder="Search docs" aria-label="Search docs" />${toc.map((t) => `<a href="#${t.id}">${t.text}</a>`).join("")}<p class="nohits" hidden>No matches</p></aside>
-  <article>
-    <div class="doc-tools"><button type="button" class="copy-md">Copy page as Markdown</button><a href="index.md">View .md</a><a href="llms.txt">llms.txt</a><a href="https://github.com/ghiansalman30-crypto/moonpeak/edit/main/packages/moonpeak/README.md">Edit on GitHub</a></div>
-    ${body.replace("<p><strong>", '<p class="lead"><strong>')}
-  </article>
+${NAV(root)}
+<div class="docs-shell">
+  <aside class="sidebar" aria-label="Docs navigation">
+    <button class="search-open" type="button"><span>Search docs</span><kbd>/</kbd></button>
+    <button class="sb-toggle" type="button" aria-expanded="false">Browse docs <span>${group(slug) || "Docs"} · ${p.title}</span></button>
+    <nav>${sidebar(slug)}</nav>
+  </aside>
+  <main class="doc">
+    <p class="crumb">${group(slug) || "Docs"}</p>
+    <h1>${p.title}</h1>
+    ${p.description ? `<p class="doc-lede">${p.description}</p>` : ""}
+    <div class="doc-tools"><button type="button" class="copy-md">Copy page as Markdown</button><a href="index.md">View .md</a><a href="${REPO}/edit/main/${p.source}">Edit on GitHub</a></div>
+    <article>${body}</article>
+    <nav class="pager">${prev !== undefined ? `<a class="prev" href="${href(slug, prev)}"><span>Previous</span>${pages.get(prev).title}</a>` : "<span></span>"}${next !== undefined ? `<a class="next" href="${href(slug, next)}"><span>Next</span>${pages.get(next).title}</a>` : ""}</nav>
+  </main>
+  <aside class="onpage" aria-label="On this page">${toc.length ? `<b>On this page</b>${toc.map((t) => `<a class="d${t.depth}" href="#${t.id}">${t.text}</a>`).join("")}` : ""}</aside>
 </div>
-<footer>
-  <span class="logo small"><svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="mk-lit" cx="42%" cy="38%" r="64%"><stop offset="0" stop-color="#fffdf5"/><stop offset=".6" stop-color="#e7e3d6"/><stop offset="1" stop-color="#a3a094"/></radialGradient><radialGradient id="mk-limb" r="50%"><stop offset=".72" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#11131c" stop-opacity=".45"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#mk-lit)"/><filter id="mk-soft"><feGaussianBlur stdDeviation="1.6"/></filter><g filter="url(#mk-soft)" opacity=".8"><path fill="#97948a" d="M30.49 51.43 C29.66 54.60 29.97 56.99 29.16 60.14 C28.36 63.28 27.32 68.28 25.66 70.31 C24.00 72.33 21.36 72.04 19.20 72.29 C17.04 72.54 14.28 73.40 12.70 71.81 C11.13 70.23 10.43 65.86 9.73 62.77 C9.04 59.68 8.21 56.40 8.51 53.29 C8.81 50.18 10.73 47.47 11.55 44.11 C12.37 40.75 12.03 35.14 13.41 33.14 C14.80 31.14 17.91 32.39 19.86 32.11 C21.82 31.84 23.27 31.38 25.12 31.49 C26.98 31.60 29.50 31.16 31.00 32.77 C32.50 34.37 34.23 38.03 34.15 41.14 C34.06 44.25 31.32 48.27 30.49 51.43Z"/><path fill="#858279" d="M45.29 28.91 C45.46 30.72 47.49 32.39 46.96 33.83 C46.43 35.28 43.81 36.55 42.12 37.57 C40.43 38.60 38.81 39.32 36.82 39.99 C34.84 40.66 32.02 41.98 30.21 41.59 C28.39 41.20 27.23 39.00 25.91 37.66 C24.60 36.33 22.93 35.18 22.34 33.57 C21.74 31.96 21.67 29.77 22.34 28.00 C23.00 26.23 24.49 23.94 26.30 22.96 C28.11 21.99 30.99 22.47 33.20 22.13 C35.42 21.78 37.46 20.73 39.58 20.88 C41.70 21.02 44.97 21.66 45.92 23.00 C46.87 24.33 45.12 27.11 45.29 28.91Z"/><path fill="#a3a095" d="M59.74 14.86 C60.64 15.54 65.02 16.57 63.85 17.24 C62.69 17.90 56.51 18.42 52.73 18.84 C48.94 19.26 44.54 19.80 41.14 19.75 C37.75 19.69 33.63 19.10 32.36 18.51 C31.10 17.91 33.59 16.93 33.53 16.17 C33.47 15.42 30.62 14.56 32.02 13.96 C33.41 13.35 38.40 13.01 41.91 12.54 C45.42 12.06 50.32 10.99 53.07 11.10 C55.82 11.20 57.33 12.52 58.44 13.15 C59.55 13.78 58.83 14.18 59.74 14.86Z"/><path fill="#827f76" d="M62.34 31.00 C62.21 32.30 61.93 33.46 61.27 34.62 C60.62 35.78 59.65 37.46 58.39 37.96 C57.14 38.46 55.12 38.09 53.73 37.61 C52.34 37.13 50.87 36.18 50.06 35.08 C49.25 33.98 48.88 32.38 48.86 31.00 C48.83 29.62 49.05 27.81 49.90 26.82 C50.75 25.82 52.57 25.40 53.95 25.04 C55.33 24.68 56.83 24.36 58.18 24.66 C59.53 24.96 61.36 25.79 62.06 26.84 C62.75 27.90 62.47 29.70 62.34 31.00Z"/><path fill="#9a978d" d="M50.36 41.00 C50.36 41.72 50.60 42.64 50.15 43.14 C49.70 43.63 48.48 43.91 47.65 43.98 C46.82 44.04 45.94 43.85 45.19 43.54 C44.43 43.24 43.41 42.74 43.12 42.14 C42.84 41.55 43.23 40.70 43.49 39.97 C43.75 39.23 43.97 38.20 44.69 37.76 C45.41 37.31 46.89 37.11 47.81 37.30 C48.72 37.48 49.75 38.22 50.18 38.84 C50.60 39.46 50.37 40.28 50.36 41.00Z"/><path fill="#88857c" d="M71.76 46.25 C71.34 47.55 72.32 49.55 71.52 50.44 C70.72 51.34 68.59 51.24 66.97 51.62 C65.34 52.01 63.24 53.23 61.79 52.76 C60.34 52.30 59.36 50.07 58.25 48.83 C57.14 47.59 55.76 46.67 55.11 45.35 C54.47 44.02 53.97 42.15 54.39 40.87 C54.81 39.60 56.45 38.74 57.63 37.69 C58.80 36.64 59.98 34.59 61.45 34.59 C62.93 34.58 64.78 37.00 66.46 37.66 C68.15 38.32 70.30 37.72 71.56 38.54 C72.82 39.37 74.01 41.35 74.04 42.63 C74.08 43.91 72.18 44.94 71.76 46.25Z"/><path fill="#7f7c73" d="M84.98 35.45 C85.01 36.28 85.17 37.46 84.62 38.12 C84.08 38.78 82.72 39.28 81.71 39.40 C80.70 39.52 79.44 39.23 78.56 38.83 C77.68 38.42 76.91 37.67 76.43 36.96 C75.95 36.24 75.66 35.35 75.66 34.51 C75.67 33.68 75.83 32.50 76.46 31.94 C77.09 31.38 78.47 31.23 79.44 31.16 C80.41 31.09 81.43 31.20 82.26 31.53 C83.09 31.85 83.98 32.46 84.43 33.11 C84.88 33.77 84.95 34.61 84.98 35.45Z"/><path fill="#97948a" d="M78.68 57.00 C78.63 58.24 79.35 59.62 78.97 60.62 C78.60 61.62 77.42 62.33 76.43 63.02 C75.43 63.71 73.95 65.10 73.01 64.79 C72.08 64.48 71.61 62.15 70.81 61.17 C70.02 60.19 68.85 59.99 68.24 58.92 C67.63 57.84 66.85 55.91 67.14 54.72 C67.44 53.53 69.01 52.57 70.00 51.77 C70.99 50.96 72.01 50.09 73.10 49.90 C74.19 49.71 75.53 50.10 76.56 50.65 C77.59 51.19 78.91 52.11 79.26 53.17 C79.62 54.23 78.73 55.76 78.68 57.00Z"/><path fill="#9d9a8f" d="M66.74 61.00 C66.85 61.75 67.09 62.79 66.70 63.45 C66.32 64.11 65.27 64.71 64.42 64.97 C63.56 65.22 62.32 65.29 61.58 64.96 C60.84 64.64 60.55 63.66 59.97 63.00 C59.39 62.34 58.27 61.78 58.10 61.00 C57.93 60.22 58.34 58.92 58.94 58.32 C59.55 57.72 60.83 57.50 61.71 57.38 C62.59 57.26 63.49 57.33 64.22 57.60 C64.95 57.86 65.66 58.40 66.08 58.97 C66.50 59.53 66.64 60.25 66.74 61.00Z"/><path fill="#9d9a8f" d="M45.80 63.00 C45.72 64.00 45.74 65.03 45.14 65.88 C44.53 66.72 43.44 67.33 42.18 68.08 C40.91 68.82 39.13 70.31 37.55 70.34 C35.98 70.37 33.59 69.26 32.73 68.27 C31.88 67.29 32.49 65.53 32.42 64.41 C32.34 63.29 32.21 62.65 32.30 61.56 C32.38 60.48 32.03 58.77 32.93 57.89 C33.83 57.01 36.08 56.40 37.68 56.30 C39.28 56.21 41.22 56.74 42.55 57.34 C43.87 57.94 45.07 58.95 45.62 59.90 C46.16 60.84 45.88 62.00 45.80 63.00Z"/><path fill="#918e84" d="M31.55 66.00 C31.55 66.82 31.64 67.77 31.21 68.46 C30.78 69.15 29.83 69.88 28.97 70.14 C28.12 70.41 26.95 70.31 26.06 70.05 C25.17 69.79 24.19 69.25 23.61 68.58 C23.03 67.90 22.51 66.80 22.59 66.00 C22.68 65.20 23.53 64.40 24.12 63.76 C24.71 63.12 25.32 62.52 26.14 62.18 C26.96 61.84 28.17 61.51 29.02 61.74 C29.86 61.96 30.79 62.83 31.21 63.54 C31.63 64.25 31.55 65.18 31.55 66.00Z"/><path fill="#aca89e" d="M36.00 54.00 C36.09 54.68 36.67 55.60 36.30 56.22 C35.94 56.84 34.68 57.66 33.82 57.72 C32.96 57.77 31.96 56.97 31.16 56.55 C30.36 56.12 29.22 55.74 29.01 55.16 C28.80 54.59 29.50 53.67 29.89 53.09 C30.28 52.52 30.74 51.99 31.36 51.72 C31.97 51.45 32.83 51.39 33.56 51.46 C34.30 51.53 35.36 51.72 35.77 52.14 C36.17 52.57 35.91 53.32 36.00 54.00Z"/></g><circle cx="44" cy="82" r="4" fill="#fffdf5" fill-opacity=".8"/><circle cx="50" cy="50" r="50" fill="url(#mk-limb)"/></svg>moonpeak</span>
-  <span>© 2026 moonpeak contributors · MIT</span>
-  <a href="https://github.com/ghiansalman30-crypto/moonpeak">GitHub</a>
-</footer>
-<script>
-// Wrap each h2 and what follows in a <section> so search can hide whole sections.
-const art = document.querySelector("article");
-for (const h of [...art.querySelectorAll("h2")]) {
-  const sec = document.createElement("section");
-  h.before(sec);
-  let n = h;
-  while (n && !(n !== h && n.tagName === "H2")) { const next = n.nextSibling; sec.append(n); n = next; }
-}
-const q = document.querySelector(".search"), nohits = document.querySelector(".nohits");
-q.addEventListener("input", () => {
-  const term = q.value.trim().toLowerCase();
-  let hits = 0;
-  for (const sec of art.querySelectorAll("section")) {
-    const show = !term || sec.textContent.toLowerCase().includes(term);
-    sec.classList.toggle("hidden-by-search", !show);
-    const a = document.querySelector('.toc a[href="#' + sec.querySelector("h2").id + '"]');
-    if (a) a.hidden = !show;
-    hits += show;
-  }
-  nohits.hidden = hits > 0;
-});
-document.querySelector(".copy-md").addEventListener("click", async (e) => {
-  const b = e.currentTarget;
-  try { await navigator.clipboard.writeText(await (await fetch("index.md")).text()); b.textContent = "Copied"; }
-  catch { b.textContent = "Copy failed"; }
-  setTimeout(() => (b.textContent = "Copy page as Markdown"), 1500);
-});
-</script>
+<div class="search-modal" hidden>
+  <div class="search-box" role="dialog" aria-modal="true" aria-label="Search docs">
+    <input type="search" placeholder="Search the docs" aria-label="Search the docs" />
+    <ol class="search-results"></ol>
+    <p class="search-hint">Enter to open · Esc to close · ${order.length} pages</p>
+  </div>
+</div>
+${FOOTER(root)}
+<script src="${docsRoot}docs.js" defer></script>
 </body>
 </html>
 `;
-fs.writeFileSync(path.join(here, "docs", "index.html"), html);
+  const dir = path.join(OUT, slug);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, "index.html"), html);
+  fs.writeFileSync(path.join(dir, "index.md"), `# ${p.title}\n\n${p.description ? `> ${p.description}\n\n` : ""}${p.md}`);
+}
 
-// Machine-readable docs, like sunpeak's: /llms.txt index + the full page as Markdown.
-const SITE = "https://moonpeak-ai.com";
-fs.writeFileSync(path.join(here, "docs", "index.md"), `# moonpeak docs\n\n${md}`);
+// remove folders of pages that no longer exist
+(function sweep(dir, rel = "") {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (!e.isDirectory()) continue;
+    const r = rel ? `${rel}/${e.name}` : e.name;
+    sweep(path.join(dir, e.name), r);
+    if (!pages.has(r) && ![...pages.keys()].some((k) => k.startsWith(r + "/"))) fs.rmSync(path.join(dir, e.name), { recursive: true, force: true });
+  }
+})(OUT);
+
+fs.writeFileSync(path.join(OUT, "search.json"), JSON.stringify(searchIndex));
+fs.copyFileSync(path.join(SRC, "docs.js"), path.join(OUT, "docs.js"));
+
+// llms.txt (index) and llms-full.txt (every page), like sunpeak's docs
+const url = (s) => `${SITE}/docs/${s ? s + "/" : ""}`;
+const line = (s) => `- [${pages.get(s).title}](${url(s)}index.md)${pages.get(s).description ? `: ${pages.get(s).description}` : ""}`;
 const llms = `# moonpeak
 
 > Server-agnostic MCP testing framework and full-stack MCP App framework. Build, inspect and test MCP Apps (interactive UIs) for ChatGPT, Claude and every MCP Apps host. Open source, MIT, npm package \`moonpeak\`.
 
-Start a project with \`npx moonpeak new\`. A live demo MCP server runs at ${SITE}/mcp.
+Start a project with \`npx moonpeak new\`. A live demo MCP server runs at ${SITE}/mcp. Every page below is also available as Markdown, and ${SITE}/docs/llms-full.txt has all of them in one file.
 
-## Docs
+${nav.map((g) => `## ${g.title}\n\n${g.items.map(line).join("\n")}`).join("\n\n")}
 
-- [Full documentation as Markdown](${SITE}/docs/index.md): everything below on one page
-${toc.map((t) => `- [${t.text.replace(/<[^>]+>/g, "")}](${SITE}/docs/#${t.id})`).join("\n")}
-
-## Pages
+## Site
 
 - [MCP App framework](${SITE}/mcp-app-framework/)
 - [MCP testing framework](${SITE}/testing-framework/)
 - [MCP App inspector](${SITE}/mcp-app-inspector/)
 - [FAQs](${SITE}/faqs/)
-- [Source on GitHub](https://github.com/ghiansalman30-crypto/moonpeak)
-- [Agent skill](https://github.com/ghiansalman30-crypto/moonpeak/blob/main/skills/moonpeak/SKILL.md)
+- [Source on GitHub](${REPO})
 `;
+fs.writeFileSync(path.join(OUT, "llms.txt"), llms);
 fs.writeFileSync(path.join(here, "llms.txt"), llms);
-fs.writeFileSync(path.join(here, "docs", "llms.txt"), llms);
-console.log(`docs: ${toc.length} sections + index.md + llms.txt`);
+fs.writeFileSync(path.join(OUT, "llms-full.txt"), order.map((s) => `# ${pages.get(s).title}\n\nSource: ${url(s)}\n\n${pages.get(s).md}`).join("\n\n---\n\n"));
+console.log(`docs: ${order.length} pages in ${nav.length} groups + search.json + llms.txt + llms-full.txt`);

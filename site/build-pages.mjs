@@ -15,22 +15,30 @@ const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, 
 export const NAV = (base) => `<header class="nav">
   <a class="logo" href="${base}">${LOGO}moonpeak</a>
   <nav>
-    <a href="${base}mcp-app-framework/">App Framework</a>
+    <div class="dd">
+      <button class="dd-btn" type="button" aria-haspopup="true" aria-expanded="false" onclick="var d=this.parentNode;d.classList.toggle('open');this.setAttribute('aria-expanded',d.classList.contains('open'))">App Framework <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="dd-menu">
+        <a href="${base}mcp-app-framework/"><b>MCP App framework</b><span>One codebase for every MCP Apps host</span></a>
+        <a href="${base}chatgpt-app-framework/"><b>ChatGPT App framework</b><span>Build and test ChatGPT Apps</span></a>
+        <a href="${base}claude-connector-framework/"><b>Claude Connector framework</b><span>Connectors with interactive UI</span></a>
+      </div>
+    </div>
     <a href="${base}testing-framework/">Testing Framework</a>
     <a href="${base}mcp-app-inspector/">Inspector</a>
-    <a href="${base}faqs/">FAQs</a>
+    <a href="${base}blog/">Blog</a>
     <a href="${base}docs/">Docs</a>
     <a class="gh" href="${GH}" aria-label="Source on GitHub">${GH_ICON}</a>
   </nav>
   <button class="menu-btn" type="button" aria-label="Menu" aria-expanded="false" onclick="var n=this.closest('.nav');n.classList.toggle('open');this.setAttribute('aria-expanded',n.classList.contains('open'))"><span></span><span></span></button>
   <span class="progress" aria-hidden="true"></span>
-</header>`;
+</header>
+<script>(function(){function shut(e){document.querySelectorAll(".dd.open").forEach(function(d){if(e.type==="keydown"?e.key==="Escape":!d.contains(e.target)){d.classList.remove("open");var b=d.querySelector(".dd-btn");if(b)b.setAttribute("aria-expanded","false")}})}document.addEventListener("click",shut);document.addEventListener("keydown",shut)})();</script>`;
 
 export const FOOTER = (base) => `<footer class="site-foot">
   <div class="foot-brand"><span class="logo small">${LOGO}moonpeak</span><p>Server-agnostic MCP testing framework and full-stack MCP App framework.</p></div>
   <div class="foot-cols">
-    <div><b>Product</b><a href="${base}mcp-app-framework/">App Framework</a><a href="${base}testing-framework/">Testing Framework</a><a href="${base}mcp-app-inspector/">Inspector</a></div>
-    <div><b>Learn</b><a href="${base}docs/">Docs</a><a href="${base}faqs/">FAQs</a><a href="${base}llms.txt">llms.txt</a></div>
+    <div><b>Product</b><a href="${base}mcp-app-framework/">MCP App framework</a><a href="${base}chatgpt-app-framework/">ChatGPT App framework</a><a href="${base}claude-connector-framework/">Claude Connector framework</a><a href="${base}testing-framework/">Testing Framework</a><a href="${base}mcp-app-inspector/">Inspector</a></div>
+    <div><b>Learn</b><a href="${base}docs/">Docs</a><a href="${base}blog/">Blog</a><a href="${base}faqs/">FAQs</a><a href="${base}llms.txt">llms.txt</a></div>
     <div><b>Open source</b><a href="${GH}">GitHub</a><a href="https://www.npmjs.com/package/moonpeak">npm</a><a href="${GH}/blob/main/LICENSE">MIT License</a></div>
   </div>
   <p class="foot-copy">© 2026 moonpeak contributors · MIT · No token, no telemetry</p>
@@ -66,7 +74,7 @@ ${body}
     <div class="cta center">
       <button class="cmd magnetic" data-copy="npx moonpeak new"><span class="prompt">$</span> npx moonpeak new <span class="copy">copy</span></button>
       <a class="btn shine magnetic" href="../docs/">Documentation →</a>
-      <a class="btn ghost" href="${GH}">GitHub</a>
+      <a class="btn ghost gh-btn" href="${GH}">${GH_ICON} GitHub</a>
     </div>
   </section>
 </main>
@@ -84,7 +92,7 @@ const hero = ({ kicker, h1, sub, cmd }) => `  <section class="page-hero">
     <div class="cta">
       <button class="cmd magnetic" data-copy="${esc(cmd)}"><span class="prompt">$</span> ${esc(cmd)} <span class="copy">copy</span></button>
       <a class="btn shine magnetic" href="../docs/">Documentation</a>
-      <a class="btn ghost" href="${GH}">Source</a>
+      <a class="btn ghost gh-btn" href="${GH}">${GH_ICON} Source</a>
     </div>
   </section>`;
 
@@ -150,7 +158,7 @@ export default async function ({ date }) {
     <div>
       <h2>A View is one React component.</h2>
       <p>Twenty-seven typed hooks cover everything a View needs: the tool's input and output, theme, locale, safe areas, container size, display mode requests, per-View state that survives reloads, calling other tools, posting into the chat and updating model context.</p>
-      <a class="more" href="../docs/#hooks">Every hook →</a>
+      <a class="more" href="../docs/app-framework/runtime-apis/">Every hook →</a>
     </div>
     ${code("tsx", `import { useToolData, useTheme, useCallTool } from "moonpeak";
 
@@ -188,7 +196,7 @@ import { createHandler } from "moonpeak/server";`, "deploy")}
     <div>
       <h2>Ship it anywhere.</h2>
       <p><code>moonpeak build</code> inlines every View and bundles your tools. Serve the result with <code>moonpeak start</code>, or mount <code>createHandler</code> on any runtime that speaks Fetch, or <code>createNodeHandler</code> on Express and node:http. Then add the HTTPS URL as a Claude connector or a ChatGPT app.</p>
-      <a class="more" href="../docs/#deploy">Deploy docs →</a>
+      <a class="more" href="../docs/guides/deployment/">Deploy docs →</a>
     </div>
   </section>`,
 });
@@ -255,7 +263,7 @@ const testing = page({
     <div>
       <h2>E2E with real host behaviour.</h2>
       <p>Tests get an <code>inspector</code> fixture that opens your View in a ChatGPT or Claude style host, with theme, device and display mode, and an <code>mcp</code> fixture that calls tools directly. Sent messages and model context are captured so you can assert on them.</p>
-      <a class="more" href="../docs/#testing">Testing docs →</a>
+      <a class="more" href="../docs/testing/">Testing docs →</a>
     </div>
     ${code("ts", `import { test, expect } from "moonpeak/test";
 
@@ -385,8 +393,119 @@ const faqs = page({
   </section>`,
 });
 
-for (const [slug, html] of [["mcp-app-framework", framework], ["testing-framework", testing], ["mcp-app-inspector", inspector], ["faqs", faqs]]) {
+// ---------------------------------------------------------------- ChatGPT Apps
+const chatgpt = page({
+  slug: "chatgpt-app-framework",
+  title: "ChatGPT App framework · build and test ChatGPT Apps | moonpeak",
+  description: "Build ChatGPT Apps with moonpeak: React Views, the ChatGPT Apps SDK metadata written for you, window.openai in the local inspector, and tests that run without a ChatGPT account.",
+  body: `${hero({
+    kicker: "ChatGPT App framework",
+    h1: "Build ChatGPT Apps<br />without the guesswork.",
+    sub: "ChatGPT Apps are MCP Apps. moonpeak writes the ChatGPT Apps SDK metadata for you, replicates <code>window.openai</code> on localhost and tests your app in a ChatGPT-style host before you ever open ChatGPT.",
+    cmd: "npx moonpeak new",
+  })}
+
+  <section class="split" data-reveal>
+    <div>
+      <h2>One app, ChatGPT included.</h2>
+      <p>Every moonpeak resource carries the MCP Apps metadata and the older ChatGPT keys side by side, so the same build renders in ChatGPT, Claude and every other host.</p>
+      ${ticks([
+        "<code>resource</code> becomes <code>openai/outputTemplate</code>.",
+        "<code>invoking</code> / <code>invoked</code> become ChatGPT's status texts.",
+        "App-only tools get <code>openai/visibility: private</code> and <code>openai/widgetAccessible</code>.",
+        "Resource <code>csp</code> becomes <code>openai/widgetCSP</code>.",
+        "<code>useAppState</code> saves to ChatGPT widget state automatically.",
+      ])}
+      <a class="more" href="../docs/app-framework/chatgpt/">ChatGPT Apps docs →</a>
+    </div>
+    ${code("ts", `export const tool = {
+  title: "Show moon phase",
+  description: "Show the moon phase for a date.",
+  resource: "moon",
+  invoking: "Looking up",        // ChatGPT status while running
+  invoked: "Here's the moon",    // ...and after
+};`, "src/tools/show-moon.ts")}
+  </section>
+
+  <section class="split rev" data-reveal>
+    ${code("tsx", `import { useIsChatGPT, useWidgetState, useUploadFile } from "moonpeak/chatgpt";
+
+export default function Gallery() {
+  const chatgpt = useIsChatGPT();
+  const upload = useUploadFile();      // null outside ChatGPT
+  // ...
+}`, "ChatGPT extras")}
+    <div>
+      <h2>ChatGPT extras when you need them.</h2>
+      <p><code>moonpeak/chatgpt</code> exposes widget state, file upload, modals, user agent and any <code>window.openai</code> global. Each hook is safe to call in other hosts, where it returns an empty value.</p>
+    </div>
+  </section>
+
+  <section class="split" data-reveal>
+    <div>
+      <h2>Try it in ChatGPT.</h2>
+      <p>Deploy over HTTPS, then in ChatGPT open Settings → Apps, turn on Developer mode and create an app with your <code>/mcp</code> URL. Or add the live demo, <code>https://moonpeak-ai.com/mcp</code>, to see it first.</p>
+      <a class="more" href="../docs/guides/deployment/">Deployment guide →</a>
+    </div>
+    ${code("bash", `npm run build && npm start      # http://localhost:8000/mcp
+npx moonpeak test --server https://your-domain/mcp`, "ship")}
+  </section>`,
+});
+
+// ---------------------------------------------------------------- Claude connectors
+const claude = page({
+  slug: "claude-connector-framework",
+  title: "Claude Connector framework · connectors with interactive UI | moonpeak",
+  description: "Build Claude connectors that render interactive UI with moonpeak: MCP Apps Views, a Claude-style host on localhost and tests that run without a Claude account.",
+  body: `${hero({
+    kicker: "Claude Connector framework",
+    h1: "Claude connectors<br />with real UI.",
+    sub: "Claude renders MCP Apps natively. moonpeak turns your tools and React Views into a connector, lets you see it in a Claude-style host on localhost and tests it in CI.",
+    cmd: "npx moonpeak new",
+  })}
+
+  <section class="split" data-reveal>
+    <div>
+      <h2>From tool to connector.</h2>
+      ${ticks([
+        "Write a tool in <code>src/tools</code> and its View in <code>src/resources</code>.",
+        "See it in the inspector's Claude host, light or dark, inline or fullscreen.",
+        "Deploy with <code>moonpeak start</code> or <code>createHandler</code>, behind HTTPS.",
+        "In Claude: Settings → Connectors → Add custom connector → your <code>/mcp</code> URL.",
+      ])}
+      <a class="more" href="../docs/app-framework/claude/">Claude connector docs →</a>
+    </div>
+    ${code("bash", `npx moonpeak new my-connector review
+cd my-connector && npm run dev     # Claude host at localhost:3000?host=claude`, "start")}
+  </section>
+
+  <section class="split rev" data-reveal>
+    ${code("tsx", `import { useIsClaude, useClaudeStyles } from "moonpeak/claude";
+
+const vars = useClaudeStyles();   // fonts and colors from Claude
+<div style={{ fontFamily: vars["--font-sans"] }}>…</div>`, "Claude extras")}
+    <div>
+      <h2>Looks at home in Claude.</h2>
+      <p>moonpeak applies the host's style variables to the document, so your CSS can use Claude's fonts and colors. <code>moonpeak/claude</code> adds host detection and the raw style map.</p>
+    </div>
+  </section>
+
+  <section class="split" data-reveal>
+    <div>
+      <h2>Safe actions by design.</h2>
+      <p>Mark a tool <code>visibility: ["app"]</code> and Claude never offers it to the model: only a click in your View can run it. The <code>review</code> starter shows the full propose-then-confirm flow.</p>
+      <a class="more" href="../docs/mcp-apps/visibility/">Tool visibility →</a>
+    </div>
+    ${code("ts", `export const tool = {
+  title: "Confirm stargazing plan",
+  description: "Called from the review View only.",
+  visibility: ["app"],
+};`, "src/tools/confirm-plan.ts")}
+  </section>`,
+});
+
+for (const [slug, html] of [["mcp-app-framework", framework], ["chatgpt-app-framework", chatgpt], ["claude-connector-framework", claude], ["testing-framework", testing], ["mcp-app-inspector", inspector], ["faqs", faqs]]) {
   fs.mkdirSync(path.join(here, slug), { recursive: true });
   fs.writeFileSync(path.join(here, slug, "index.html"), html);
 }
-console.log("pages: mcp-app-framework, testing-framework, mcp-app-inspector, faqs");
+console.log("pages: mcp-app-framework, chatgpt-app-framework, claude-connector-framework, testing-framework, mcp-app-inspector, faqs");

@@ -1,0 +1,17 @@
+/* Blog index and posts (typography comes from docs.css). */
+.blog-index, .post { max-width: 820px; margin: 0 auto; padding: clamp(60px, 9vw, 110px) clamp(16px, 5vw, 32px) 80px; }
+.blog-index h1, .post h1 { font-size: clamp(34px, 5vw, 54px); letter-spacing: -0.025em; line-height: 1.08; margin: 0 0 14px; }
+.post-list { display: flex; flex-direction: column; gap: 14px; margin-top: 34px; }
+.post-card { display: block; padding: 22px 24px; border-radius: 16px; border: 1px solid var(--line); background: linear-gradient(180deg, var(--panel), var(--night-2)); text-decoration: none; color: inherit; }
+.post-card h2 { font-size: 22px; margin: 6px 0 8px; line-height: 1.25; }
+.post-card p { margin: 0 0 10px; color: var(--mute); }
+.post-card:hover { border-color: #33406b; }
+.post .back { display: inline-block; color: var(--mute); text-decoration: none; font-size: 14px; margin-bottom: 26px; }
+.post .back:hover { color: var(--text); }
+.byline { color: var(--mute); font-size: 14px; margin: 0 0 30px; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+.post article { max-width: none; }
+.post article pre { margin: 16px 0; font: 13.5px/1.65 var(--mono); color: #c9d0ea; background: #0a0d1a; border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; overflow-x: auto; }
+.post article pre code { background: none; border: 0; padding: 0; font: inherit; }
+.post-foot { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 48px; padding-top: 26px; border-top: 1px solid var(--line); }
+.rss { margin-top: 26px; font-size: 14px; }
+.rss a { color: var(--mute); }

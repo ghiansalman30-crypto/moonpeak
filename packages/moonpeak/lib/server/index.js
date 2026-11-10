@@ -129,3 +129,21 @@ export async function createNodeHandler(opts) {
 
 /** Alias kept for people coming from other MCP App frameworks. */
 export const createMcpHandlerFor = createHandler;
+
+/**
+ * Load a `moonpeak build` output (dist/server.mjs + dist/resources/*.html) as
+ * server options for createHandler / createNodeHandler. Node only; node built-ins
+ * are imported lazily so this module still loads on Workers.
+ */
+export async function loadBuilt(root = ".", outDir = "dist") {
+  const [{ default: fs }, { default: path }, { pathToFileURL }] = await Promise.all([import("node:fs"), import("node:path"), import("node:url")]);
+  const out = path.resolve(root, outDir);
+  const file = path.join(out, "server.mjs");
+  if (!fs.existsSync(file)) throw new Error(`nothing built yet: run "moonpeak build" first (looked for ${file})`);
+  const mod = await import(pathToFileURL(file).href);
+  const resources = mod.resources.map((r) => {
+    const html = fs.readFileSync(path.join(out, "resources", `${r.name}.html`), "utf8");
+    return { ...r, html: () => html };
+  });
+  return { ...mod.app, tools: mod.tools, resources };
+}

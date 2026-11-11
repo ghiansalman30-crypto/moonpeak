@@ -453,7 +453,8 @@ function shadowPath(p) {
   const $ = (id) => document.getElementById(id);
   $("tsCaTxt").textContent = t.ca;
   $("tsCa").onclick = async () => { try { await navigator.clipboard.writeText(t.ca); $("tsCa").querySelector("i").textContent = "copied"; setTimeout(() => ($("tsCa").querySelector("i").textContent = "copy"), 1500); } catch {} };
-  if (/^https:\/\//.test(t.buyUrl || "")) { $("tsBuy").href = t.buyUrl; $("tsBuy").hidden = false; }
+  // Buy goes to the posted buy link, or to the token's GMGN page on Robinhood Chain
+  $("tsBuy").href = /^https:\/\//.test(t.buyUrl || "") ? t.buyUrl : "https://gmgn.ai/robinhood/token/" + t.ca; $("tsBuy").hidden = false;
   if (/^https:\/\/t\.me\//.test(t.telegram || "")) { $("tsTg").href = t.telegram; $("tsTg").hidden = false; }
   const b = t.burned || {};
   if (b.count) { const n = Number(b.tokens).toLocaleString("en-US", { maximumFractionDigits: 0 }); $("tsBurn").textContent = "burned " + n + " $MOONPEAK" + (b.usd ? " · $" + b.usd + " bought back" : ""); $("tsBurn").hidden = false; }
